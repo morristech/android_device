@@ -150,6 +150,10 @@ import universum.studios.android.device.BroadcastProcessor;
 public interface Battery extends BroadcastProcessor {
 
 	/**
+	 * Provider ====================================================================================
+	 */
+
+	/**
 	 * Interface for provider that may be used to access implementation of {@link Battery}.
 	 *
 	 * @author Martin Albedinsky
@@ -159,8 +163,8 @@ public interface Battery extends BroadcastProcessor {
 		/**
 		 * Provides a singleton implementation of {@link Battery}.
 		 *
-		 * @param context Context used by the battery implementation to access current battery data.
-		 * @return Battery implementation with current battery data already available.
+		 * @param context Context used by the battery implementation to access actual battery data.
+		 * @return Battery implementation with actual battery data already available.
 		 */
 		@NonNull
 		Battery getBattery(@NonNull Context context);

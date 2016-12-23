@@ -18,15 +18,19 @@
  */
 package universum.studios.android.device;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import universum.studios.android.device.screen.Screen;
+
 /**
- * todo: description
+ * Utility class that may be used to check whether the Android device is tablet or not via
+ * {@link #isTablet(Context)}.
  *
  * @author Martin Albedinsky
  */
-public final class AndroidDeviceUtils {
+public final class DeviceUtils {
 
 	/**
 	 * Interface ===================================================================================
@@ -39,7 +43,7 @@ public final class AndroidDeviceUtils {
 	/**
 	 * Log TAG.
 	 */
-	// private static final String TAG = "AndroidDeviceUtils";
+	// private static final String TAG = "DeviceUtils";
 
 	/**
 	 * Identifier for <b>UNKNOWN</b> type of Android powered device.
@@ -134,9 +138,11 @@ public final class AndroidDeviceUtils {
 	 */
 
 	/**
-	 * Checks whether this Android device match tablet specifications or not. <b>Note</b>, that this
-	 * information is only accurate and shouldn't be used for core logic of your application.
-	 * <h3>Specifications to check:</h3>
+	 * Checks whether the current Android device matches tablet specifications or not.
+	 * <p>
+	 * <b>Note</b>, that this information is only accurate and shouldn't be used for core logic of
+	 * any application.
+	 * <h3>Checked specifications:</h3>
 	 * <ul>
 	 * <li>Screen orientation</li>
 	 * <li>{@link universum.studios.android.device.screen.Screen.ScreenRotation}</li>
@@ -145,33 +151,29 @@ public final class AndroidDeviceUtils {
 	 * <li><b>Screen diagonal distance</b></li>
 	 * </ul>
 	 *
-	 * @return {@code True} if this Android device matches tablet specifications, {@code false}
+	 * @return {@code True} if the current Android device matches tablet specifications, {@code false}
 	 * otherwise.
 	 */
+	@SuppressLint("SwitchIntDef")
 	public static boolean isTablet(@NonNull Context context) {
-		// todo:
-		/*final Screen screen = getScreen();
+		final Screen screen = Screen.PROVIDER.getScreen(context);
 		int percentageMatch = 0;
-
 		// Check the default screen orientation.
 		// LANDSCAPE => tablet, PORTRAIT => phone
 		switch (screen.getDefaultOrientation()) {
 			case Screen.ORIENTATION_LANDSCAPE:
 				percentageMatch += TABLET_MATCH_SCREEN_DEFAULT_ORIENTATION_POINTS;
 		}
-
 		// Check screen type. Most of the Android tablet devices have display type LARGE or X-LARGE.
 		switch (screen.getType()) {
 			case LARGE:
 			case XLARGE:
 				percentageMatch += TABLET_MATCH_SCREEN_TYPE_POINTS;
 		}
-
 		// Check screen diagonal distance.
 		if (screen.getDiagonalDistanceInInches() >= MINIMUM_TABLET_DIAGONAL_DISTANCE) {
 			percentageMatch += TABLET_MATCH_SCREEN_DIAGONAL_POINTS;
 		}
-
 		// Check screen density.
 		// Most of Android tablet devices have MDPI or HDPI screen density (in some cases XHDPI too).
 		switch (screen.getDensity()) {
@@ -180,8 +182,7 @@ public final class AndroidDeviceUtils {
 			case XHDPI:
 				percentageMatch += TABLET_MATCH_SCREEN_DENSITY_POINTS;
 		}
-		return percentageMatch >= MINIMUM_TABLET_PERCENTAGE_MATCH;*/
-		return false;
+		return percentageMatch >= MINIMUM_TABLET_PERCENTAGE_MATCH;
 	}
 
 	/**

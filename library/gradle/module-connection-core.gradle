@@ -16,26 +16,21 @@
  * See the License for the specific language governing permissions and limitations under the License.
  * =================================================================================================
  */
-package universum.studios.android.device;
-
-import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.NonNull;
+/**
+ * Library Module options ==========================================================================
+ */
+android {
+    sourceSets {
+        main.manifest.srcFile 'src/connection/core/AndroidManifest.xml'
+        main.java.srcDirs = [
+                'src/connection/core/java'
+        ]
+    }
+}
 
 /**
- * Interface specifying API that is required for all wrappers implementations from the Device library
- * which are relaying on data received via {@link android.content.BroadcastReceiver}.
- *
- * @author Martin Albedinsky
+ * Library Module dependencies =====================================================================
  */
-public interface BroadcastProcessor {
-
-	/**
-	 * Called to process the given <var>intent</var> with data by this broadcast processor.
-	 *
-	 * @param context    Current application context.
-	 * @param intent     Broad-casted intent with data.
-	 * @param receiverId An id of the broadcast receiver which received the given <var>intent</var>.
-	 */
-	void processBroadcast(@NonNull Context context, @NonNull Intent intent, int receiverId);
+dependencies {
+    // None.
 }

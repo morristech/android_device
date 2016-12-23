@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
-import universum.studios.android.device.AndroidDevice;
+import universum.studios.android.device.Device;
 
 /**
  * A {@link android.content.BroadcastReceiver} used by {@link Battery} implementation to receive
@@ -63,7 +63,7 @@ public class BatteryHealthReceiver extends Battery.BatteryBroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final Battery battery = AndroidDevice.getInstance(context).getBattery();
+		final Battery battery = Device.getInstance(context).getBattery();
 		battery.processBroadcast(context, intent, RECEIVER_ID);
 	}
 }

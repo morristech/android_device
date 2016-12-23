@@ -18,11 +18,10 @@
  */
 package universum.studios.android.device.storage;
 
+import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import universum.studios.android.device.util.StorageEditor;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -32,11 +31,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 /**
- * The Storage interface specifies API allowing to create, delete, copy, move files on the current
- * Android device's file system and more. An implementation of this API can be obtained from the
- * {@link AndroidDevice} via {@link AndroidDevice#getStorage()}.
+ * Storage interface specifies API through which an actual information about the Android device's
+ * storage may be accessed. Also this interface may be used to create, delete, copy or move files
+ * on the Android devide's file system.
  * <p>
- * Below are specified methods provided by this API to manage files on the file system:
+ * A storage implementation may be obtained via {@link Storage.Provider#getStorage(Context) Storage.PROVIDER.getStorage(Context)}.
+ * <p>
+ * Below are listed methods to manage files on the file system provided by the this interface:
  *
  * <h3>To create files and directories</h3>
  * <ul>
@@ -97,6 +98,41 @@ import java.util.List;
 public interface Storage {
 
 	/**
+	 * Provider ====================================================================================
+	 */
+
+	/**
+	 * Interface for provider that may be used to access implementation of {@link Storage}.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface Provider {
+
+		/**
+		 * Provides a singleton implementation of {@link Storage}.
+		 *
+		 * @param context Context used by the storage implementation to access actual storage data.
+		 * @return Storage implementation with actual storage data already available.
+		 */
+		@NonNull
+		Storage getStorage(@NonNull Context context);
+	}
+
+	/**
+	 * A {@link Provider} implementation that may be used to access implementation of {@link Storage}.
+	 */
+	Provider PROVIDER = new Provider() {
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public Storage getStorage(@NonNull Context context) {
+			return StorageImpl.getInstance(context);
+		}
+	};
+
+	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -110,26 +146,23 @@ public interface Storage {
 
 	/**
 	 * Represents an empty set of flags for storage API. This is only for informative purpose for
-	 * {@link Storage.Result} objects when there are used storage API methods
-	 * which does not takes any flags.
+	 * {@link Storage.Result} objects when there are used storage API methods which does not takes
+	 * any flags.
 	 */
 	int NO_FLAGS = -1;
 
 	/**
-	 * Copied flag from {@link universum.studios.android.device.util.StorageEditor#DEFAULT} for better
-	 * access.
+	 * Copied flag from {@link StorageEditor#DEFAULT} for better access.
 	 */
 	int DEFAULT = StorageEditor.DEFAULT;
 
 	/**
-	 * Copied flag from {@link universum.studios.android.device.util.StorageEditor#OVERWRITE} for better
-	 * access.
+	 * Copied flag from {@link StorageEditor#OVERWRITE} for better access.
 	 */
 	int OVERWRITE = StorageEditor.OVERWRITE;
 
 	/**
-	 * Copied flag from {@link universum.studios.android.device.util.StorageEditor#COPY} for better
-	 * access.
+	 * Copied flag from {@link StorageEditor#COPY} for better access.
 	 */
 	int COPY = StorageEditor.COPY;
 
@@ -582,7 +615,7 @@ public interface Storage {
 	/**
 	 * Creates a <b>file</b> with the given <var>path</var> on this Android device's storage.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#createFile(String)} for additional info.
+	 * See {@link StorageUtils#createFile(String)} for additional info.
 	 *
 	 * @param storage An identifier of the storage of which path to use as {@code base path} for
 	 *                the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -620,8 +653,7 @@ public interface Storage {
 	/**
 	 * Creates a <b>directory</b> with the given <var>path</var> on this Android device's storage.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#createDirectory(String)} for
-	 * additional info.
+	 * See {@link StorageUtils#createDirectory(String)} for additional info.
 	 *
 	 * @param storage An identifier of the storage of which path to use as {@code base path} for
 	 *                the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -659,8 +691,7 @@ public interface Storage {
 	/**
 	 * Deletes a file at the given <var>path</var> from this Android device's storage.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#deleteFile(String)} for additional
-	 * info.
+	 * See {@link StorageUtils#deleteFile(String)} for additional info.
 	 *
 	 * @param storage An identifier of the storage of which path to use as {@code base path} for
 	 *                the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -710,8 +741,8 @@ public interface Storage {
 	 * deleting process will remain and will be not deleted. This also applies to the requested directory.
 	 * This can be used to not delete whole directory, but only the desired files of such a directory.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#deleteDirectory(FileFilter, FilenameFilter, String)}
-	 * for additional info.
+	 * See {@link StorageUtils#deleteDirectory(FileFilter, FilenameFilter, String)} for additional
+	 * info.
 	 *
 	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
 	 *                   the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -805,8 +836,7 @@ public interface Storage {
 	 * Copies a file from the given <var>fromPath</var> to the given <var>toPath</var> on this Android
 	 * device's storage.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#deleteFile(String)} for additional
-	 * info.
+	 * See {@link StorageUtils#deleteFile(String)} for additional info.
 	 *
 	 * @param storage  An identifier of the storage of which path to use as {@code base path} for
 	 *                 the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -861,8 +891,8 @@ public interface Storage {
 	 * the given filters will be copied to the requested destination. This can be used to not copy
 	 * whole directory, but only the desired files of such a directory.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#copyDirectory(int, FileFilter, FilenameFilter, String, String)}
-	 * for additional info.
+	 * See {@link StorageUtils#copyDirectory(int, FileFilter, FilenameFilter, String, String)} for
+	 * additional info.
 	 *
 	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
 	 *                   the given paths. Use {@link #BASE} when the given paths represents full paths
@@ -961,8 +991,7 @@ public interface Storage {
 	 * Moves a file from the given <var>fromPath</var> to the given <var>toPath</var> on this Android
 	 * device's storage.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#moveFile(int, String, String)} for additional
-	 * info.
+	 * See {@link StorageUtils#moveFile(int, String, String)} for additional info.
 	 *
 	 * @param storage  An identifier of the storage of which path to use as {@code base path} for
 	 *                 the given <var>path</var>. Use {@link #BASE} when the given path represents
@@ -1016,8 +1045,7 @@ public interface Storage {
 	 * the given filters will be moved to the requested destination. This can be used to not move
 	 * whole directory, but only the desired files of such a directory.
 	 * <p>
-	 * See {@link universum.studios.android.device.util.StorageUtils#moveDirectory(int, String, String)}
-	 * for additional info.
+	 * See {@link StorageUtils#moveDirectory(int, String, String)} for additional info.
 	 *
 	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
 	 *                   the given paths. Use {@link #BASE} when the given paths represents full paths
@@ -1302,7 +1330,7 @@ public interface Storage {
 	 */
 
 	/**
-	 * This class represents the base structure for results which can be returned by this storage API
+	 * This class represents the base structure for results which may be returned by this storage API
 	 * when invoking some of its methods.
 	 */
 	abstract class BaseResult {

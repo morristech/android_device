@@ -531,5 +531,6 @@ public class StorageUtils {
 	 * Creates a new instance of StorageUtils.
 	 */
 	private StorageUtils() {
+		// Instances are not allowed to be created publicly.
 	}
 }

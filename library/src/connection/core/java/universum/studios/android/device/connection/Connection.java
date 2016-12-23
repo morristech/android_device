@@ -19,20 +19,18 @@
 package universum.studios.android.device.connection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import universum.studios.android.device.receiver.BroadcastProcessor;
-
 /**
- * The Connection interface specifies API allowing to access current information about type, availability
- * connection state of the current Android device's network connection and more. An implementation of
- * this API can be obtained from the {@link AndroidDevice} via {@link AndroidDevice#getConnection()}.
+ * Connection interface specifies API through which an actual information about the Android device's
+ * screen may be accessed.
  * <p>
- * Below are specified methods provided by this API to access the current network connection's data:
+ * A connection implementation may be obtained via {@link Connection.Provider#getConnection(Context) Connection.PROVIDER.getConnection(Context)}.
+ * <p>
+ * Below are listed methods provided by the this interface:
  * <ul>
  * <li>{@link #getConnectionType()}</li>
  * <li>{@link #getConnectionInfo(Connection.ConnectionType)}</li>
@@ -44,7 +42,7 @@ import universum.studios.android.device.receiver.BroadcastProcessor;
  * </ul>
  *
  * <h3>Listening for changes in the connection</h3>
- * The following code snipped shows, how to properly register connection receivers and where to handle
+ * The following code snippet shows, how to properly register connection receivers and where to handle
  * the desired callbacks.
  * <pre>
  * public class ConnectionActivity extends Activity {
@@ -63,37 +61,31 @@ import universum.studios.android.device.receiver.BroadcastProcessor;
  *          }
  *      }
  *
- *      // Device connection wrapper.
+ *      // Connection implementation.
  *      private Connection mConnection;
  *
  *      &#064;Override
  *      protected void onCreate(Bundle savedInstanceState) {
  *          super.onCreate(savedInstanceState);
- *
  *           // ...
- *
  *           // Get the connection API implementation.
- *           this.mConnection = AndroidDevice.getInstance(this).getConnection();
- *
+ *           this.mConnection = Connection.PROVIDER.getConnection(this);
  *           // Register connection listener to handle changes in network connection.
  *           mConnection.registerOnConnectionListener(CONNECTION_LISTENER);
- *
  *           // ...
  *      }
  *
  *      &#064;Override
  *      protected void onResume() {
  *          super.onResume();
- *
- *          // Register connection broadcast receiver so the Connection wrapper will receive info
- *          // about the established/lost connection.
+ *          // Register connection broadcast receiver so the Connection implementation will receive
+ *          // info about the established/lost connection.
  *          mConnection.registerConnectionReceiver(this);
  *      }
  *
  *      &#064;Override
  *      protected void onPause() {
  *          super.onPause();
- *
  *          // Un-register all registered receivers.
  *          mConnection.unregisterConnectionReceiver(this);
  *      }
@@ -101,7 +93,6 @@ import universum.studios.android.device.receiver.BroadcastProcessor;
  *      &#064;Override
  *      protected void onDestroy() {
  *          super.onDestroy();
- *
  *          // Un-register connection listener.
  *          mConnection.unregisterOnConnectionListener(CONNECTION_LISTENER);
  *      }
@@ -110,7 +101,82 @@ import universum.studios.android.device.receiver.BroadcastProcessor;
  *
  * @author Martin Albedinsky
  */
-public interface Connection extends BroadcastProcessor {
+public interface Connection {
+
+	/**
+	 * Provider ====================================================================================
+	 */
+
+	/**
+	 * Interface for provider that may be used to access implementation of {@link Connection}.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface Provider {
+
+		/**
+		 * Provides a singleton implementation of {@link Connection}.
+		 *
+		 * @param context Context used by the connection implementation to access actual connection
+		 *                data.
+		 * @return Connection implementation with actual connection data already available.
+		 */
+		@NonNull
+		Connection getConnection(@NonNull Context context);
+	}
+
+	/**
+	 * A {@link Provider} implementation that may be used to access implementation of {@link Connection}.
+	 */
+	Provider PROVIDER = new Provider() {
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public Connection getConnection(@NonNull Context context) {
+			return ConnectionImpl.getsInstance(context);
+		}
+	};
+
+	/**
+	 * Listeners ===================================================================================
+	 */
+
+	/**
+	 * Listener that can receive callback with info about changed network connection.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface OnConnectionListener {
+
+		/**
+		 * Invoked whenever registered {@link ConnectionStateReceiver} revive an Intent for the
+		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is some connection established.
+		 * <p>
+		 * <b>Note:</b> this is also fired while connection receiver is being registered via
+		 * {@link #registerConnectionReceiver(Context)} and there is currently established some connection.
+		 *
+		 * @param context Current application context.
+		 * @param type    Type of the connection which was just now established or was already established
+		 *                while this callback was being registered.
+		 * @param info    Info about the current established connection.
+		 */
+		void onConnectionEstablished(@NonNull Context context, @NonNull ConnectionType type, @Nullable NetworkInfo info);
+
+		/**
+		 * Invoked whenever registered {@link ConnectionStateReceiver} receive an Intent for the
+		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is no connection available.
+		 * <p>
+		 * <b>Note:</b> this is also fired while connection receiver is being registered via
+		 * {@link #registerConnectionReceiver(Context)} and there isn't currently any connection available.
+		 *
+		 * @param context Current application context.
+		 * @param type    Type of the connection which the Android device just lost or {@link ConnectionType#UNAVAILABLE UNAVAILABLE}
+		 *                if there was no connection available while this callback was being registered.
+		 */
+		void onConnectionLost(@NonNull Context context, @NonNull ConnectionType type);
+	}
 
 	/**
 	 * Constants ===================================================================================
@@ -270,9 +336,7 @@ public interface Connection extends BroadcastProcessor {
 		public final String originalName;
 
 		/**
-		 * The key under which will be this connection type saved within shared preferences when
-		 * {@link #saveUserPreferredConnections(Connection.ConnectionType[], SharedPreferences)}
-		 * is called.
+		 * The key under which may be this connection type saved within shared preferences.
 		 */
 		public final String preferencesKey;
 
@@ -283,9 +347,7 @@ public interface Connection extends BroadcastProcessor {
 		 *
 		 * @param id       Id of connectivity type as flag provided by {@link ConnectivityManager}.
 		 * @param origName Original name of this connectivity type.
-		 * @param prefsKey The key under which will be this connectivity type saved into shared preferences when
-		 *                 {@link #saveUserPreferredConnections(Connection.ConnectionType[], SharedPreferences)}
-		 *                 is called.
+		 * @param prefsKey The key under which may be this connectivity type saved into shared preferences.
 		 */
 		ConnectionType(int id, String origName, String prefsKey) {
 			this.systemConstant = id;
@@ -305,9 +367,7 @@ public interface Connection extends BroadcastProcessor {
 		@NonNull
 		public static ConnectionType resolve(int systemConstant) {
 			for (ConnectionType type : ConnectionType.values()) {
-				if (type.systemConstant == systemConstant) {
-					return type;
-				}
+				if (type.systemConstant == systemConstant) return type;
 			}
 			return UNAVAILABLE;
 		}
@@ -318,8 +378,8 @@ public interface Connection extends BroadcastProcessor {
 	 */
 
 	/**
-	 * Checks whether this Android device has some connection or is currently in the process
-	 * to establish some connection.
+	 * Checks whether the Android device has some connection or is currently in the process to establish
+	 * some connection.
 	 * <p>
 	 * See {@link NetworkInfo#isConnectedOrConnecting()} for additional info.
 	 *
@@ -331,7 +391,7 @@ public interface Connection extends BroadcastProcessor {
 	boolean isConnectedOrConnecting();
 
 	/**
-	 * Checks whether this Android device has some connection currently established.
+	 * Checks whether the Android device has some connection currently established.
 	 * <p>
 	 * See {@link NetworkInfo#isConnected()} for additional info.
 	 *
@@ -342,8 +402,8 @@ public interface Connection extends BroadcastProcessor {
 	boolean isConnected();
 
 	/**
-	 * Checks whether this Android device has established the connection or is currently in
-	 * the process to establish the connection for the requested <var>connectionType</var>.
+	 * Checks whether the Android device has established the connection or is currently in the process
+	 * to establish the connection for the requested <var>connectionType</var>.
 	 * <p>
 	 * See {@link NetworkInfo#isConnectedOrConnecting()} for additional info.
 	 *
@@ -354,7 +414,7 @@ public interface Connection extends BroadcastProcessor {
 	boolean isConnectedOrConnecting(@NonNull ConnectionType connectionType);
 
 	/**
-	 * Checks whether this Android device has established the connection for the requested <var>connectionType</var>.
+	 * Checks whether the Android device has established the connection for the requested <var>connectionType</var>.
 	 * <p>
 	 * See {@link NetworkInfo#isConnected()} for additional info.
 	 *
@@ -365,7 +425,7 @@ public interface Connection extends BroadcastProcessor {
 	boolean isConnected(@NonNull ConnectionType connectionType);
 
 	/**
-	 * Checks whether this Android device can establish connection for the requested <var>connectionType</var>
+	 * Checks whether the Android device can establish connection for the requested <var>connectionType</var>
 	 * <p>
 	 * See {@link NetworkInfo#isAvailable()} for additional info.
 	 *
@@ -378,8 +438,8 @@ public interface Connection extends BroadcastProcessor {
 	/**
 	 * Returns type of the current established connection.
 	 *
-	 * @return One of {@link Connection.ConnectionType} values or
-	 * {@link Connection.ConnectionType#UNAVAILABLE} if there is no connection currently available.
+	 * @return One of {@link Connection.ConnectionType} values or  {@link Connection.ConnectionType#UNAVAILABLE}
+	 * if there is no connection currently available.
 	 */
 	@NonNull
 	ConnectionType getConnectionType();
@@ -410,8 +470,8 @@ public interface Connection extends BroadcastProcessor {
 	void unregisterOnConnectionListener(@NonNull OnConnectionListener listener);
 
 	/**
-	 * Registers {@link universum.studios.android.device.receiver.ConnectionStateReceiver} to receive messages
-	 * about the current connection state.
+	 * Registers {@link ConnectionStateReceiver} to receive broadcasts about the current connection
+	 * state.
 	 *
 	 * @param context The main activity of application.
 	 * @see #registerOnConnectionListener(Connection.OnConnectionListener)
@@ -420,92 +480,17 @@ public interface Connection extends BroadcastProcessor {
 	void registerConnectionReceiver(@NonNull Context context);
 
 	/**
-	 * Un-registers registered {@link universum.studios.android.device.receiver.ConnectionStateReceiver}.
-	 *
-	 * @param context Context in which was connection receiver registered before.
-	 * @see #registerConnectionReceiver(Context)
-	 */
-	void unregisterConnectionReceiver(@NonNull Context context);
-
-	/**
-	 * Called to dispatch message that registered {@link universum.studios.android.device.receiver.ConnectionStateReceiver ConnectionStateReceiver}
-	 * was currently unregistered. This should be called immediately after successful un-registration
-	 * of connection receiver.
-	 */
-	void dispatchConnectionReceiverUnregistered();
-
-	/**
-	 * Returns flag indicating whether {@link universum.studios.android.device.receiver.ConnectionStateReceiver ConnectionStateReceiver}
-	 * is currently registered or not.
+	 * Returns flag indicating whether {@link ConnectionStateReceiver} is currently registered or not.
 	 *
 	 * @return {@code True} if receiver is registered, {@code false} otherwise.
 	 */
 	boolean isConnectionReceiverRegistered();
 
 	/**
-	 * Saves the given set of user preferred connection types. Data can be latter obtained using
-	 * {@link #getUserPreferredConnections(SharedPreferences)}.
+	 * Un-registers registered {@link ConnectionStateReceiver}.
 	 *
-	 * @param types       The set of connection types to save.
-	 * @param preferences The instance of shared preferences into which should be the given set of
-	 *                    connection types saved.
+	 * @param context Context in which was connection receiver registered before.
+	 * @see #registerConnectionReceiver(Context)
 	 */
-	void saveUserPreferredConnections(@NonNull ConnectionType[] types, @NonNull SharedPreferences preferences);
-
-	/**
-	 * Returns the set of user preferred connection types.
-	 *
-	 * @param preferences The instance of shared preferences within which was requested set of
-	 *                    connection types saved before by
-	 *                    {@link #saveUserPreferredConnections(Connection.ConnectionType[], SharedPreferences)}.
-	 * @return Set of connection types if the given instance of shared preferences contains these data,
-	 * {@code null} otherwise.
-	 */
-	@NonNull
-	ConnectionType[] getUserPreferredConnections(@NonNull SharedPreferences preferences);
-
-	/**
-	 * Inner classes ===============================================================================
-	 */
-
-	/**
-	 * Listeners ===================================================================================
-	 */
-
-	/**
-	 * Listener that can receive callback with info about changed network connection.
-	 *
-	 * @author Martin Albedinsky
-	 */
-	interface OnConnectionListener {
-
-		/**
-		 * Invoked whenever registered {@link universum.studios.android.device.receiver.ConnectionStateReceiver ConnectionStateReceiver}
-		 * revive an Intent for the {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is some
-		 * connection established.
-		 * <p>
-		 * <b>Note:</b> this is also fired while connection receiver is being registered ({@link #registerConnectionReceiver(Context)})
-		 * and there is currently established some connection.
-		 *
-		 * @param type    Type of the connection which was just now established or was already established
-		 *                while this callback was being registered.
-		 * @param info    Info about the current established connection.
-		 * @param context Current application context.
-		 */
-		void onConnectionEstablished(@NonNull ConnectionType type, @Nullable NetworkInfo info, @NonNull Context context);
-
-		/**
-		 * Invoked whenever registered {@link universum.studios.android.device.receiver.ConnectionStateReceiver ConnectionStateReceiver}
-		 * receive an Intent for the {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is no
-		 * connection available.
-		 * <p>
-		 * <b>Note:</b> this is also fired while connection receiver is being registered ({@link #registerConnectionReceiver(Context)})
-		 * and there isn't currently any connection available.
-		 *
-		 * @param type    Type of the connection which this Android device just lost or {@link ConnectionType#UNAVAILABLE UNAVAILABLE}
-		 *                if there was no connection available while this callback was being registered.
-		 * @param context Current application context.
-		 */
-		void onConnectionLost(@NonNull ConnectionType type, @NonNull Context context);
-	}
+	void unregisterConnectionReceiver(@NonNull Context context);
 }

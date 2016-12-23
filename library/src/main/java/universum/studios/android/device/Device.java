@@ -21,11 +21,11 @@ package universum.studios.android.device;
 import android.os.Build;
 
 /**
- * todo
+ * Device is a simple class with basic information about the Android device.
  *
  * @author Martin Albedinsky
  */
-public class AndroidDevice {
+public class Device {
 
 	/**
 	 * Interface ===================================================================================
@@ -38,7 +38,7 @@ public class AndroidDevice {
 	/**
 	 * Log TAG.
 	 */
-	// private static final String TAG = "AndroidDevice";
+	// private static final String TAG = "Device";
 
 	/**
 	 * Android version that powers this Android device.

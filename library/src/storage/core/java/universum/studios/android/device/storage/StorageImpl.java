@@ -19,6 +19,7 @@
 package universum.studios.android.device.storage;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
@@ -35,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import universum.studios.android.device.DeviceConfig;
+
 /**
- * Implementation of {@link Storage} API for {@link AndroidDevice AndroidDevice}.
+ * A {@link Storage} implementation.
  *
  * @author Martin Albedinsky
  */
@@ -69,6 +72,21 @@ class StorageImpl implements Storage {
 	 */
 
 	/**
+	 * Lock used for synchronized operations.
+	 */
+	private static final Object LOCK = new Object();
+
+	/**
+	 * StorageImpl singleton instance.
+	 */
+	@SuppressLint("StaticFieldLeak")
+	private static StorageImpl sInstance;
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
 	 * Helper for create operations on files system.
 	 */
 	private final StorageAction SA_CREATE = new StorageAction.Create(this);
@@ -87,10 +105,6 @@ class StorageImpl implements Storage {
 	 * Helper for move operations on file system.
 	 */
 	private final StorageAction SA_MOVE = new StorageAction.Move(this);
-
-	/**
-	 * Members =====================================================================================
-	 */
 
 	/**
 	 * Application context obtained from the context passed during initialization of this wrapper.
@@ -120,20 +134,33 @@ class StorageImpl implements Storage {
 	 */
 
 	/**
-	 * Creates a new instance of StorageImpl wrapper with already initialized external storage
-	 * directory if it is available.
+	 * Creates a new instance of StorageImpl.
 	 *
-	 * @param context Application context or activity context.
+	 * @param applicationContext Application context used to access system services.
 	 */
-	StorageImpl(Context context) {
-		this.mContext = context.getApplicationContext();
-		this.mPackageName = context.getPackageName();
+	private StorageImpl(Context applicationContext) {
+		this.mContext = applicationContext;
+		this.mPackageName = applicationContext.getPackageName();
 		this.checkExternalAvailability();
 	}
 
 	/**
 	 * Methods =====================================================================================
 	 */
+
+	/**
+	 * Returns or creates a new singleton instance of StorageImpl.
+	 *
+	 * @param context Context used by the storage implementation to access system services.
+	 * @return Storage implementation with actual storage data available.
+	 */
+	@NonNull
+	static StorageImpl getInstance(@NonNull Context context) {
+		synchronized (LOCK) {
+			if (sInstance == null) sInstance = new StorageImpl(context.getApplicationContext());
+		}
+		return sInstance;
+	}
 
 	/**
 	 */
@@ -753,7 +780,14 @@ class StorageImpl implements Storage {
 					mPackageName
 			);
 		}
-		if (!hasPermissionToWriteExternalStorage()) return false;
+		// Check whether we have permission to write on external storage.
+		if (mContext.checkPermission(
+				Manifest.permission.WRITE_EXTERNAL_STORAGE,
+				Process.myPid(),
+				Process.myUid()
+		) != PackageManager.PERMISSION_GRANTED) {
+			return false;
+		}
 		// Create if not exists.
 		if (!mExternalPackage.isDirectory() && !mExternalPackage.mkdirs()) {
 			this.logMessage(
@@ -926,19 +960,6 @@ class StorageImpl implements Storage {
 	String appendBasePath(int storage, String path) {
 		final String basePath = getStoragePath(storage);
 		return !TextUtils.isEmpty(basePath) ? basePath + File.separator + path : path;
-	}
-
-	/**
-	 * Checks whether the current process has permission to write external storage.
-	 *
-	 * @return {@code True} if writing to external storage is granted, {@code false} otherwise.
-	 */
-	private boolean hasPermissionToWriteExternalStorage() {
-		return mContext.checkPermission(
-				Manifest.permission.WRITE_EXTERNAL_STORAGE,
-				Process.myPid(),
-				Process.myUid()
-		) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	/**

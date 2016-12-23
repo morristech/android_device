@@ -20,8 +20,6 @@ package universum.studios.android.device.storage;
 
 import android.text.TextUtils;
 
-import universum.studios.android.device.util.StorageUtils;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -31,17 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class represents base implementation for all file/directory operations requested by {@link StorageImpl}.
+ * StorageAction represents base implementation for all file/directory operations requested by {@link StorageImpl}.
  * <ul>
  * <li>{@link StorageAction.Create} implementation for <b>create</b> operations</li>
  * <li>{@link StorageAction.Delete} implementation for <b>delete</b> operations</li>
  * <li>{@link StorageAction.Copy} implementation for <b>copy</b> operations</li>
  * <li>{@link StorageAction.Move} implementation for <b>move</b> operations</li>
  * </ul>
- * Above mentioned implementations use {@link universum.studios.android.device.util.StorageUtils} to
- * perform all requested operations and also handles all thrown exceptions and sets the related error
- * codes to implementation of {@link universum.studios.android.device.Storage.BaseResult} when returning
- * result for the preformed action.
+ * Above mentioned implementations use {@link StorageUtils} to perform all requested operations and
+ * also handles all thrown exceptions and sets the related error codes to implementation of
+ * {@link Storage.BaseResult} when returning result for the preformed action.
  *
  * @author Martin Albedinsky
  */
@@ -71,17 +68,17 @@ abstract class StorageAction {
 	/**
 	 * Storage implementation to access some storage info.
 	 */
-	final StorageImpl mStorage;
+	private final StorageImpl mStorage;
 
 	/**
 	 * Unique identifier of this storage action.
 	 */
-	final int mAction;
+	private final int mAction;
 
 	/**
 	 * Action verb.
 	 */
-	final String mActionVerb, mActionVerbPast;
+	private final String mActionVerb, mActionVerbPast;
 
 	/**
 	 * Constructors ================================================================================
@@ -95,7 +92,7 @@ abstract class StorageAction {
 	 * @param actionVerb     Verb representing this action.
 	 * @param actionVerbPast Past form of the verb representing this action.
 	 */
-	StorageAction(StorageImpl storage, int action, String actionVerb, String actionVerbPast) {
+	private StorageAction(StorageImpl storage, int action, String actionVerb, String actionVerbPast) {
 		this.mStorage = storage;
 		this.mAction = action;
 		this.mActionVerb = actionVerb;
@@ -149,8 +146,8 @@ abstract class StorageAction {
 	}
 
 	/**
-	 * Called from {@link #performFileAction(int, int, String, String)} with same data to perform
-	 * by this action represented storage file operation.
+	 * Called from {@link #performFileAction(int, int, String, String)} with same data to perform by
+	 * this action represented storage file operation.
 	 *
 	 * @return {@code True} if this action succeeded, {@code false} otherwise.
 	 */
@@ -286,8 +283,8 @@ abstract class StorageAction {
 	/**
 	 * Performs storage operation represented by this action for file or directory at the given
 	 * <var>fromPath</var>. This will call {@link #performFileAction(int, int, String, String)} or
-	 * {@link #performDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)}
-	 * depends on whether the given <var>fromPath</var> points to a file or to a directory.
+	 * {@link #performDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)} depends
+	 * on whether the given <var>fromPath</var> points to a file or to a directory.
 	 * <p>
 	 * See {@link Storage} and its file or directory related operations for additional parameters
 	 * descriptions which are passed to this action.
@@ -303,8 +300,8 @@ abstract class StorageAction {
 	}
 
 	/**
-	 * Builds a storage message used to bundle into {@link universum.studios.android.device.Storage.BaseResult}
-	 * implementation as result message for this action.
+	 * Builds a storage message used to bundle into {@link Storage.BaseResult} implementation as result
+	 * message for this action.
 	 *
 	 * @param baseMessage      Base for the requested message. This should identify storage action.
 	 * @param storage          An identifier of storage of which name will be added into message to identify
@@ -353,14 +350,14 @@ abstract class StorageAction {
 	}
 
 	/**
-	 * See {@link universum.studios.android.device.Storage.Result#Result(int, String, String, int, int)} for additional info.
+	 * See {@link Storage.Result#Result(int, String, String, int, int)} for additional info.
 	 */
 	static Storage.Result createResult(int action, String message, String path, int flags, int error) {
 		return new Storage.Result(action, message, path, flags, error);
 	}
 
 	/**
-	 * See {@link universum.studios.android.device.Storage.Results#Results(int, String, int, List, int, int)} for additional info.
+	 * See {@link Storage.Results#Results(int, String, int, List, int, int)} for additional info.
 	 */
 	static Storage.Results createResults(int action, int size, String message, List<Storage.Result> results, int flags, int error) {
 		return new Storage.Results(action, message, size, results, flags, error);

@@ -25,29 +25,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Simple utility class specifying API allowing to check whenever the current Android device has
- * some network connection established or to access info of the current established network connection.
+ * Connection utility class specifying API allowing to check whether the Android device has some network
+ * connection established or to access info of the current established network connection.
  *
  * @author Martin Albedinsky
  */
 public class ConnectionUtils {
-
-	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Log TAG.
-	 */
-	// private static final String TAG = "ConnectionUtils";
-
-	/**
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 * Checks whether there is some connection currently established or not.
@@ -77,7 +60,9 @@ public class ConnectionUtils {
 	 * @see #isConnectionEstablished(Context)
 	 * @see #isConnectionAvailable(Context, int)
 	 */
+	@SuppressWarnings("deprecation")
 	public static boolean isConnectionEstablished(@NonNull Context context, int connectionType) {
+		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = accessManager(context).getNetworkInfo(connectionType);
 		return info != null && info.isConnected();
 	}
@@ -93,7 +78,9 @@ public class ConnectionUtils {
 	 * otherwise.
 	 * @see #isConnectionEstablished(Context, int)
 	 */
+	@SuppressWarnings("deprecation")
 	public static boolean isConnectionAvailable(@NonNull Context context, int connectionType) {
+		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = accessManager(context).getNetworkInfo(connectionType);
 		return info != null && info.isAvailable();
 	}
@@ -136,5 +123,12 @@ public class ConnectionUtils {
 	 */
 	private static ConnectivityManager accessManager(Context context) {
 		return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	}
+
+	/**
+	 * Creates a new instance of ConnectionUtils.
+	 */
+	private ConnectionUtils() {
+		// Instances are not allowed to be created publicly.
 	}
 }

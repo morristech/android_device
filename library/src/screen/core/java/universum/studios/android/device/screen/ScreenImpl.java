@@ -18,6 +18,7 @@
  */
 package universum.studios.android.device.screen;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -36,8 +37,10 @@ import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
+import universum.studios.android.device.DeviceConfig;
+
 /**
- * Implementation of {@link Screen} API for {@link AndroidDevice AndroidDevice}.
+ * A {@link Screen} implementation.
  *
  * @author Martin Albedinsky
  */
@@ -59,6 +62,17 @@ final class ScreenImpl implements Screen {
 	/**
 	 * Static members ==============================================================================
 	 */
+
+	/**
+	 * Lock used for synchronized operations.
+	 */
+	private static final Object LOCK = new Object();
+
+	/**
+	 * ScreenImpl singleton instance.
+	 */
+	@SuppressLint("StaticFieldLeak")
+	private static ScreenImpl sInstance;
 
 	/**
 	 * Members =====================================================================================
@@ -140,17 +154,73 @@ final class ScreenImpl implements Screen {
 	 */
 
 	/**
-	 * Creates a new instance of ScreenImpl wrapper with already prepared screen data to access.
+	 * Creates a new instance of ScreenImpl.
 	 *
-	 * @param context Application context or activity context.
+	 * @param applicationContext Application context used to access system services.
 	 */
-	ScreenImpl(Context context) {
-		this.mContext = context.getApplicationContext();
-		this.mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+	private ScreenImpl(Context applicationContext) {
+		this.mContext = applicationContext;
+		this.mWindowManager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);
 		this.refresh();
-		this.mDefaultOrientation = this.resolveDefaultOrientation(mCurrentOrientation, mCurrentRotation);
+		// Resolve default orientation.
+		switch (mCurrentRotation) {
+			case ROTATION_0:
+			case ROTATION_180:
+				switch (mCurrentOrientation) {
+					case ORIENTATION_LANDSCAPE:
+					case ORIENTATION_REVERSE_LANDSCAPE:
+						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;
+						break;
+					case ORIENTATION_PORTRAIT:
+					case ORIENTATION_REVERSE_PORTRAIT:
+						this.mDefaultOrientation = ORIENTATION_PORTRAIT;
+						break;
+					default:
+						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+						break;
+				}
+				break;
+			case ROTATION_90:
+			case ROTATION_270:
+				switch (mCurrentOrientation) {
+					case ORIENTATION_LANDSCAPE:
+					case ORIENTATION_REVERSE_LANDSCAPE:
+						this.mDefaultOrientation = ORIENTATION_PORTRAIT;
+						break;
+					case ORIENTATION_PORTRAIT:
+					case ORIENTATION_REVERSE_PORTRAIT:
+						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;
+						break;
+					default:
+						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+						break;
+				}
+				break;
+			default:
+				this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+				break;
+		}
 		this.mDensity = ScreenDensity.resolve(mRawDensity = METRICS.densityDpi);
-		this.mType = resolveScreenType(mCurrentOrientation);
+		// Resolve screen type.
+		float defaultWidthDP, defaultHeightDP;
+		switch (mCurrentOrientation) {
+			case ORIENTATION_LANDSCAPE:
+			case ORIENTATION_REVERSE_LANDSCAPE:
+				defaultWidthDP = pixelToDP(METRICS.heightPixels);
+				defaultHeightDP = pixelToDP(METRICS.widthPixels);
+				break;
+			case ORIENTATION_PORTRAIT:
+			case ORIENTATION_REVERSE_PORTRAIT:
+				defaultWidthDP = pixelToDP(METRICS.widthPixels);
+				defaultHeightDP = pixelToDP(METRICS.heightPixels);
+				break;
+			case ORIENTATION_UNSPECIFIED:
+			default:
+				defaultWidthDP = pixelToDP(METRICS.widthPixels);
+				defaultHeightDP = pixelToDP(METRICS.heightPixels);
+				break;
+		}
+		this.mType = ScreenType.resolve(defaultWidthDP, defaultHeightDP);
 		// Resolve actual screen metrics.
 		boolean reverse = false;
 		switch (mDefaultOrientation) {
@@ -169,74 +239,17 @@ final class ScreenImpl implements Screen {
 	}
 
 	/**
-	 * Resolves the current Android device's screen default orientation.
+	 * Returns or creates a new singleton instance of ScreenImpl.
 	 *
-	 * @param currentOrientation The current screen orientation.
-	 * @param currentRotation    The current screen rotation.
-	 * @return Default screen orientation depends on the given parameters.
+	 * @param context Context used by the screen implementation to access system services.
+	 * @return Screen implementation with actual screen data available.
 	 */
-	private int resolveDefaultOrientation(int currentOrientation, ScreenRotation currentRotation) {
-		int orientation = ORIENTATION_UNSPECIFIED;
-		switch (currentRotation) {
-			case ROTATION_0:
-			case ROTATION_180:
-				switch (currentOrientation) {
-					case ORIENTATION_LANDSCAPE:
-					case ORIENTATION_REVERSE_LANDSCAPE:
-						orientation = ORIENTATION_LANDSCAPE;
-						break;
-					case ORIENTATION_PORTRAIT:
-					case ORIENTATION_REVERSE_PORTRAIT:
-						orientation = ORIENTATION_PORTRAIT;
-						break;
-					default:
-				}
-				break;
-			case ROTATION_90:
-			case ROTATION_270:
-				switch (currentOrientation) {
-					case ORIENTATION_LANDSCAPE:
-					case ORIENTATION_REVERSE_LANDSCAPE:
-						orientation = ORIENTATION_PORTRAIT;
-						break;
-					case ORIENTATION_PORTRAIT:
-					case ORIENTATION_REVERSE_PORTRAIT:
-						orientation = ORIENTATION_LANDSCAPE;
-						break;
-					default:
-				}
-				break;
-			default:
+	@NonNull
+	static ScreenImpl getsInstance(@NonNull Context context) {
+		synchronized (LOCK) {
+			if (sInstance == null) sInstance = new ScreenImpl(context.getApplicationContext());
 		}
-		return orientation;
-	}
-
-	/**
-	 * Resolves the current Android device's screen type.
-	 *
-	 * @param orientation Actual screen orientation.
-	 * @return Resolved type of the screen.
-	 */
-	private ScreenType resolveScreenType(int orientation) {
-		float defaultWidthDP, defaultHeightDP;
-		switch (orientation) {
-			case ORIENTATION_LANDSCAPE:
-			case ORIENTATION_REVERSE_LANDSCAPE:
-				defaultWidthDP = pixelToDP(METRICS.heightPixels);
-				defaultHeightDP = pixelToDP(METRICS.widthPixels);
-				break;
-			case ORIENTATION_PORTRAIT:
-			case ORIENTATION_REVERSE_PORTRAIT:
-				defaultWidthDP = pixelToDP(METRICS.widthPixels);
-				defaultHeightDP = pixelToDP(METRICS.heightPixels);
-				break;
-			case ORIENTATION_UNSPECIFIED:
-			default:
-				defaultWidthDP = pixelToDP(METRICS.widthPixels);
-				defaultHeightDP = pixelToDP(METRICS.heightPixels);
-				break;
-		}
-		return ScreenType.resolve(defaultWidthDP, defaultHeightDP);
+		return sInstance;
 	}
 
 	/**
@@ -261,38 +274,25 @@ final class ScreenImpl implements Screen {
 	 */
 	@Override
 	public boolean lockOrientation(@NonNull Activity activity) {
-		return requestOrientation(ORIENTATION_CURRENT, activity);
+		return requestOrientation(activity, ORIENTATION_CURRENT);
 	}
 
 	/**
 	 */
 	@Override
 	public void unlockOrientation(@NonNull Activity activity) {
-		requestOrientation(ORIENTATION_USER, activity);
+		requestOrientation(activity, ORIENTATION_USER);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean requestOrientation(@Orientation int orientation, @NonNull Activity activity) {
-		// Request for screen orientation.
-		this.requestOrientationInner(
-				orientation != ORIENTATION_CURRENT ? orientation : (orientation = getCurrentOrientation()),
-				activity
-		);
-		return mOrientationLocked = (orientation != ORIENTATION_USER);
-	}
-
-	/**
-	 * Requests for the given screen <var>orientation</var>.
-	 *
-	 * @param orientation Requested orientation.
-	 * @param activity    The actual (visible) activity context.
-	 */
-	private void requestOrientationInner(int orientation, Activity activity) {
+	@SuppressWarnings("WrongConstant")
+	public boolean requestOrientation(@NonNull Activity activity, @Orientation int orientation) {
 		switch (orientation) {
 			case ORIENTATION_CURRENT:
-				// Current should never never be passed here.
+				activity.setRequestedOrientation(getCurrentOrientation());
+				break;
 			case ORIENTATION_UNSPECIFIED:
 				// In case of UNKNOWN oriented screen we cannot do nothing useful :).
 				break;
@@ -300,6 +300,7 @@ final class ScreenImpl implements Screen {
 				activity.setRequestedOrientation(orientation);
 				break;
 		}
+		return mOrientationLocked = (orientation != ORIENTATION_USER);
 	}
 
 	/**
@@ -391,8 +392,8 @@ final class ScreenImpl implements Screen {
 
 	/**
 	 */
-	@Orientation
 	@Override
+	@Orientation
 	public int getCurrentOrientation() {
 		refresh();
 		return mCurrentOrientation;
@@ -400,8 +401,8 @@ final class ScreenImpl implements Screen {
 
 	/**
 	 */
-	@Orientation
 	@Override
+	@Orientation
 	public int getDefaultOrientation() {
 		return mDefaultOrientation;
 	}
@@ -461,7 +462,7 @@ final class ScreenImpl implements Screen {
 	/**
 	 */
 	@Override
-	public void setBrightness(@IntRange(from = 0, to = 100) int brightness, @NonNull Activity activity) {
+	public void setBrightness(@NonNull Activity activity, @IntRange(from = 0, to = 100) int brightness) {
 		if (brightness < 0 || brightness > 100) {
 			throw new IllegalArgumentException("Brightness value(" + brightness + ") out of the range [0, 100].");
 		}
@@ -548,25 +549,8 @@ final class ScreenImpl implements Screen {
 	 */
 	private void onRefresh() {
 		// Update orientation to the actual. This call also updates the screen rotation.
-		updateOrientation();
-		// Get screen metrics to handle actual ones.
-		this.mCurrentWidth = METRICS.widthPixels;
-		this.mCurrentHeight = METRICS.heightPixels;
-	}
-
-	/**
-	 * Updates the current screen orientation to the actual one. This make difference between phone
-	 * and tablet screen rotation in degrees so we can find out reversed orientations. Also updates
-	 * the screen rotation to the actual one.
-	 *
-	 * @return Updated screen orientation.
-	 */
-	private int updateOrientation() {
-		// Default initialization.
 		int orientation = ORIENTATION_UNSPECIFIED;
-		// Get actual screen rotation to resolve difference between phone and tablet device.
 		this.mCurrentRotation = ScreenRotation.resolve(getDisplay().getRotation());
-		// Resolve actual screen orientation from configuration.
 		switch (mContext.getResources().getConfiguration().orientation) {
 			case Configuration.ORIENTATION_LANDSCAPE:
 				// Check screen rotation.
@@ -606,7 +590,10 @@ final class ScreenImpl implements Screen {
 			default:
 				break;
 		}
-		return this.mCurrentOrientation = orientation;
+		this.mCurrentOrientation = orientation;
+		// Get screen metrics to handle actual ones.
+		this.mCurrentWidth = METRICS.widthPixels;
+		this.mCurrentHeight = METRICS.heightPixels;
 	}
 
 	/**

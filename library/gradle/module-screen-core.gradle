@@ -21,9 +21,9 @@
  */
 android {
     sourceSets {
-        main.manifest.srcFile 'src/main/AndroidManifest.xml'
+        main.manifest.srcFile 'src/screen/core/AndroidManifest.xml'
         main.java.srcDirs = [
-                'src/device/java'
+                'src/screen/core/java'
         ]
     }
 }

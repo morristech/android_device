@@ -16,38 +16,21 @@
  * See the License for the specific language governing permissions and limitations under the License.
  * =================================================================================================
  */
-package universum.studios.android.device.connection;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.support.annotation.NonNull;
+/**
+ * Library Module options ==========================================================================
+ */
+android {
+    sourceSets {
+        main.manifest.srcFile 'src/util/AndroidManifest.xml'
+        main.java.srcDirs = [
+                'src/util/java'
+        ]
+    }
+}
 
 /**
- * A {@link BroadcastReceiver} used by {@link Connection} implementation to receive actual information
- * about network connection state.
- *
- * @author Martin Albedinsky
+ * Library Module dependencies =====================================================================
  */
-public final class ConnectionStateReceiver extends BroadcastReceiver {
-
-	/**
-	 * Returns the intent filter for {@link ConnectivityManager#CONNECTIVITY_ACTION} action which
-	 * should be used when registering this instance of connection receiver.
-	 *
-	 * @return New instance of {@link IntentFilter}.
-	 */
-	@NonNull
-	public final IntentFilter newIntentFilter() {
-		return new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-	}
-
-	/**
-	 */
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		ConnectionImpl.getsInstance(context).handleBroadcast(context, intent);
-	}
+dependencies {
+    // None.
 }
