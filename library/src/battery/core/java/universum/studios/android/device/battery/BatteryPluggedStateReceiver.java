@@ -23,44 +23,27 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
-import universum.studios.android.device.Device;
-import universum.studios.android.device.Battery;
-
 /**
- * A {@link android.content.BroadcastReceiver} used by {@link Battery} implementation to receive
- * information about the current plugged state of the Android device's battery.
+ * A {@link Battery.BatteryBroadcastReceiver} used by {@link Battery} implementation to receive actual
+ * information about the current battery plugged state.
  * <p>
  * This broadcast receiver receives only data about:
  * <ul>
  * <li>plugged state</li>
  * <li>voltage</li>
- * <li>technology: {@link universum.studios.android.device.Battery.BatteryTechnology}</li>
+ * <li>technology: {@link Battery.BatteryTechnology}</li>
  * </ul>
  * All other data about the battery will be unknown at the time when the intent for this receiver is
- * being processed by {@link universum.studios.android.device.Battery} wrapper, if there isn't
- * {@link universum.studios.android.device.receiver.BatteryStatusReceiver} registered.
+ * being processed by {@link Battery} implementation, if there is not {@link BatteryStatusReceiver}
+ * registered.
  *
  * @author Martin Albedinsky
  */
 public class BatteryPluggedStateReceiver extends Battery.BatteryBroadcastReceiver {
 
 	/**
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Id of this receiver.
-	 */
-	public static final int RECEIVER_ID = 0x10003;
-
-	/**
-	 * Methods =====================================================================================
-	 */
-
-	/**
-	 * Returns the intent filter for {@link Intent#ACTION_POWER_CONNECTED} and
-	 * {@link Intent#ACTION_POWER_DISCONNECTED} actions which should be used when registering this
-	 * instance of battery receiver.
+	 * Returns the intent filter for {@link Intent#ACTION_POWER_CONNECTED} and {@link Intent#ACTION_POWER_DISCONNECTED}
+	 * actions which should be used when registering this instance of battery receiver.
 	 *
 	 * @return New instance of {@link IntentFilter}.
 	 */
@@ -77,7 +60,7 @@ public class BatteryPluggedStateReceiver extends Battery.BatteryBroadcastReceive
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final Battery battery = Device.getInstance(context).getBattery();
-		battery.processBroadcast(context, intent, RECEIVER_ID);
+		intent.putExtra(EXTRA_RECEIVER_CLASS, getClass());
+		BatteryImpl.getInstance(context).handleBroadcast(context, intent);
 	}
 }

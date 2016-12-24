@@ -39,7 +39,7 @@ import java.lang.annotation.RetentionPolicy;
  * <p>
  * A screen implementation may be obtained via {@link Screen.Provider#getScreen(Context) Screen.PROVIDER.getScreen(Context)}.
  * <p>
- * Below are listed methods provided by the this interface:
+ * Below are listed methods provided by this interface:
  * <ul>
  * <li>{@link #getType()}</li>
  * <li>{@link #getDensity()}</li>

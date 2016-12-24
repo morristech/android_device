@@ -23,28 +23,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
-import universum.studios.android.device.Device;
-
 /**
- * A {@link android.content.BroadcastReceiver} used by {@link Battery} implementation to receive
- * information about the current health state of the Android device's battery.
+ * A {@link Battery.BatteryBroadcastReceiver} used by {@link Battery} implementation to receive actual
+ * information about the current battery health state.
  *
  * @author Martin Albedinsky
  */
 public class BatteryHealthReceiver extends Battery.BatteryBroadcastReceiver {
-
-	/**
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Id of this receiver.
-	 */
-	public static final int RECEIVER_ID = 0x10002;
-
-	/**
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 * Returns the intent filter for {@link Intent#ACTION_BATTERY_OKAY} and {@link Intent#ACTION_BATTERY_LOW}
@@ -63,7 +48,7 @@ public class BatteryHealthReceiver extends Battery.BatteryBroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final Battery battery = Device.getInstance(context).getBattery();
-		battery.processBroadcast(context, intent, RECEIVER_ID);
+		intent.putExtra(EXTRA_RECEIVER_CLASS, getClass());
+		BatteryImpl.getInstance(context).handleBroadcast(context, intent);
 	}
 }

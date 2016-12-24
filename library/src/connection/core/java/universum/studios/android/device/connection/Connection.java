@@ -144,14 +144,14 @@ public interface Connection {
 	 */
 
 	/**
-	 * Listener that can receive callback with info about changed network connection.
+	 * Listener that may be used to receive callback with info about changed network connection.
 	 *
 	 * @author Martin Albedinsky
 	 */
 	interface OnConnectionListener {
 
 		/**
-		 * Invoked whenever registered {@link ConnectionStateReceiver} revive an Intent for the
+		 * Invoked whenever registered {@link ConnectionStateReceiver} revives an Intent for the
 		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is some connection established.
 		 * <p>
 		 * <b>Note:</b> this is also fired while connection receiver is being registered via
@@ -165,7 +165,7 @@ public interface Connection {
 		void onConnectionEstablished(@NonNull Context context, @NonNull ConnectionType type, @Nullable NetworkInfo info);
 
 		/**
-		 * Invoked whenever registered {@link ConnectionStateReceiver} receive an Intent for the
+		 * Invoked whenever registered {@link ConnectionStateReceiver} receives an Intent for the
 		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is no connection available.
 		 * <p>
 		 * <b>Note:</b> this is also fired while connection receiver is being registered via

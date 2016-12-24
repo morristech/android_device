@@ -140,8 +140,8 @@ public final class DeviceUtils {
 	/**
 	 * Checks whether the current Android device matches tablet specifications or not.
 	 * <p>
-	 * <b>Note</b>, that this information is only accurate and shouldn't be used for core logic of
-	 * any application.
+	 * <b>Note</b>, that this information is only approximate and shouldn't be used for core logic
+	 * of any application.
 	 * <h3>Checked specifications:</h3>
 	 * <ul>
 	 * <li>Screen orientation</li>

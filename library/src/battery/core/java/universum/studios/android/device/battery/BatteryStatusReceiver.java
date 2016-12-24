@@ -23,30 +23,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 
-import universum.studios.android.device.Device;
-
 /**
- * A {@link android.content.BroadcastReceiver} used by {@link Battery} implementation to receive
- * information about the current state of the Android device's battery.
+ * A {@link Battery.BatteryBroadcastReceiver} used by {@link Battery} implementation to receive actual
+ * information about the current battery status.
  * <p>
- * This broadcast receiver receives all data about the battery.
+ * This broadcast receiver receives all battery data.
  *
  * @author Martin Albedinsky
  */
 public final class BatteryStatusReceiver extends Battery.BatteryBroadcastReceiver {
-
-	/**
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Id of this receiver.
-	 */
-	public static final int RECEIVER_ID = 0x10001;
-
-	/**
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 * Returns the intent filter for {@link Intent#ACTION_BATTERY_CHANGED} action which should be used
@@ -64,7 +49,7 @@ public final class BatteryStatusReceiver extends Battery.BatteryBroadcastReceive
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final Battery battery = Device.getInstance(context).getBattery();
-		battery.processBroadcast(context, intent, RECEIVER_ID);
+		intent.putExtra(EXTRA_RECEIVER_CLASS, getClass());
+		BatteryImpl.getInstance(context).handleBroadcast(context, intent);
 	}
 }

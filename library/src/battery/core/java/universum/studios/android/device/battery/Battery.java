@@ -29,14 +29,13 @@ import android.support.annotation.NonNull;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import universum.studios.android.device.BroadcastProcessor;
-
 /**
- * The Battery interface specifies API allowing to access current information about status, plugged
- * state, health state of the current Android device's battery and more. An implementation of this
- * API can be obtained from the {@link AndroidDevice} via {@link AndroidDevice#getBattery()}.
+ * Battery interface specifies API through which an actual information about the Android device's
+ * battery may be accessed.
  * <p>
- * Below are specified methods provided by this API to access the current battery's data:
+ * A battery implementation may be obtained via {@link Battery.Provider#getBattery(Context) Battery.PROVIDER.getBattery(Context)}.
+ * <p>
+ * Below are listed methods provided by the this interface:
  * <ul>
  * <li>{@link #getStatus()}</li>
  * <li>{@link #getStrength()}</li>
@@ -46,13 +45,13 @@ import universum.studios.android.device.BroadcastProcessor;
  * <li>{@link #getTechnology()}</li>
  * </ul>
  *
- * <h3>Listening for changes in the battery's data</h3>
- * The following code snipped shows, how to properly register battery receivers and where to handle
+ * <h3>Listening for changes in the battery</h3>
+ * The following code snippet shows, how to properly register battery receivers and where to handle
  * the desired callbacks.
  * <pre>
  * public class BatteryActivity extends Activity {
  *
- *      // Battery status listener.
+ *      // Battery state listener.
  *      private final Battery.OnStatusListener STATUS_LISTENER = new Battery.OnStatusListener() {
  *
  *          &#064;Override
@@ -61,7 +60,7 @@ import universum.studios.android.device.BroadcastProcessor;
  *          }
  *      }
  *
- *      // Battery health status listener.
+ *      // Battery health listener.
  *      private final Battery.OnHealthListener HEALTH_LISTENER = new Battery.OnHealthListener() {
  *
  *          &#064;Override
@@ -89,65 +88,51 @@ import universum.studios.android.device.BroadcastProcessor;
  *          }
  *      }
  *
- *      // Device battery wrapper.
+ *      // Battery implementation.
  *      private Battery mBattery;
  *
  *      &#064;Override
  *      protected void onCreate(Bundle savedInstanceState) {
  *          super.onCreate(savedInstanceState);
- *
  *          // ...
- *
  *          // Get the battery API implementation.
- *          this.mBattery = AndroidDevice.getInstance(this).getBattery();
+ *          this.mBattery = Battery.PROVIDER.getBattery(this);
  *          // Register battery listeners to handle battery status changes.
- *          mBattery.registerOnBatteryListener(STATUS_LISTENER);
- *          mBattery.registerOnBatteryListener(HEALTH_LISTENER);
- *          mBattery.registerOnBatteryListener(PLUGGED_STATE_LISTENER);
- *
+ *          mBattery.registerOnStatusListener(STATUS_LISTENER);
+ *          mBattery.registerOnHealthListener(HEALTH_LISTENER);
+ *          mBattery.registerOnPluggedStateListener(PLUGGED_STATE_LISTENER);
  *          // ...
  *      }
  *
  *      &#064;Override
  *      protected void onResume() {
  *          super.onResume();
- *
- *          // Register only needed battery broadcast receivers so the Battery wrapper will receive
- *          // info about the current battery status, plugged state or health.
- *          mBattery.registerBatteryReceiver(this, Battery.RECEIVER_BATTERY_STATUS);
- *          mBattery.registerBatteryReceiver(this, Battery.RECEIVER_BATTERY_HEALTH);
- *          mBattery.registerBatteryReceiver(this, Battery.RECEIVER_BATTERY_PLUGGED_STATE);
- *          // ... or
- *          mBattery.registerAllBatteryReceivers(this);
+ *          // Register battery broadcast receivers so the Battery implementation will receive info
+ *          // about the current battery status, plugged state or health.
+ *          mBattery.registerBatteryReceiver(this, Battery.RECEIVER_BATTERY_STATUS | Battery.RECEIVER_BATTERY_HEALTH | Battery.RECEIVER_BATTERY_PLUGGED_STATE);
  *      }
  *
  *      &#064;Override
  *      protected void onPause() {
  *          super.onPause();
- *
  *          // Un-register all registered receivers.
- *          mBattery.unregisterBatteryReceiver(this, Battery.RECEIVER_BATTERY_STATUS);
- *          mBattery.unregisterBatteryReceiver(this, Battery.RECEIVER_BATTERY_HEALTH);
- *          mBattery.unregisterBatteryReceiver(this, Battery.RECEIVER_BATTERY_PLUGGED_STATE);
- *          // ... or
- *          mBattery.unregisterAllBatteryReceivers(this);
+ *          mBattery.unregisterBatteryReceiver(this, Battery.RECEIVER_BATTERY_STATUS | Battery.RECEIVER_BATTERY_HEALTH | Battery.RECEIVER_BATTERY_PLUGGED_STATE);
  *      }
  *
  *      &#064;Override
  *      protected void onDestroy() {
  *          super.onDestroy();
- *
  *          // Un-register battery listeners.
- *          mBattery.unregisterOnBatteryListener(STATUS_LISTENER);
- *          mBattery.unregisterOnBatteryListener(HEALTH_LISTENER);
- *          mBattery.unregisterOnBatteryListener(PLUGGED_STATE_LISTENER);
+ *          mBattery.registerOnStatusListener(STATUS_LISTENER);
+ *          mBattery.registerOnHealthListener(HEALTH_LISTENER);
+ *          mBattery.registerOnPluggedStateListener(PLUGGED_STATE_LISTENER);
  *      }
  * }
  * </pre>
  *
  * @author Martin Albedinsky
  */
-public interface Battery extends BroadcastProcessor {
+public interface Battery {
 
 	/**
 	 * Provider ====================================================================================
@@ -189,100 +174,92 @@ public interface Battery extends BroadcastProcessor {
 	 */
 
 	/**
-	 * Parent battery listener. Only for internal purpose.
-	 */
-	interface BatteryListener {
-	}
-
-	/**
-	 * Listener that can receive callback about changed battery's status.
+	 * Listener that may be used to receive callback with info about changed battery's status.
 	 *
 	 * @author Martin Albedinsk
 	 */
-	interface OnStatusListener extends BatteryListener {
+	interface OnStatusListener {
 
 		/**
-		 * Invoked whenever the status change of this Android device's battery occurs.
+		 * Invoked whenever the status change of the battery occurs.
 		 * <p>
-		 * <b>Note</b>, that there need to be registered {@link BatteryStatusReceiver}, for example
-		 * by {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_STATUS}
-		 * to receive this callback.
+		 * <b>Note</b>, that there need to be registered {@link BatteryStatusReceiver} via
+		 * {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_STATUS} to
+		 * receive this callback.
 		 *
-		 * @param battery Battery with actual data.
 		 * @param context Current application context.
+		 * @param battery Battery with the actual data.
 		 */
-		void onStatusChange(@NonNull Battery battery, @NonNull Context context);
+		void onStatusChange(@NonNull Context context, @NonNull Battery battery);
 	}
 
 	/**
-	 * Listener that can receive callback about changed battery's plugged state.
+	 * Listener that may be used to receive callback with info about changed battery's plugged state.
 	 *
 	 * @author Martin Albedinsky
 	 */
-	interface OnPluggedStateListener extends BatteryListener {
+	interface OnPluggedStateListener {
 
 		/**
-		 * Invoked whenever this Android device's battery has been plugged into some power source.
-		 * The current plugged state can be obtained via {@link Battery#getPluggedState()}.
+		 * Invoked whenever the battery has been plugged into some power source. The current plugged
+		 * state may be obtained via {@link #getPluggedState()}.
 		 * <p>
-		 * <b>Note</b>, that there need to be registered {@link BatteryPluggedStateReceiver}, for
-		 * example by {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_PLUGGED_STATE}
+		 * <b>Note</b>, that there need to be registered {@link BatteryPluggedStateReceiver} via
+		 * {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_PLUGGED_STATE}
 		 * to receive this callback.
 		 *
-		 * @param battery Battery with actual data.
 		 * @param context Current application context.
+		 * @param battery Battery with the actual data.
 		 */
-		void onPluggedToPowerSource(@NonNull Battery battery, @NonNull Context context);
+		void onPluggedToPowerSource(@NonNull Context context, @NonNull Battery battery);
 
 		/**
-		 * Invoked whenever this Android device's battery has been unplugged from its power source.
+		 * Invoked whenever the battery has been unplugged from power source.
 		 * <p>
-		 * <b>Note</b>, that there need to be registered {@link BatteryPluggedStateReceiver}, for
-		 * example by {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_PLUGGED_STATE}
+		 * <b>Note</b>, that there need to be registered {@link BatteryPluggedStateReceiver} via
+		 * {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_PLUGGED_STATE}
 		 * to receive this callback.
 		 *
-		 * @param battery Battery with actual data.
 		 * @param context Current application context.
+		 * @param battery Battery with the actual data.
 		 */
-		void onUnpluggedFromPowerSource(@NonNull Battery battery, @NonNull Context context);
+		void onUnpluggedFromPowerSource(@NonNull Context context, @NonNull Battery battery);
 	}
 
 	/**
-	 * Listener that can receive callback about changed battery's health (LOW/OK).
+	 * Listener that may be used to receive callback with info about changed battery's health (LOW/OK).
 	 *
 	 * @author Martin Albedinsky
+	 * @see #setHealthLowLevel(int)
+	 * @see #setHealthOkLevel(int)
 	 */
-	interface OnHealthListener extends BatteryListener {
+	interface OnHealthListener {
 
 		/**
-		 * Invoked whenever the current strength of this Android device's battery comes from the
-		 * <b>LOW</b> level to the <b>OK</b> one. The current health can be obtained via {@link Battery#getHealth()}.
+		 * Invoked whenever the current strength of the battery changes from the <b>LOW</b> level to
+		 * the <b>OK</b> level. The current health may be obtained via {@link Battery#getHealth()}.
 		 * <p>
-		 * <b>Note</b>, that there need to be registered {@link BatteryHealthReceiver}, for example
-		 * by {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_HEALTH}
-		 * to receive this callback.
+		 * <b>Note</b>, that there need to be registered {@link BatteryHealthReceiver} via
+		 * {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_HEALTH} to
+		 * receive this callback.
 		 *
-		 * @param battery Battery with actual data.
 		 * @param context Current application context.
-		 * @see #setHealthLowLevel(int)
-		 * @see #setHealthOkLevel(int)
+		 * @param battery Battery with the actual data.
 		 */
-		void onHealthOk(@NonNull Battery battery, @NonNull Context context);
+		void onHealthOk(@NonNull Context context, @NonNull Battery battery);
 
 		/**
-		 * Invoked whenever the current strength of this Android device's battery comes from the <b>OK</b>
-		 * level to the <b>LOW</b>. The current health can be obtained via {@link Battery#getHealth()}.
+		 * Invoked whenever the current strength of the battery changes from the <b>OK</b> level to
+		 * the <b>LOW</b>. The current health may be obtained via {@link Battery#getHealth()}.
 		 * <p>
-		 * <b>Note</b>, that there need to be registered {@link BatteryHealthReceiver}, for example
-		 * by {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_HEALTH}
-		 * to receive this callback.
+		 * <b>Note</b>, that there need to be registered {@link BatteryHealthReceiver} via
+		 * {@link #registerBatteryReceiver(Context, int)} with {@link #RECEIVER_BATTERY_HEALTH} to
+		 * receive this callback.
 		 *
-		 * @param battery Battery with actual data.
 		 * @param context Current application context.
-		 * @see #setHealthLowLevel(int)
-		 * @see #setHealthOkLevel(int)
+		 * @param battery Battery with the actual data.
 		 */
-		void onHealthLow(@NonNull Battery battery, @NonNull Context context);
+		void onHealthLow(@NonNull Context context, @NonNull Battery battery);
 	}
 
 	/**
@@ -290,30 +267,27 @@ public interface Battery extends BroadcastProcessor {
 	 */
 
 	/**
-	 * Defines an annotation for determining set of allowed battery receiver ids.
+	 * Defines an annotation for determining set of available battery receiver ids.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({RECEIVER_BATTERY_STATUS, RECEIVER_BATTERY_HEALTH, RECEIVER_BATTERY_PLUGGED_STATE})
+	@IntDef(flag = true, value = {RECEIVER_BATTERY_STATUS, RECEIVER_BATTERY_HEALTH, RECEIVER_BATTERY_PLUGGED_STATE})
 	@interface Receiver {
 	}
 
 	/**
-	 * The id of {@link universum.studios.android.device.receiver.BatteryStatusReceiver} copied from
-	 * {@link universum.studios.android.device.receiver.BatteryStatusReceiver#RECEIVER_ID}.
+	 * Flag used to identify {@link BatteryStatusReceiver}.
 	 */
-	int RECEIVER_BATTERY_STATUS = BatteryStatusReceiver.RECEIVER_ID;
+	int RECEIVER_BATTERY_STATUS = 0x00000001;
 
 	/**
-	 * The id of {@link universum.studios.android.device.receiver.BatteryHealthReceiver} copied from
-	 * {@link universum.studios.android.device.receiver.BatteryHealthReceiver#RECEIVER_ID}.
+	 * Flag used to identify {@link BatteryHealthReceiver}.
 	 */
-	int RECEIVER_BATTERY_HEALTH = BatteryHealthReceiver.RECEIVER_ID;
+	int RECEIVER_BATTERY_HEALTH = 0x00000001 << 1;
 
 	/**
-	 * The id of {@link universum.studios.android.device.receiver.BatteryPluggedStateReceiver} copied from
-	 * {@link universum.studios.android.device.receiver.BatteryPluggedStateReceiver#RECEIVER_ID}.
+	 * Flag used to identify {@link BatteryPluggedStateReceiver}.
 	 */
-	int RECEIVER_BATTERY_PLUGGED_STATE = BatteryPluggedStateReceiver.RECEIVER_ID;
+	int RECEIVER_BATTERY_PLUGGED_STATE = 0x00000001 << 2;
 
 	/**
 	 * Defines an annotation for determining set of available battery statuses.
@@ -565,82 +539,7 @@ public interface Battery extends BroadcastProcessor {
 	 */
 
 	/**
-	 * Registers all battery receivers to receive all possible battery states for the given context.
-	 *
-	 * @param context Current activity or application context.
-	 * @see #unregisterAllBatteryReceivers(Context)
-	 * @see #registerBatteryReceiver(Context, int)
-	 */
-	void registerAllBatteryReceivers(@NonNull Context context);
-
-	/**
-	 * Registers single battery receiver for the given context.
-	 *
-	 * @param context    Current activity or application context.
-	 * @param receiverId One of {@link #RECEIVER_BATTERY_STATUS}, {@link #RECEIVER_BATTERY_HEALTH},
-	 *                   {@link #RECEIVER_BATTERY_PLUGGED_STATE} ids of the receiver to register.
-	 * @see #registerAllBatteryReceivers(Context)
-	 */
-	void registerBatteryReceiver(@NonNull Context context, @Receiver int receiverId);
-
-	/**
-	 * Un-registers all battery receivers from the given context.
-	 *
-	 * @param context Context in which were all battery receivers registered before.
-	 * @see #registerAllBatteryReceivers(Context)
-	 * @see #unregisterBatteryReceiver(Context, int)
-	 */
-	void unregisterAllBatteryReceivers(@NonNull Context context);
-
-	/**
-	 * Un-registers single battery receiver from the given context.
-	 *
-	 * @param context    Context in which was battery receiver registered before.
-	 * @param receiverId The id of battery receiver to un-register. One of {@link #RECEIVER_BATTERY_STATUS},
-	 *                   {@link #RECEIVER_BATTERY_HEALTH}, {@link #RECEIVER_BATTERY_PLUGGED_STATE}.
-	 */
-	void unregisterBatteryReceiver(@NonNull Context context, @Receiver int receiverId);
-
-	/**
-	 * Called to dispatch message that one of the registered {@link Battery.BatteryBroadcastReceiver}
-	 * was currently unregistered. This should be called immediately after successful un-registration
-	 * of battery receiver with the specified <var>receiverId</var>.
-	 *
-	 * @param receiverId The id of the battery receiver which was un-registered. One of {@link #RECEIVER_BATTERY_STATUS},
-	 *                   {@link #RECEIVER_BATTERY_HEALTH}, {@link #RECEIVER_BATTERY_PLUGGED_STATE}.
-	 */
-	void dispatchBatteryReceiverUnregistered(@Receiver int receiverId);
-
-	/**
-	 * Returns flag indicating whether the battery receiver with the specified <var>receiverId</var>
-	 * is currently registered or not.
-	 *
-	 * @param receiverId The id of the battery receiver. One of {@link #RECEIVER_BATTERY_STATUS},
-	 *                   {@link #RECEIVER_BATTERY_HEALTH}, {@link #RECEIVER_BATTERY_PLUGGED_STATE}.
-	 * @return {@code True} if battery receiver is registered, {@code false} otherwise.
-	 */
-	boolean isBatteryReceiverRegistered(@Receiver int receiverId);
-
-	/**
-	 * Registers a callback to be invoked when some of the battery states changes.
-	 *
-	 * @param listener Callback to register. One of {@link Battery.OnStatusListener},
-	 *                 {@link Battery.OnHealthListener},
-	 *                 {@link Battery.OnPluggedStateListener}.
-	 * @see #unregisterOnBatteryListener(Battery.BatteryListener)
-	 */
-	void registerOnBatteryListener(@NonNull BatteryListener listener);
-
-	/**
-	 * Un-registers the given battery listener callback.
-	 *
-	 * @param listener Callback to un-register.
-	 * @see #registerOnBatteryListener(Battery.BatteryListener)
-	 */
-	void unregisterOnBatteryListener(@NonNull BatteryListener listener);
-
-	/**
-	 * Returns the current strength of life of this Android device's battery.
+	 * Returns the current strength of life of the Android device's battery.
 	 *
 	 * @return The value of strength in the range {@code [0, 100]} or negative number if the current
 	 * battery data are unavailable.
@@ -649,7 +548,7 @@ public interface Battery extends BroadcastProcessor {
 	int getStrength();
 
 	/**
-	 * Returns the current status of this Android device's battery.
+	 * Returns the current status of the Android device's battery.
 	 *
 	 * @return One of {@link #STATUS_CHARGING}, {@link #STATUS_DISCHARGING}, {@link #STATUS_NOT_CHARGING}
 	 * {@link #STATUS_FULL} or {@link #STATUS_UNKNOWN} if the current battery data are unavailable.
@@ -658,7 +557,7 @@ public interface Battery extends BroadcastProcessor {
 	int getStatus();
 
 	/**
-	 * Returns the current plugged state of this Android device's battery.
+	 * Returns the current plugged state of the Android device's battery.
 	 *
 	 * @return One of {@link #PLUGGED_AC}, {@link #PLUGGED_USB}, {@link #PLUGGED_WIRELESS}, {@link #PLUGGED_NONE}
 	 * or {@link #PLUGGED_UNKNOWN} if the current battery data are unavailable.
@@ -667,7 +566,7 @@ public interface Battery extends BroadcastProcessor {
 	int getPluggedState();
 
 	/**
-	 * Returns the current health of this Android device's battery.
+	 * Returns the current health of the Android device's battery.
 	 *
 	 * @return One of {@link #HEALTH_GOOD}, {@link #HEALTH_LOW_LEVEL}, {@link #HEALTH_OK_LEVEL},
 	 * {@link #HEALTH_DEAD}, {@link #HEALTH_OVERHEAT}, {@link #HEALTH_OVER_VOLTAGE} or {@link #HEALTH_UNKNOWN}
@@ -677,7 +576,7 @@ public interface Battery extends BroadcastProcessor {
 	int getHealth();
 
 	/**
-	 * Returns the technology of this Android device's battery.
+	 * Returns the technology of the Android device's battery.
 	 *
 	 * @return One of {@link BatteryTechnology} values or {@link BatteryTechnology#UNKNOWN BatteryTechnology.UNKNOWN}
 	 * if technology can't be parsed due to unknown technology tag name or if the current battery data
@@ -687,7 +586,7 @@ public interface Battery extends BroadcastProcessor {
 	BatteryTechnology getTechnology();
 
 	/**
-	 * Returns the current temperature of this Android device's battery.
+	 * Returns the current temperature of the Android device's battery.
 	 *
 	 * @return Current temperature in degree <b>Centigrade</b> (°C) or negative number if the current
 	 * battery data are unavailable.
@@ -695,7 +594,7 @@ public interface Battery extends BroadcastProcessor {
 	float getTemperature();
 
 	/**
-	 * Returns the current voltage of this Android device's battery.
+	 * Returns the current voltage of the Android device's battery.
 	 *
 	 * @return Current voltage in <b>milli-Volts</b> (mV) or negative number if current voltage is
 	 * unknown or the current battery data are unavailable.
@@ -703,7 +602,7 @@ public interface Battery extends BroadcastProcessor {
 	int getVoltage();
 
 	/**
-	 * Returns flag indicating whether this Android device's battery is currently being charging or not.
+	 * Returns flag indicating whether the Android device's battery is currently being charging or not.
 	 * <p>
 	 * This is similar to {@link #isPlugged()} but here is checked the battery current status.
 	 *
@@ -714,7 +613,7 @@ public interface Battery extends BroadcastProcessor {
 	boolean isCharging();
 
 	/**
-	 * Returns flag indicating whether this Android device's battery is currently plugged to some
+	 * Returns flag indicating whether the Android device's battery is currently plugged to some
 	 * power source or not.
 	 * <p>
 	 * This is similar to {@link #isCharging()} but here is checked the battery current plugged state.
@@ -726,7 +625,7 @@ public interface Battery extends BroadcastProcessor {
 	boolean isPlugged();
 
 	/**
-	 * Returns flag indicating whether the current strength of this Android device's battery is below
+	 * Returns flag indicating whether the current strength of the Android device's battery is below
 	 * the <b>LOW</b> ({@link #getHealthLowLevel()}) level value or not.
 	 *
 	 * @return {@code True} if the current strength is less then or equal to the current <b>LOW</b>
@@ -783,16 +682,105 @@ public interface Battery extends BroadcastProcessor {
 	int getHealthOkLevel();
 
 	/**
+	 * Registers a callback to be invoked when the battery status changes.
+	 *
+	 * @param listener Callback to register.
+	 * @see #unregisterOnStatusListener(OnStatusListener)
+	 * @see #registerBatteryReceiver(Context, int)
+	 */
+	void registerOnStatusListener(@NonNull OnStatusListener listener);
+
+	/**
+	 * Un-registers the given status callback.
+	 *
+	 * @param listener Callback to un-register.
+	 * @see #registerOnStatusListener(OnStatusListener)
+	 */
+	void unregisterOnStatusListener(@NonNull OnStatusListener listener);
+
+	/**
+	 * Registers a callback to be invoked when health of the battery changes.
+	 *
+	 * @param listener Callback to register.
+	 * @see #unregisterOnHealthListener(OnHealthListener)
+	 * @see #registerBatteryReceiver(Context, int)
+	 */
+	void registerOnHealthListener(@NonNull OnHealthListener listener);
+
+	/**
+	 * Un-registers the given health callback.
+	 *
+	 * @param listener Callback to un-register.
+	 * @see #registerOnHealthListener(OnHealthListener)
+	 */
+	void unregisterOnHealthListener(@NonNull OnHealthListener listener);
+
+	/**
+	 * Registers a callback to be invoked when plugged state of the battery changes.
+	 *
+	 * @param listener Callback to register.
+	 * @see #unregisterOnPluggedStateListener(OnPluggedStateListener)
+	 * @see #registerBatteryReceiver(Context, int)
+	 */
+	void registerOnPluggedStateListener(@NonNull OnPluggedStateListener listener);
+
+	/**
+	 * Un-registers the given plugged state callback.
+	 *
+	 * @param listener Callback to un-register.
+	 * @see #registerOnPluggedStateListener(OnPluggedStateListener)
+	 */
+	void unregisterOnPluggedStateListener(@NonNull OnPluggedStateListener listener);
+
+	/**
+	 * Registers a battery receiver for the given context.
+	 *
+	 * @param context      Context where to register the desired battery receiver.
+	 * @param receiverFlag One of {@link #RECEIVER_BATTERY_STATUS}, {@link #RECEIVER_BATTERY_HEALTH},
+	 *                     {@link #RECEIVER_BATTERY_PLUGGED_STATE} or theirs combination.
+	 * @see #isBatteryReceiverRegistered(int)
+	 * @see #unregisterBatteryReceiver(Context, int)
+	 */
+	void registerBatteryReceiver(@NonNull Context context, @Receiver int receiverFlag);
+
+	/**
+	 * Returns flag indicating whether the battery receiver with the specified <var>receiverFlag</var>
+	 * is currently registered or not.
+	 *
+	 * @param receiverFlag The flag used to identify the battery receiver. One of {@link #RECEIVER_BATTERY_STATUS},
+	 *                     {@link #RECEIVER_BATTERY_HEALTH}, {@link #RECEIVER_BATTERY_PLUGGED_STATE}
+	 *                     or theirs combination.
+	 * @return {@code True} if battery receiver is registered, {@code false} otherwise.
+	 */
+	boolean isBatteryReceiverRegistered(@Receiver int receiverFlag);
+
+	/**
+	 * Un-registers the battery receiver from the given context.
+	 *
+	 * @param context      Context where was battery receiver registered before.
+	 * @param receiverFlag The flag of battery receiver to un-register. One of {@link #RECEIVER_BATTERY_STATUS},
+	 *                     {@link #RECEIVER_BATTERY_HEALTH}, {@link #RECEIVER_BATTERY_PLUGGED_STATE}
+	 *                     or theirs combination.
+	 * @see #registerBatteryReceiver(Context, int)
+	 */
+	void unregisterBatteryReceiver(@NonNull Context context, @Receiver int receiverFlag);
+
+	/**
 	 * Inner classes ===============================================================================
 	 */
 
 	/**
-	 * Base battery status receiver.
+	 * Base battery status broadcast receiver.
 	 */
 	abstract class BatteryBroadcastReceiver extends BroadcastReceiver {
 
 		/**
-		 * Implementation in subclass should return new intent filter specific for its receiver action.
+		 * Extra key used to identify a battery receiver which received the battery intent.
+		 */
+		static final String EXTRA_RECEIVER_CLASS = "universum.studios.android.device.battery.EXTRA.ReceiverClass";
+
+		/**
+		 * Implementation should return new intent filter specific for its receiver action.
 		 *
 		 * @return New intent filter.
 		 */

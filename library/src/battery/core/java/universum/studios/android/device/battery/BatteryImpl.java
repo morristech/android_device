@@ -18,6 +18,7 @@
  */
 package universum.studios.android.device.battery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
@@ -27,11 +28,13 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import universum.studios.android.device.DeviceConfig;
+import universum.studios.android.device.connection.ConnectionStateReceiver;
 
 /**
- * Implementation of {@link Battery} API for {@link AndroidDevice AndroidDevice}.
+ * A {@link Battery} implementation.
  *
  * @author Martin Albedinsky
  */
@@ -51,27 +54,23 @@ final class BatteryImpl implements Battery {
 	private static final String TAG = "BatteryImpl";
 
 	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
 	 * Lock used for synchronized operations.
 	 */
 	private static final Object LOCK = new Object();
 
 	/**
-	 * Static members ==============================================================================
+	 * BatteryImpl singleton instance.
 	 */
-
-	/**
-	 * todo:
-	 */
+	@SuppressLint("StaticFieldLeak")
 	private static BatteryImpl sInstance;
 
 	/**
 	 * Members =====================================================================================
 	 */
-
-	/**
-	 * Application context obtained from the context passed during initialization of this wrapper.
-	 */
-	private final Context mContext;
 
 	/**
 	 * Value of the battery strength to indicate low battery level.
@@ -109,24 +108,24 @@ final class BatteryImpl implements Battery {
 	private BatteryInfo mPrevInfo;
 
 	/**
-	 * Array with status listeners.
+	 * List of status listeners.
 	 */
-	private List<OnStatusListener> mStatusListeners;
+	private final List<OnStatusListener> mStatusListeners = new ArrayList<>(2);
 
 	/**
-	 * Array with health listeners.
+	 * AList of health listeners.
 	 */
-	private List<OnHealthListener> mHealthListeners;
+	private final List<OnHealthListener> mHealthListeners = new ArrayList<>(2);
 
 	/**
-	 * Array with charge listeners.
+	 * List of plugged state listeners.
 	 */
-	private List<OnPluggedStateListener> mPluggedStateListeners;
+	private final List<OnPluggedStateListener> mPluggedStateListeners = new ArrayList<>(2);
 
 	/**
-	 * Flag indicating whether the receiver is registered or not.
+	 * Integer holding state determining which battery receivers are registered.
 	 */
-	private boolean mStatusReceiverRegistered, mHealthReceiverRegistered, mPluggedStateReceiverRegistered;
+	private final AtomicInteger mRegisteredReceivers = new AtomicInteger(0);
 
 	/**
 	 * Flag indicating whether the persistent data about battery are initialized or not.
@@ -143,12 +142,11 @@ final class BatteryImpl implements Battery {
 	 */
 
 	/**
-	 * Creates a new instance of BatteryImpl wrapper.
+	 * Creates a new instance of BatteryImpl.
 	 *
-	 * @param applicationContext Application context or activity context.
+	 * @param applicationContext Application context used to access system services.
 	 */
 	private BatteryImpl(Context applicationContext) {
-		this.mContext = applicationContext.getApplicationContext();
 	}
 
 	/**
@@ -156,277 +154,17 @@ final class BatteryImpl implements Battery {
 	 */
 
 	/**
-	 * todo:
+	 * Returns or creates a new singleton instance of BatteryImpl.
 	 *
-	 * @param context
-	 * @return
+	 * @param context Context used by the battery implementation to access system services.
+	 * @return Battery implementation with actual battery data available.
 	 */
+	@NonNull
 	static BatteryImpl getInstance(@NonNull Context context) {
 		synchronized (LOCK) {
 			if (sInstance == null) sInstance = new BatteryImpl(context.getApplicationContext());
 		}
 		return sInstance;
-	}
-
-	/**
-	 */
-	@Override
-	public void registerAllBatteryReceivers(@NonNull Context context) {
-		registerBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_STATUS);
-		registerBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_HEALTH);
-		registerBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_PLUGGED_STATE);
-	}
-
-	/**
-	 */
-	@Override
-	public void registerBatteryReceiver(@NonNull Context context, @Receiver int receiverId) {
-		final String receiverName = getReceiverName(receiverId);
-		synchronized (LOCK) {
-			// Check already registered receiver.
-			if (isBatteryReceiverRegistered(receiverId)) {
-				if (DeviceConfig.LOG_ENABLED)
-					Log.v(TAG, "Battery receiver(" + receiverName + ") already registered.");
-			} else {
-				final BatteryBroadcastReceiver receiver = getReceiver(receiverId);
-				context.registerReceiver(receiver, receiver.newIntentFilter());
-				switch (receiverId) {
-					case RECEIVER_BATTERY_HEALTH:
-						this.mHealthReceiverRegistered = true;
-						break;
-					case RECEIVER_BATTERY_PLUGGED_STATE:
-						this.mPluggedStateReceiverRegistered = true;
-						break;
-					case RECEIVER_BATTERY_STATUS:
-						this.mStatusReceiverRegistered = true;
-						break;
-				}
-				if (DeviceConfig.LOG_ENABLED)
-					Log.v(TAG, "Battery receiver(" + receiverName + ") successfully registered.");
-			}
-		}
-	}
-
-	/**
-	 */
-	@Override
-	public void unregisterAllBatteryReceivers(@NonNull Context context) {
-		unregisterBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_STATUS);
-		unregisterBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_HEALTH);
-		unregisterBatteryReceiver(context, BatteryImpl.RECEIVER_BATTERY_PLUGGED_STATE);
-	}
-
-	/**
-	 */
-	@Override
-	public void unregisterBatteryReceiver(@NonNull Context context, @Receiver int receiverId) {
-		final String receiverName = getReceiverName(receiverId);
-		synchronized (LOCK) {
-			// Check if is receiver registered.
-			if (!isBatteryReceiverRegistered(receiverId)) {
-				if (DeviceConfig.LOG_ENABLED) {
-					Log.v(TAG, "Cannot un-register not registered battery receiver(" + receiverName + ").");
-				}
-			} else {
-				final BatteryBroadcastReceiver receiver = getReceiver(receiverId);
-				context.unregisterReceiver(receiver);
-				dispatchBatteryReceiverUnregistered(receiverId);
-				if (DeviceConfig.LOG_ENABLED) {
-					Log.v(TAG, "Battery receiver(" + receiverName + ") successfully unregistered.");
-				}
-			}
-		}
-	}
-
-	/**
-	 */
-	@Override
-	public boolean isBatteryReceiverRegistered(@Receiver int receiverId) {
-		switch (receiverId) {
-			case RECEIVER_BATTERY_STATUS:
-				return mStatusReceiverRegistered;
-			case RECEIVER_BATTERY_HEALTH:
-				return mHealthReceiverRegistered;
-			case RECEIVER_BATTERY_PLUGGED_STATE:
-				return mPluggedStateReceiverRegistered;
-		}
-		return false;
-	}
-
-	/**
-	 */
-	@Override
-	public final void dispatchBatteryReceiverUnregistered(@Receiver int receiverId) {
-		switch (receiverId) {
-			case RECEIVER_BATTERY_STATUS:
-				this.mStatusReceiverRegistered = false;
-				break;
-			case RECEIVER_BATTERY_HEALTH:
-				this.mHealthReceiverRegistered = false;
-				break;
-			case RECEIVER_BATTERY_PLUGGED_STATE:
-				this.mPluggedStateReceiverRegistered = false;
-				break;
-		}
-		onBatteryReceiverUnregistered(receiverId);
-	}
-
-	/**
-	 * Invoked when a battery receiver with the specified <var>receiverId</var> was currently un-registered.
-	 *
-	 * @param receiverId The id of currently un-registered receiver.
-	 */
-	private void onBatteryReceiverUnregistered(int receiverId) {
-		switch (receiverId) {
-			case RECEIVER_BATTERY_STATUS:
-				// Dispatch to reset status data.
-				mInfo.resetStatusData();
-				mPrevInfo.resetStatusData();
-				// Reset all status receiver flags.
-				this.mPersistentDataInitialized = this.mDataInitialized = false;
-				// Dispatch to reset both plugged and health state.
-				mInfo.resetHealthState();
-				mInfo.resetPluggedState();
-				mPrevInfo.resetHealthState();
-				mPrevInfo.resetPluggedState();
-				break;
-			case RECEIVER_BATTERY_HEALTH:
-				mInfo.resetHealthState();
-				mPrevInfo.resetHealthState();
-				break;
-			case RECEIVER_BATTERY_PLUGGED_STATE:
-				mInfo.resetPluggedState();
-				mPrevInfo.resetPluggedState();
-				break;
-		}
-	}
-
-	/**
-	 */
-	@Override
-	public void registerOnBatteryListener(@NonNull BatteryListener listener) {
-		this.registerUnregisterListener(listener, true);
-	}
-
-	/**
-	 */
-	@Override
-	public void unregisterOnBatteryListener(@NonNull BatteryListener listener) {
-		this.registerUnregisterListener(listener, false);
-	}
-
-	/**
-	 * Handles registering/un-registering of the given listener.
-	 *
-	 * @param listener Listener to register/un-register.
-	 * @param register {@code True} to register, {@code false} to un-register listener.
-	 */
-	private void registerUnregisterListener(BatteryListener listener, boolean register) {
-		if (listener instanceof OnStatusListener) {
-			if (register) {
-				this.addStatusListener((OnStatusListener) listener);
-			} else {
-				this.removeStatusListener((OnStatusListener) listener);
-			}
-		} else if (listener instanceof OnPluggedStateListener) {
-			if (register) {
-				this.addPluggedListener((OnPluggedStateListener) listener);
-			} else {
-				this.removePluggedListener((OnPluggedStateListener) listener);
-			}
-		} else if (listener instanceof OnHealthListener) {
-			if (register) {
-				this.addHealthListener((OnHealthListener) listener);
-			} else {
-				this.removeHealthListener((OnHealthListener) listener);
-			}
-		} else if (DeviceConfig.LOG_ENABLED) {
-			Log.v(TAG, "Unknown battery listener type(" + listener.getClass().getSimpleName()
-					+ ") when registering/un-registering BatteryListener.");
-		}
-	}
-
-	/**
-	 * Adds the given listener into the current set of plugged state listeners.
-	 *
-	 * @param listener Listener to add.
-	 */
-	private void addPluggedListener(OnPluggedStateListener listener) {
-		if (mPluggedStateListeners == null) {
-			this.mPluggedStateListeners = new ArrayList<>();
-			mPluggedStateListeners.add(listener);
-			return;
-		}
-		if (!mPluggedStateListeners.contains(listener)) {
-			mPluggedStateListeners.add(listener);
-		}
-	}
-
-	/**
-	 * Removes the given listener from the current ste of plugged state listeners.
-	 *
-	 * @param listener Listener to remove.
-	 */
-	private void removePluggedListener(OnPluggedStateListener listener) {
-		if (mPluggedStateListeners != null) mPluggedStateListeners.remove(listener);
-	}
-
-	/**
-	 * Adds the given listener into the current set of status listeners.
-	 *
-	 * @param listener Listener to add.
-	 */
-	private void addStatusListener(OnStatusListener listener) {
-		if (mStatusListeners == null) {
-			this.mStatusListeners = new ArrayList<>();
-			mStatusListeners.add(listener);
-			if (mDataInitialized) {
-				// Fire initial callback.
-				notifyBatteryStatusChange(getApplicationContext());
-			}
-			return;
-		}
-		if (!mStatusListeners.contains(listener)) {
-			mStatusListeners.add(listener);
-			if (mDataInitialized) {
-				// Fire initial callback.
-				notifyBatteryStatusChange(getApplicationContext());
-			}
-		}
-	}
-
-	/**
-	 * Removes the given listener from the current set of status listeners.
-	 *
-	 * @param listener Listener to remove.
-	 */
-	private void removeStatusListener(OnStatusListener listener) {
-		if (mStatusListeners != null) mStatusListeners.remove(listener);
-	}
-
-	/**
-	 * Adds the given listener into the current set of health listeners.
-	 *
-	 * @param listener Listener to add.
-	 */
-	private void addHealthListener(OnHealthListener listener) {
-		if (mHealthListeners == null) {
-			this.mHealthListeners = new ArrayList<>();
-			mHealthListeners.add(listener);
-			return;
-		}
-		if (!mHealthListeners.contains(listener)) {
-			mHealthListeners.add(listener);
-		}
-	}
-
-	/**
-	 * Removes the given listener from the current set of health listeners.
-	 *
-	 * @param listener Listener to remove.
-	 */
-	private void removeHealthListener(OnHealthListener listener) {
-		if (mHealthListeners != null) mHealthListeners.remove(listener);
 	}
 
 	/**
@@ -452,54 +190,6 @@ final class BatteryImpl implements Battery {
 	@Override
 	public boolean isLow() {
 		return (getStrength() <= getHealthLowLevel());
-	}
-
-	/**
-	 */
-	@Override
-	public void processBroadcast(@NonNull Context context, @NonNull Intent intent, int receiverId) {
-		// Obtain intent action.
-		final String action = intent.getAction();
-		if (action == null) {
-			return;
-		}
-		// Resolve which receiver receives broadcast.
-		switch (receiverId) {
-			case RECEIVER_BATTERY_STATUS:
-				// Update data to actual ones.
-				this.bindBatteryData(intent, receiverId);
-				// Fire callback for listener.
-				notifyBatteryStatusChange(context);
-				break;
-			case RECEIVER_BATTERY_HEALTH:
-				// This is fired whenever the battery level reach the LOW level or
-				// OK level value of its strength.
-				// Intent is not fired repeatedly, but only when the battery reach
-				// low level from the OK level or on the contrary when the battery
-				// reach OK level from the low level.
-				// =================================================================
-				// Fire callback for listeners.
-				notifyBatteryHealthChange(context, action.equals(Intent.ACTION_BATTERY_LOW));
-				break;
-			case RECEIVER_BATTERY_PLUGGED_STATE:
-				// This is fired whenever the power is connected/disconnected
-				// to/from the battery. We want to just determine if this is connect
-				// or disconnect.
-				// =================================================================
-				// Fire callback for listeners.
-				notifyBatteryPluggedStateChange(context, action.equals(Intent.ACTION_POWER_CONNECTED));
-				break;
-		}
-	}
-
-	/**
-	 * Returns an application context obtained from the context passed during initialization of this
-	 * wrapper.
-	 *
-	 * @return Application context.
-	 */
-	public Context getApplicationContext() {
-		return mContext;
 	}
 
 	/**
@@ -570,7 +260,7 @@ final class BatteryImpl implements Battery {
 	 * @return {@code True} if data are initialized, {@code false} otherwise.
 	 */
 	private boolean checkDataInitialization(String batteryInfo) {
-		if (!mDataInitialized && !mStatusReceiverRegistered) {
+		if (!mDataInitialized && !isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
 			if (DeviceConfig.DEBUG_LOG_ENABLED) {
 				Log.d(TAG, "Cannot determine " + batteryInfo + " of the battery. The BatteryStatusReceiver is not registered.");
 			}
@@ -608,100 +298,11 @@ final class BatteryImpl implements Battery {
 	}
 
 	/**
-	 * Notifies all current {@link universum.studios.android.device.Battery.OnHealthListener} listeners, that the health state of battery
-	 * was changed.
-	 *
-	 * @param context Current application context.
-	 * @param low     {@code True} if the current health of battery is low, {@code false} otherwise.
-	 */
-	private void notifyBatteryHealthChange(Context context, boolean low) {
-		for (OnHealthListener listener : mHealthListeners) {
-			if (listener != null) {
-				if (low) {
-					listener.onHealthLow(this, context);
-				} else {
-					listener.onHealthOk(this, context);
-				}
-			}
-		}
-		// Dispatch to reset status data.
-		mInfo.resetStatusData();
-		mPrevInfo.resetStatusData();
-	}
-
-	/**
-	 * Notifies all current {@link universum.studios.android.device.Battery.OnPluggedStateListener}
-	 * listeners, that the plugged state of battery was changed.
-	 *
-	 * @param context Current application context.
-	 * @param plugged {@code True} if battery is currently plugged to some source,
-	 *                {@code false} otherwise.
-	 */
-	private void notifyBatteryPluggedStateChange(Context context, boolean plugged) {
-		for (OnPluggedStateListener listener : mPluggedStateListeners) {
-			if (listener != null) {
-				if (plugged) {
-					listener.onPluggedToPowerSource(this, context);
-				} else {
-					listener.onUnpluggedFromPowerSource(this, context);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Returns the battery receiver associated with the requested <var>receiverId</var>.
-	 *
-	 * @param receiverId Id of the battery receiver.
-	 * @return One of battery receivers.
-	 */
-	private BatteryBroadcastReceiver getReceiver(int receiverId) {
-		BatteryBroadcastReceiver receiver = null;
-		synchronized (LOCK) {
-			switch (receiverId) {
-				case RECEIVER_BATTERY_STATUS:
-					receiver = (mStatusReceiver == null) ? mStatusReceiver = new BatteryStatusReceiver() : mStatusReceiver;
-					break;
-				case RECEIVER_BATTERY_HEALTH:
-					receiver = (mHealthReceiver == null) ? mHealthReceiver = new BatteryHealthReceiver() : mHealthReceiver;
-					break;
-				case RECEIVER_BATTERY_PLUGGED_STATE:
-					receiver = (mPluggedStateReceiver == null) ? mPluggedStateReceiver = new BatteryPluggedStateReceiver() : mPluggedStateReceiver;
-					break;
-			}
-		}
-		return receiver;
-	}
-
-	/**
-	 * Returns a name of the battery receiver associated with the requested <var>receiverId</var>.
-	 *
-	 * @param receiverId Id of the battery receiver which name to obtain.
-	 * @return Battery receiver's name.
-	 */
-	private String getReceiverName(int receiverId) {
-		String name = "";
-		switch (receiverId) {
-			case RECEIVER_BATTERY_STATUS:
-				name = "BATTERY_STATUS_RECEIVER";
-				break;
-			case RECEIVER_BATTERY_HEALTH:
-				name = "BATTERY_HEALTH_RECEIVER";
-				break;
-			case RECEIVER_BATTERY_PLUGGED_STATE:
-				name = "BATTERY_PLUGGED_STATE_RECEIVER";
-				break;
-		}
-		return name;
-	}
-
-	/**
 	 * Binds the current battery data with that ones (actual) from the given intent.
 	 *
-	 * @param intent     Intent with the actual battery data.
-	 * @param receiverId Id of the battery receiver which receives the given intent.
+	 * @param intent Intent with the actual battery data.
 	 */
-	private void bindBatteryData(Intent intent, int receiverId) {
+	private void bindBatteryData(Intent intent) {
 		// Save previous battery info.
 		this.mPrevInfo = new BatteryInfo(mInfo);
 		// Initialize persistent data only if this is first binding.
@@ -737,20 +338,188 @@ final class BatteryImpl implements Battery {
 	}
 
 	/**
-	 * Notifies all current {@link universum.studios.android.device.Battery.OnStatusListener} listeners, that some of the battery status
-	 * values was changed.
+	 */
+	@Override
+	public void registerOnStatusListener(@NonNull OnStatusListener listener) {
+		synchronized (mStatusListeners) {
+			if (!mStatusListeners.contains(listener)) mStatusListeners.add(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterOnStatusListener(@NonNull OnStatusListener listener) {
+		synchronized (mStatusListeners) {
+			mStatusListeners.remove(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void registerOnHealthListener(@NonNull OnHealthListener listener) {
+		synchronized (mHealthListeners) {
+			if (!mHealthListeners.contains(listener)) mHealthListeners.add(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterOnHealthListener(@NonNull OnHealthListener listener) {
+		synchronized (mHealthListeners) {
+			mHealthListeners.remove(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void registerOnPluggedStateListener(@NonNull OnPluggedStateListener listener) {
+		synchronized (mPluggedStateListeners) {
+			if (!mPluggedStateListeners.contains(listener)) mPluggedStateListeners.add(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterOnPluggedStateListener(@NonNull OnPluggedStateListener listener) {
+		synchronized (mPluggedStateListeners) {
+			mPluggedStateListeners.remove(listener);
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public void registerBatteryReceiver(@NonNull Context context, @Receiver int receiverFlag) {
+		synchronized (LOCK) {
+			if ((receiverFlag & RECEIVER_BATTERY_STATUS) != 0 && !isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
+				this.mStatusReceiver = new BatteryStatusReceiver();
+				context.registerReceiver(mStatusReceiver, mStatusReceiver.newIntentFilter());
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() | RECEIVER_BATTERY_STATUS);
+			}
+			if ((receiverFlag & RECEIVER_BATTERY_HEALTH) != 0 && !isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
+				this.mHealthReceiver = new BatteryHealthReceiver();
+				context.registerReceiver(mHealthReceiver, mHealthReceiver.newIntentFilter());
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() | RECEIVER_BATTERY_HEALTH);
+			}
+			if ((receiverFlag & RECEIVER_BATTERY_PLUGGED_STATE) != 0 && !isBatteryReceiverRegistered(RECEIVER_BATTERY_PLUGGED_STATE)) {
+				this.mPluggedStateReceiver = new BatteryPluggedStateReceiver();
+				context.registerReceiver(mPluggedStateReceiver, mPluggedStateReceiver.newIntentFilter());
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() | RECEIVER_BATTERY_PLUGGED_STATE);
+			}
+		}
+	}
+
+	/**
+	 */
+	@Override
+	public boolean isBatteryReceiverRegistered(@Receiver int receiverFlag) {
+		return (mRegisteredReceivers.get() & receiverFlag) != 0;
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterBatteryReceiver(@NonNull Context context, @Receiver int receiverFlag) {
+		synchronized (LOCK) {
+			if ((receiverFlag & RECEIVER_BATTERY_STATUS) != 0 && isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
+				context.unregisterReceiver(mStatusReceiver);
+				this.mStatusReceiver = null;
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() & ~RECEIVER_BATTERY_STATUS);
+				// Reset status data.
+				mInfo.resetStatusData();
+				mPrevInfo.resetStatusData();
+				// Reset all status receiver flags.
+				this.mPersistentDataInitialized = this.mDataInitialized = false;
+				if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
+					mInfo.resetHealthState();
+					mPrevInfo.resetHealthState();
+				}
+				if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_PLUGGED_STATE)) {
+					mInfo.resetPluggedState();
+					mPrevInfo.resetPluggedState();
+				}
+			}
+			if ((receiverFlag & RECEIVER_BATTERY_HEALTH) != 0 && isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
+				context.unregisterReceiver(mHealthReceiver);
+				this.mHealthReceiver = null;
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() & ~RECEIVER_BATTERY_HEALTH);
+				if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
+					mInfo.resetHealthState();
+					mPrevInfo.resetHealthState();
+				}
+			}
+			if ((receiverFlag & RECEIVER_BATTERY_PLUGGED_STATE) != 0 && isBatteryReceiverRegistered(RECEIVER_BATTERY_PLUGGED_STATE)) {
+				context.unregisterReceiver(mPluggedStateReceiver);
+				this.mPluggedStateReceiver = null;
+				this.mRegisteredReceivers.set(mRegisteredReceivers.get() & ~RECEIVER_BATTERY_PLUGGED_STATE);
+				if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
+					mInfo.resetPluggedState();
+					mPrevInfo.resetPluggedState();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handles a broadcast received by {@link ConnectionStateReceiver}.
+	 *
+	 * @param context Application context.
+	 * @param intent  The intent containing the broadcasted data.
+	 */
+	void handleBroadcast(@NonNull Context context, @NonNull Intent intent) {
+		// Check whether there is an intent action.
+		final String action = intent.getAction();
+		if (action == null) {
+			return;
+		}
+		// Resolve which receiver has received the broadcast.
+		final Class<?> receiverClass = (Class<?>) intent.getSerializableExtra(BatteryBroadcastReceiver.EXTRA_RECEIVER_CLASS);
+		if (BatteryStatusReceiver.class.equals(receiverClass)) {
+			// Update data to actual ones.
+			this.bindBatteryData(intent);
+			// Fire callback for listener.
+			notifyBatteryStatusChange(context);
+		} else if (BatteryHealthReceiver.class.equals(receiverClass)) {
+			// This is fired whenever the battery level reach the LOW level or
+			// OK level value of its strength.
+			// Intent is not fired repeatedly, but only when the battery reach
+			// low level from the OK level or on the contrary when the battery
+			// reach OK level from the low level.
+			// =================================================================
+			// Fire callback for listeners.
+			notifyBatteryHealthChange(context, action.equals(Intent.ACTION_BATTERY_LOW));
+		} else if (BatteryPluggedStateReceiver.class.equals(receiverClass)) {
+			// This is fired whenever the power is connected/disconnected
+			// to/from the battery. We want to just determine if this is connect
+			// or disconnect.
+			// =================================================================
+			// Fire callback for listeners.
+			notifyBatteryPluggedStateChange(context, action.equals(Intent.ACTION_POWER_CONNECTED));
+		}
+	}
+
+	/**
+	 * Notifies all registered {@link OnStatusListener} listeners that some of the battery status
+	 * values has changed.
 	 *
 	 * @param context Current application context.
 	 */
 	private void notifyBatteryStatusChange(Context context) {
-		for (OnStatusListener listener : mStatusListeners) {
-			if (listener != null) {
-				listener.onStatusChange(this, context);
+		synchronized (mStatusListeners) {
+			if (mStatusListeners.size() > 0) {
+				for (OnStatusListener listener : mStatusListeners) {
+					listener.onStatusChange(context, this);
+				}
 			}
 		}
 		// Check for changed health or plugged status.
 		if (mPrevInfo != null) {
-			if (!mHealthReceiverRegistered) {
+			if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
 				switch (mPrevInfo.getHealthStatus(mInfo.strength())) {
 					case BatteryInfo.HEALTH_LEVEL_STATUS_UNCHANGED:
 						break;
@@ -762,9 +531,45 @@ final class BatteryImpl implements Battery {
 						break;
 				}
 			}
-			if (!mPluggedStateReceiverRegistered) {
+			if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_PLUGGED_STATE)) {
 				if (mPrevInfo.hasPluggedStateChanged(mInfo.pluggedState)) {
 					notifyBatteryPluggedStateChange(context, isPlugged());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Notifies all registered {@link OnHealthListener} listeners that the health state of battery
+	 * has changed.
+	 *
+	 * @param context Current application context.
+	 * @param low     {@code True} if the current health of battery is low, {@code false} otherwise.
+	 */
+	private void notifyBatteryHealthChange(Context context, boolean low) {
+		synchronized (mHealthListeners) {
+			if (mHealthListeners.size() > 0) {
+				for (OnHealthListener listener : mHealthListeners) {
+					if (low) listener.onHealthLow(context, this);
+					else listener.onHealthOk(context, this);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Notifies all registered {@link OnPluggedStateListener} listeners that the plugged state of
+	 * battery has changed.
+	 *
+	 * @param context Current application context.
+	 * @param plugged {@code True} if battery is currently plugged to some source, {@code false} otherwise.
+	 */
+	private void notifyBatteryPluggedStateChange(Context context, boolean plugged) {
+		synchronized (mPluggedStateListeners) {
+			if (mPluggedStateListeners.size() > 0) {
+				for (OnPluggedStateListener listener : mPluggedStateListeners) {
+					if (plugged) listener.onPluggedToPowerSource(context, this);
+					else listener.onUnpluggedFromPowerSource(context, this);
 				}
 			}
 		}
@@ -855,10 +660,8 @@ final class BatteryImpl implements Battery {
 		 * Resets the current value of health state of this info to {@link #HEALTH_UNKNOWN}.
 		 */
 		private void resetHealthState() {
-			if (!mStatusReceiverRegistered) {
-				// We don't know anymore the actual health state of the battery.
-				this.health = HEALTH_UNKNOWN;
-			}
+			// We don't know anymore the actual health state of the battery.
+			this.health = HEALTH_UNKNOWN;
 		}
 
 		/**
@@ -866,9 +669,7 @@ final class BatteryImpl implements Battery {
 		 */
 		final void resetPluggedState() {
 			// We don't know anymore the actual plugged state of the battery.
-			if (!mStatusReceiverRegistered || !mPluggedStateReceiverRegistered) {
-				this.pluggedState = PLUGGED_UNKNOWN;
-			}
+			this.pluggedState = PLUGGED_UNKNOWN;
 		}
 
 		/**
@@ -876,11 +677,9 @@ final class BatteryImpl implements Battery {
 		 * to {@code -1} of this info.
 		 */
 		final void resetStatusData() {
-			if (!mStatusReceiverRegistered) {
-				// Reset all dynamically changing states.
-				this.status = STATUS_UNKNOWN;
-				this.strength = this.temperature = -1;
-			}
+			// Reset all dynamically changing states.
+			this.status = STATUS_UNKNOWN;
+			this.strength = this.temperature = -1;
 		}
 
 		/**
@@ -944,8 +743,8 @@ final class BatteryImpl implements Battery {
 		@Override
 		@SuppressWarnings("StringBufferReplaceableByString")
 		public String toString() {
-			final StringBuilder builder = new StringBuilder("BatteryInfo{");
-			builder.append("status: ");
+			final StringBuilder builder = new StringBuilder(64);
+			builder.append("BatteryInfo{status: ");
 			builder.append(status);
 			builder.append(", health: ");
 			builder.append(health);

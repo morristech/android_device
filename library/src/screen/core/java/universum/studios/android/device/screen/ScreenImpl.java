@@ -84,7 +84,7 @@ final class ScreenImpl implements Screen {
 	private final DisplayMetrics METRICS = new DisplayMetrics();
 
 	/**
-	 * Application context obtained from the context passed during initialization of this wrapper.
+	 * Application context.
 	 */
 	private final Context mContext;
 
