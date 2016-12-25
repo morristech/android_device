@@ -144,11 +144,10 @@ public final class DeviceUtils {
 	 * of any application.
 	 * <h3>Checked specifications:</h3>
 	 * <ul>
-	 * <li>Screen orientation</li>
-	 * <li>{@link universum.studios.android.device.screen.Screen.ScreenRotation}</li>
-	 * <li>{@link universum.studios.android.device.screen.Screen.ScreenType}</li>
-	 * <li>{@link universum.studios.android.device.screen.Screen.ScreenDensity}</li>
-	 * <li><b>Screen diagonal distance</b></li>
+	 * <li>{@link Screen#getDefaultOrientation()}</li>
+	 * <li>{@link Screen#getType()}</li>
+	 * <li>{@link Screen#getDiagonalDistanceInInches()}</li>
+	 * <li>{@link Screen#getDensity()}</li>
 	 * </ul>
 	 *
 	 * @return {@code True} if the current Android device matches tablet specifications, {@code false}
@@ -181,6 +180,7 @@ public final class DeviceUtils {
 			case HDPI:
 			case XHDPI:
 				percentageMatch += TABLET_MATCH_SCREEN_DENSITY_POINTS;
+				break;
 		}
 		return percentageMatch >= MINIMUM_TABLET_PERCENTAGE_MATCH;
 	}

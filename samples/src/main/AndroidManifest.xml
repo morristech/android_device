@@ -19,7 +19,7 @@
  * =================================================================================================
  */
 -->
-<manifest package="universum.studios.android.samples.preference"
+<manifest package="universum.studios.android.samples.device"
 		  xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<application

@@ -7,7 +7,7 @@ Download the latest **[release](https://github.com/universum-studios/android_dev
 
 ### Gradle ###
 
-    compile 'universum.studios.android:devjce:1.0.0@aar'
+    compile 'universum.studios.android:device:1.0.0@aar'
 
 ## Compatibility ##
 

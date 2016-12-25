@@ -422,7 +422,6 @@ public interface Screen {
 		ROTATION_90(90, Surface.ROTATION_90),
 		/**
 		 * Rotation indicating screen rotation by <b>180 degrees</b>:
-		 * <p>
 		 * <ul>
 		 * <li><b>phone:</b> {@link #ORIENTATION_REVERSE_PORTRAIT REVERSE_PORTRAIT} orientation</li>
 		 * <li><b>tablet:</b> {@link #ORIENTATION_REVERSE_LANDSCAPE REVERSE_LANDSCAPE} orientation</li>

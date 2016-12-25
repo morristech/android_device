@@ -19,4 +19,4 @@
 /**
  * @author Martin Albedinsky
  */
-package universum.studios.android.device;
+package universum.studios.android.samples.device;

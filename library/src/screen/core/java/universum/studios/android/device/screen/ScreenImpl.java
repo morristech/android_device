@@ -294,7 +294,6 @@ final class ScreenImpl implements Screen {
 				activity.setRequestedOrientation(getCurrentOrientation());
 				break;
 			case ORIENTATION_UNSPECIFIED:
-				// In case of UNKNOWN oriented screen we cannot do nothing useful :).
 				break;
 			default:
 				activity.setRequestedOrientation(orientation);

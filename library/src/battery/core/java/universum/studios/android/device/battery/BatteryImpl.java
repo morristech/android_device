@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import universum.studios.android.device.DeviceConfig;
-import universum.studios.android.device.connection.ConnectionStateReceiver;
 
 /**
  * A {@link Battery} implementation.
@@ -466,7 +465,8 @@ final class BatteryImpl implements Battery {
 	}
 
 	/**
-	 * Handles a broadcast received by {@link ConnectionStateReceiver}.
+	 * Handles a broadcast received by one of {@link BatteryStatusReceiver}, {@link BatteryHealthReceiver}
+	 * or {@link BatteryPluggedStateReceiver}.
 	 *
 	 * @param context Application context.
 	 * @param intent  The intent containing the broadcasted data.

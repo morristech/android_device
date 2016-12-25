@@ -16,12 +16,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  * =================================================================================================
  */
-package universum.studios.android.device.ui;
+package universum.studios.android.samples.device.ui;
 
 import android.support.annotation.NonNull;
 import android.view.MenuItem;
 
-import universum.studios.android.device.battery.Battery;
 import universum.studios.android.samples.ui.SamplesNavigationActivity;
 
 /**
@@ -40,6 +39,5 @@ public final class MainActivity extends SamplesNavigationActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Battery.PROVIDER.getBattery(this).registerAllBatteryReceivers(this);
 	}
 }

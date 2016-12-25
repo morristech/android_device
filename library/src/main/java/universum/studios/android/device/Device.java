@@ -21,7 +21,7 @@ package universum.studios.android.device;
 import android.os.Build;
 
 /**
- * Device is a simple class with basic information about the Android device.
+ * Device is a simple class providing basic information about the Android device.
  *
  * @author Martin Albedinsky
  */
