@@ -42,15 +42,8 @@ android {
 
     sourceSets {
         main.java.srcDirs = [
-                '../library-core/src/main/java',
-                '../library-battery-core/src/main/java',
                 '../library-connection-core/src/main/java',
-                '../library-connection-util/src/main/java',
-                '../library-screen-core/src/main/java',
-                '../library-screen-util/src/main/java',
-                '../library-storage-core/src/main/java',
-                '../library-storage-util/src/main/java',
-                '../library-util/src/main/java'
+                '../library-connection-util/src/main/java'
         ]
     }
 
@@ -73,26 +66,6 @@ dependencies {
      * RELEASE DEPENDENCIES ------------------------------------------------------------------------
      */
     compile 'com.android.support:support-annotations:' + supportVersion
-
-    /*
-     * TEST DEPENDENCIES ---------------------------------------------------------------------------
-     */
-    // Local JUnit test dependencies.
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.0.57-beta'
-    // Android Instrumentation test dependencies.
-    androidTestCompile 'com.android.support:support-annotations:' + supportVersion
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
-    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2') {
-        exclude group: 'com.android.support', module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'com.android.support', module: 'design'
-        exclude group: 'com.android.support', module: 'recyclerview-v7'
-    }
 }
 
 // Apply PUBLISH script.

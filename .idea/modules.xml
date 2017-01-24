@@ -4,6 +4,18 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Device.iml" filepath="$PROJECT_DIR$/Device.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-battery/library-battery.iml" filepath="$PROJECT_DIR$/library-battery/library-battery.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-connection/library-connection.iml" filepath="$PROJECT_DIR$/library-connection/library-connection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-connection-core/library-connection-core.iml" filepath="$PROJECT_DIR$/library-connection-core/library-connection-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-connection-util/library-connection-util.iml" filepath="$PROJECT_DIR$/library-connection-util/library-connection-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-core/library-core.iml" filepath="$PROJECT_DIR$/library-core/library-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-screen/library-screen.iml" filepath="$PROJECT_DIR$/library-screen/library-screen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-screen-core/library-screen-core.iml" filepath="$PROJECT_DIR$/library-screen-core/library-screen-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-screen-util/library-screen-util.iml" filepath="$PROJECT_DIR$/library-screen-util/library-screen-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-storage/library-storage.iml" filepath="$PROJECT_DIR$/library-storage/library-storage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-storage-core/library-storage-core.iml" filepath="$PROJECT_DIR$/library-storage-core/library-storage-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-storage-util/library-storage-util.iml" filepath="$PROJECT_DIR$/library-storage-util/library-storage-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library-util/library-util.iml" filepath="$PROJECT_DIR$/library-util/library-util.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/samples.iml" filepath="$PROJECT_DIR$/samples/samples.iml" />
     </modules>
   </component>
