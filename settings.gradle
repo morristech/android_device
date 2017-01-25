@@ -1,2 +1,7 @@
 // Gradle project settings. Specifies which modules to include into project.
-include ':library', ':samples', ':library-core', ':library-battery', ':library-connection', ':library-connection-core', ':library-connection-util', ':library-screen', ':library-screen-core', ':library-screen-util', ':library-storage', ':library-storage-core', ':library-storage-util', ':library-util'
+include ':library', ':samples'
+include ':library-core', ':library-util'
+include ':library-battery'
+include ':library-connection', ':library-connection-core', ':library-connection-util'
+include ':library-screen', ':library-screen-core', ':library-screen-util'
+include ':library-storage', ':library-storage-core', ':library-storage-util'
