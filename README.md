@@ -1,13 +1,17 @@
 Device
 ===============
 
-## Download ##
+[![Build Status](https://travis-ci.org/universum-studios/android_device.svg?branch=master)](https://travis-ci.org/universum-studios/android_device)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_device&amp;utm_campaign=Badge_Grade)
 
-Download the latest **[release](https://github.com/universum-studios/android_device/releases/tag/1.0.0 "Latest Releases page")** or **add as dependency** in your project via:
+## Download ##
+[![Bintray Badge](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
+
+Download the latest **[release](https://github.com/universum-studios/android_device/releases "Latest Releases page")** or **add as dependency** in your project via:
 
 ### Gradle ###
 
-    compile 'universum.studios.android:device:1.0.0@aar'
+    compile "universum.studios.android:device:${DESIRED_VERSION}@aar"
 
 ## Compatibility ##
 

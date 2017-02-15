@@ -12,8 +12,7 @@ ext {
      * Release =====================================================================================
      */
     releaseDependencies = [
-            androidSupportAnnotations: "com.android.support:support-annotations:${androidSupportVersion}",
-            androidSupportRecyclerViewV7: "com.android.support:recyclerview-v7:${androidSupportVersion}"
+            androidSupportAnnotations: "com.android.support:support-annotations:${androidSupportVersion}"
     ]
 
     /**
