@@ -9,6 +9,10 @@
   <description>Simple access to battery, connection, screen and storage infomration for the Android platform.</description>
   <url>https://github.com/universum-studios/android_device</url>
   <inceptionYear>2016</inceptionYear>
+  <organization>
+    <name>Universum Studios</name>
+    <url>https://universum-studios.github.io</url>
+  </organization>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -18,19 +22,37 @@
   </licenses>
   <developers>
     <developer>
+      <id>albedinsky</id>
       <name>Martin Albedinsky</name>
       <email>martin.albedinsky@gmail.com</email>
       <roles>
-        <role>Android Designer &amp;ampersand; Developer</role>
+        <role>Android Software Engineer</role>
       </roles>
     </developer>
   </developers>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/universum-studios/android_device/issues</url>
+  </issueManagement>
   <dependencies>
     <dependency>
       <groupId>com.android.support</groupId>
       <artifactId>support-annotations</artifactId>
-      <version>25.1.0</version>
+      <version>25.1.1</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>universum.studios.android</groupId>
+      <artifactId>device-core</artifactId>
+      <version>1.0.0</version>
+      <type>aar</type>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>*</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

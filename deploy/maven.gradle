@@ -29,7 +29,7 @@ afterEvaluate { project ->
      */
     uploadArchives {
         repositories.mavenDeployer {
-            repository(url: 'file:///' + String.valueOf(project.property('maven.url.local')))
+            repository(url: 'file:///' + System.getenv('MAVEN_URL_LOCAL'))
             /**
              * Project artifact --------------------------------------------------------------------
              */
@@ -80,11 +80,10 @@ afterEvaluate { project ->
  */
 task updateLocalArtifacts() {
     if (!Boolean.parseBoolean(System.getenv('TRAVIS'))) {
-        final String mavenLocalPath = String.valueOf(project.property('maven.url.local'))
-        final String artifactsId = String.valueOf(project.property('maven.pom.artifactId'))
-        final String artifactsVersion = String.valueOf(project.property('maven.pom.version'))
-        final String artifactsSourceDir = mavenLocalPath + '\\universum\\studios\\android\\' + artifactsId + '\\' + artifactsVersion
-        final String artifactsDestinationDir = '..\\artifacts\\universum\\studios\\android\\' + artifactsId + '\\' + artifactsVersion
+        final String mavenLocalDir = System.getenv('MAVEN_URL_LOCAL')
+        final String artifactId = String.valueOf(project.property('maven.pom.artifactId'))
+        final String artifactsSourceDir = "${mavenLocalDir}\\universum\\studios\\android\\${artifactId}\\${libraryVersion}"
+        final String artifactsDestinationDir = "..\\artifacts\\universum\\studios\\android\\${artifactId}\\${libraryVersion}"
         delete artifactsDestinationDir
         copy {
             from artifactsSourceDir
