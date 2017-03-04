@@ -50,7 +50,7 @@ public class BatteryPluggedStateReceiver extends Battery.BatteryBroadcastReceive
 	@NonNull
 	@Override
 	public final IntentFilter newIntentFilter() {
-		IntentFilter filter = new IntentFilter();
+		final IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_POWER_CONNECTED);
 		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
 		return filter;

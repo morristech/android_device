@@ -40,10 +40,6 @@ import universum.studios.android.device.DeviceConfig;
 final class BatteryImpl implements Battery {
 
 	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -51,6 +47,10 @@ final class BatteryImpl implements Battery {
 	 * Log TAG.
 	 */
 	private static final String TAG = "BatteryImpl";
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -99,7 +99,7 @@ final class BatteryImpl implements Battery {
 	/**
 	 * Current battery data. This is only for battery status changes management.
 	 */
-	private BatteryInfo mInfo = new BatteryInfo();
+	private final BatteryInfo mInfo = new BatteryInfo();
 
 	/**
 	 * Previous battery data. This is only for battery status changes management.
@@ -193,8 +193,8 @@ final class BatteryImpl implements Battery {
 
 	/**
 	 */
-	@IntRange(from = 0, to = 100)
 	@Override
+	@IntRange(from = 0, to = 100)
 	public int getStrength() {
 		this.checkDataInitialization("strength");
 		return mInfo.strength();
@@ -211,8 +211,8 @@ final class BatteryImpl implements Battery {
 
 	/**
 	 */
-	@PluggedState
 	@Override
+	@PluggedState
 	public int getPluggedState() {
 		this.checkDataInitialization("plugged state");
 		return mInfo.pluggedState;
@@ -311,7 +311,7 @@ final class BatteryImpl implements Battery {
 			mInfo.voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, mInfo.voltage);
 			this.mPersistentDataInitialized = true;
 		}
-		/**
+		/*
 		 * Update data to actual ones.
 		 */
 		// Status.
@@ -321,8 +321,8 @@ final class BatteryImpl implements Battery {
 				BatteryManager.EXTRA_TEMPERATURE,
 				mInfo.temperature);
 		// Strength.
-		int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-		int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 1);
+		final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		final int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 1);
 		final float strength = level / (float) scale;
 		if (strength >= 0) {
 			mInfo.strength = strength;
@@ -511,8 +511,8 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryStatusChange(Context context) {
 		synchronized (mStatusListeners) {
-			if (mStatusListeners.size() > 0) {
-				for (OnStatusListener listener : mStatusListeners) {
+			if (!mStatusListeners.isEmpty()) {
+				for (final OnStatusListener listener : mStatusListeners) {
 					listener.onStatusChange(context, this);
 				}
 			}
@@ -521,13 +521,14 @@ final class BatteryImpl implements Battery {
 		if (mPrevInfo != null) {
 			if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
 				switch (mPrevInfo.getHealthStatus(mInfo.strength())) {
-					case BatteryInfo.HEALTH_LEVEL_STATUS_UNCHANGED:
-						break;
 					case BatteryInfo.HEALTH_LEVEL_STATUS_LOW:
 						notifyBatteryHealthChange(context, true);
 						break;
 					case BatteryInfo.HEALTH_LEVEL_STATUS_OK:
 						notifyBatteryHealthChange(context, false);
+						break;
+					case BatteryInfo.HEALTH_LEVEL_STATUS_UNCHANGED:
+					default:
 						break;
 				}
 			}
@@ -548,8 +549,8 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryHealthChange(Context context, boolean low) {
 		synchronized (mHealthListeners) {
-			if (mHealthListeners.size() > 0) {
-				for (OnHealthListener listener : mHealthListeners) {
+			if (!mHealthListeners.isEmpty()) {
+				for (final OnHealthListener listener : mHealthListeners) {
 					if (low) listener.onHealthLow(context, this);
 					else listener.onHealthOk(context, this);
 				}
@@ -566,8 +567,8 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryPluggedStateChange(Context context, boolean plugged) {
 		synchronized (mPluggedStateListeners) {
-			if (mPluggedStateListeners.size() > 0) {
-				for (OnPluggedStateListener listener : mPluggedStateListeners) {
+			if (!mPluggedStateListeners.isEmpty()) {
+				for (final OnPluggedStateListener listener : mPluggedStateListeners) {
 					if (plugged) listener.onPluggedToPowerSource(context, this);
 					else listener.onUnpluggedFromPowerSource(context, this);
 				}
@@ -635,9 +636,10 @@ final class BatteryImpl implements Battery {
 		int voltage = -1;
 
 		/**
-		 * Creates a new empty instance of BatteryInfo unknown data for all battery parameters.
+		 * Creates a new empty instance of BatteryInfo.
 		 */
 		BatteryInfo() {
+			// Use default values.
 		}
 
 		/**
@@ -659,7 +661,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Resets the current value of health state of this info to {@link #HEALTH_UNKNOWN}.
 		 */
-		private void resetHealthState() {
+		void resetHealthState() {
 			// We don't know anymore the actual health state of the battery.
 			this.health = HEALTH_UNKNOWN;
 		}
@@ -667,7 +669,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Resets the current value of plugged state of this info to {@link #PLUGGED_UNKNOWN}.
 		 */
-		final void resetPluggedState() {
+		void resetPluggedState() {
 			// We don't know anymore the actual plugged state of the battery.
 			this.pluggedState = PLUGGED_UNKNOWN;
 		}
@@ -676,7 +678,7 @@ final class BatteryImpl implements Battery {
 		 * Resets the current value of status to {@link #STATUS_UNKNOWN} and value of strength
 		 * to {@code -1} of this info.
 		 */
-		final void resetStatusData() {
+		void resetStatusData() {
 			// Reset all dynamically changing states.
 			this.status = STATUS_UNKNOWN;
 			this.strength = this.temperature = -1;
@@ -689,7 +691,7 @@ final class BatteryImpl implements Battery {
 		 * @param currentStatus Current status to compare with the current plugged state of this info.
 		 * @return {@code True} if changed, {@code false} otherwise.
 		 */
-		final boolean hasPluggedStateChanged(int currentStatus) {
+		boolean hasPluggedStateChanged(int currentStatus) {
 			return pluggedState != PLUGGED_UNKNOWN && pluggedState != currentStatus;
 		}
 
@@ -698,7 +700,7 @@ final class BatteryImpl implements Battery {
 		 *
 		 * @return Current strength multiplied by {@code 100}.
 		 */
-		final int strength() {
+		int strength() {
 			return (int) (mInfo.strength * 100);
 		}
 
@@ -707,11 +709,11 @@ final class BatteryImpl implements Battery {
 		 * @return On of the {@link #HEALTH_LEVEL_STATUS_UNCHANGED}, {@link #HEALTH_LEVEL_STATUS_LOW},
 		 * {@link #HEALTH_LEVEL_STATUS_OK}.
 		 */
-		final int getHealthStatus(int currentHealthStrength) {
+		int getHealthStatus(int currentHealthStrength) {
 			int status = HEALTH_LEVEL_STATUS_UNCHANGED;
-			int prevHealthStrength = strength();
+			final int prevHealthStrength = strength();
 			if (prevHealthStrength != currentHealthStrength) {
-				/**
+				/*
 				 * Check if the battery strength gets below/above the
 				 * LOW/OK level like so:
 				 * --------------------------------------------------
@@ -734,7 +736,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Logs the current data of this info to log-cat console.
 		 */
-		final void logCurrentData() {
+		void logCurrentData() {
 			if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, toString());
 		}
 
@@ -744,7 +746,8 @@ final class BatteryImpl implements Battery {
 		@SuppressWarnings("StringBufferReplaceableByString")
 		public String toString() {
 			final StringBuilder builder = new StringBuilder(64);
-			builder.append("BatteryInfo{status: ");
+			builder.append(BatteryInfo.class.getSimpleName());
+			builder.append("{status: ");
 			builder.append(status);
 			builder.append(", health: ");
 			builder.append(health);

@@ -30,6 +30,7 @@ import universum.studios.android.device.screen.Screen;
  *
  * @author Martin Albedinsky
  */
+@SuppressWarnings("unused")
 public final class DeviceUtils {
 
 	/**
@@ -134,6 +135,12 @@ public final class DeviceUtils {
 	 */
 
 	/**
+	 */
+	private DeviceUtils() {
+		// Creation of instances of this class is not publicly allowed.
+	}
+
+	/**
 	 * Methods =====================================================================================
 	 */
 
@@ -162,12 +169,20 @@ public final class DeviceUtils {
 		switch (screen.getDefaultOrientation()) {
 			case Screen.ORIENTATION_LANDSCAPE:
 				percentageMatch += TABLET_MATCH_SCREEN_DEFAULT_ORIENTATION_POINTS;
+				break;
+			default:
+				// No percentage improvement.
+				break;
 		}
 		// Check screen type. Most of the Android tablet devices have display type LARGE or X-LARGE.
 		switch (screen.getType()) {
 			case LARGE:
 			case XLARGE:
 				percentageMatch += TABLET_MATCH_SCREEN_TYPE_POINTS;
+				break;
+			default:
+				// No percentage improvement.
+				break;
 		}
 		// Check screen diagonal distance.
 		if (screen.getDiagonalDistanceInInches() >= MINIMUM_TABLET_DIAGONAL_DISTANCE) {
@@ -180,6 +195,9 @@ public final class DeviceUtils {
 			case HDPI:
 			case XHDPI:
 				percentageMatch += TABLET_MATCH_SCREEN_DENSITY_POINTS;
+				break;
+			default:
+				// No percentage improvement.
 				break;
 		}
 		return percentageMatch >= MINIMUM_TABLET_PERCENTAGE_MATCH;

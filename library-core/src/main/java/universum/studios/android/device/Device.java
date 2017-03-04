@@ -25,11 +25,8 @@ import android.os.Build;
  *
  * @author Martin Albedinsky
  */
-public class Device {
-
-	/**
-	 * Interface ===================================================================================
-	 */
+@SuppressWarnings("unused")
+public final class Device {
 
 	/**
 	 * Constants ===================================================================================
@@ -134,6 +131,7 @@ public class Device {
 				break;
 			default:
 				ANDROID_VERSION_NAME = "UNSPECIFIED";
+				break;
 		}
 	}
 
@@ -143,6 +141,10 @@ public class Device {
 	 * See {@link Build.VERSION#SDK_INT} for additional info.
 	 */
 	public static final int ANDROID_SDK_VERSION = Build.VERSION.SDK_INT;
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -155,6 +157,12 @@ public class Device {
 	/**
 	 * Constructors ================================================================================
 	 */
+
+	/**
+	 */
+	private Device() {
+		// Creation of instances of this class is not publicly allowed.
+	}
 
 	/**
 	 * Methods =====================================================================================

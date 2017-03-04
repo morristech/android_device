@@ -45,10 +45,6 @@ import java.util.List;
 abstract class StorageAction {
 
 	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -56,6 +52,10 @@ abstract class StorageAction {
 	 * Log TAG.
 	 */
 	// private static final String TAG = "StorageAction";
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -127,21 +127,14 @@ abstract class StorageAction {
 			errorCode = Storage.ERROR_FILE_SAME_AS_DIRECTORY;
 			exMessage = e.getMessage();
 		}
-		if (success) {
-			return createResult(
-					mAction,
-					buildStorageMessage("Successfully " + mActionVerbPast + " file('" + fromPath + "')", storage, null),
-					fromPath,
-					flags,
-					Storage.NO_ERROR
-			);
-		}
 		return createResult(
 				mAction,
-				buildStorageMessage("Failed to " + mActionVerb + " file('" + fromPath + "')", storage, exMessage),
+				success ?
+						buildStorageMessage("Successfully " + mActionVerbPast + " file('" + fromPath + "')", storage, null) :
+						buildStorageMessage("Failed to " + mActionVerb + " file('" + fromPath + "')", storage, exMessage),
 				fromPath,
 				flags,
-				errorCode
+				success ? Storage.NO_ERROR : errorCode
 		);
 	}
 
@@ -163,7 +156,7 @@ abstract class StorageAction {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
 			Storage.Result result;
-			for (String fromPath : fromPaths) {
+			for (final String fromPath : fromPaths) {
 				result = performFileAction(storage, flags, toPath, fromPath);
 				if (!result.isError) {
 					passed++;
@@ -208,21 +201,14 @@ abstract class StorageAction {
 			errorCode = Storage.ERROR_UNSUPPORTED_OPERATION;
 			exMessage = e.getMessage();
 		}
-		if (success) {
-			return createResult(
-					mAction,
-					buildStorageMessage("Successfully " + mActionVerbPast + " directory('" + fromPath + "')", storage, null),
-					fromPath,
-					flags,
-					Storage.NO_ERROR
-			);
-		}
 		return createResult(
 				mAction,
-				buildStorageMessage("Failed to " + mActionVerb + " directory('" + fromPath + "')", storage, exMessage),
+				success ?
+						buildStorageMessage("Successfully " + mActionVerbPast + " directory('" + fromPath + "')", storage, null) :
+						buildStorageMessage("Failed to " + mActionVerb + " directory('" + fromPath + "')", storage, exMessage),
 				fromPath,
 				flags,
-				errorCode
+				success ? Storage.NO_ERROR : errorCode
 		);
 	}
 
@@ -245,7 +231,7 @@ abstract class StorageAction {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
 			Storage.Result result;
-			for (String fromPath : fromPaths) {
+			for (final String fromPath : fromPaths) {
 				result = performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 				if (!result.isError) {
 					passed++;
@@ -268,7 +254,7 @@ abstract class StorageAction {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
 			Storage.Result result;
-			for (String fromPath : fromPaths) {
+			for (final String fromPath : fromPaths) {
 				result = performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 				if (!result.isError) {
 					passed++;
@@ -310,9 +296,9 @@ abstract class StorageAction {
 	 *                         requested as error message.
 	 * @return Storage message.
 	 */
-	static String buildStorageMessage(String baseMessage, int storage, String exceptionMessage) {
+	private static String buildStorageMessage(String baseMessage, int storage, String exceptionMessage) {
 		final String storageName = StorageImpl.getStorageName(storage);
-		final String message = !TextUtils.isEmpty(storageName) ? baseMessage + " on" + storageName + " storage." : baseMessage + " at device storage.";
+		final String message = TextUtils.isEmpty(storageName) ? baseMessage + " at device storage." : baseMessage + " on" + storageName + " storage.";
 		return TextUtils.isEmpty(exceptionMessage) ? message : message + "\n" + exceptionMessage;
 	}
 
@@ -359,7 +345,7 @@ abstract class StorageAction {
 	/**
 	 * See {@link Storage.Results#Results(int, String, int, List, int, int)} for additional info.
 	 */
-	static Storage.Results createResults(int action, int size, String message, List<Storage.Result> results, int flags, int error) {
+	private static Storage.Results createResults(int action, int size, String message, List<Storage.Result> results, int flags, int error) {
 		return new Storage.Results(action, message, size, results, flags, error);
 	}
 

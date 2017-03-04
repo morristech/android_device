@@ -37,10 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 final class ConnectionImpl implements Connection {
 
 	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -48,6 +44,10 @@ final class ConnectionImpl implements Connection {
 	 * Log TAG.
 	 */
 	// private static final String TAG = "ConnectionImpl";
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -70,7 +70,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 * Connectivity manager which provides current connection info.
 	 */
-	private ConnectivityManager mConnectivityManager;
+	private final ConnectivityManager mConnectivityManager;
 
 	/**
 	 * Default connection receiver (broadcast receiver) to receive connection changes.
@@ -175,10 +175,9 @@ final class ConnectionImpl implements Connection {
 	@Override
 	public ConnectionType getConnectionType() {
 		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
-		if (info != null && info.isConnected()) {
-			return ConnectionType.resolve(info.getType());
-		}
-		return ConnectionType.UNAVAILABLE;
+		return info == null || !info.isConnected() ?
+				ConnectionType.UNAVAILABLE :
+				ConnectionType.resolve(info.getType());
 	}
 
 	/**
@@ -258,8 +257,8 @@ final class ConnectionImpl implements Connection {
 				this.mActualConnection = connection;
 				final NetworkInfo info = getConnectionInfo(type);
 				synchronized (mListeners) {
-					if (mListeners.size() > 0) {
-						for (OnConnectionListener listener : mListeners) {
+					if (!mListeners.isEmpty()) {
+						for (final OnConnectionListener listener : mListeners) {
 							listener.onConnectionEstablished(context, type, info);
 						}
 					}
@@ -269,8 +268,8 @@ final class ConnectionImpl implements Connection {
 			final ConnectionType lostType = ConnectionType.values()[mActualConnection.type.ordinal()];
 			this.mActualConnection = new ActualConnection(ConnectionType.UNAVAILABLE, false);
 			synchronized (mListeners) {
-				if (mListeners.size() > 0) {
-					for (OnConnectionListener listener : mListeners) {
+				if (!mListeners.isEmpty()) {
+					for (final OnConnectionListener listener : mListeners) {
 						listener.onConnectionLost(context, lostType);
 					}
 				}
@@ -295,7 +294,7 @@ final class ConnectionImpl implements Connection {
 		/**
 		 * Flag indicating whether the connection is established or not.
 		 */
-		boolean connected = false;
+		boolean connected;
 
 		/**
 		 * Creates a new instance of CurrentConnection with the given parameters.

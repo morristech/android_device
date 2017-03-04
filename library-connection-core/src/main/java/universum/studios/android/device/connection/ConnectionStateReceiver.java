@@ -31,7 +31,7 @@ import android.support.annotation.NonNull;
  *
  * @author Martin Albedinsky
  */
-public final class ConnectionStateReceiver extends BroadcastReceiver {
+public class ConnectionStateReceiver extends BroadcastReceiver {
 
 	/**
 	 * Returns the intent filter for {@link ConnectivityManager#CONNECTIVITY_ACTION} action which

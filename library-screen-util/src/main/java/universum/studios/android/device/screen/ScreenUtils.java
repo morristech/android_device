@@ -29,24 +29,13 @@ import android.view.inputmethod.InputMethodManager;
  *
  * @author Martin Albedinsky
  */
-public class ScreenUtils {
+public final class ScreenUtils {
 
 	/**
-	 * Interface ===================================================================================
 	 */
-
-	/**
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Log TAG.
-	 */
-	// private static final String TAG = "ScreenUtils";
-
-	/**
-	 * Methods =====================================================================================
-	 */
+	private ScreenUtils() {
+		// Creation of instances of this class is not publicly allowed.
+	}
 
 	/**
 	 * Hides soft keyboard from the current window.

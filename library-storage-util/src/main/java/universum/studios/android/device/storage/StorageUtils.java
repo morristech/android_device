@@ -40,7 +40,7 @@ import java.io.IOException;
  *
  * @author Martin Albedinsky
  */
-public class StorageUtils {
+public final class StorageUtils {
 
 	/**
 	 * Interface ===================================================================================
@@ -68,7 +68,17 @@ public class StorageUtils {
 	 * Instance of StorageEditor to be used fare editable actions performed with files, like copying
 	 * or moving data between files or directories.
 	 */
-	private static volatile StorageEditor EDITOR;
+	private static final StorageEditor EDITOR = new StorageEditor();
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 */
+	private StorageUtils() {
+		// Creation of instances of this class is not publicly allowed.
+	}
 
 	/**
 	 * Methods =====================================================================================
@@ -163,10 +173,8 @@ public class StorageUtils {
 	public static int createFiles(@Nullable String basePath, @NonNull String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
-			for (String path : paths) {
-				if (createFile(basePath + path)) {
-					count++;
-				}
+			for (final String path : paths) {
+				if (createFile(basePath + path)) count++;
 			}
 			return count;
 		}
@@ -211,10 +219,8 @@ public class StorageUtils {
 	public static int createDirectories(@Nullable String basePath, @NonNull String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
-			for (String path : paths) {
-				if (createDirectory(basePath + path)) {
-					count++;
-				}
+			for (final String path : paths) {
+				if (createDirectory(basePath + path)) count++;
 			}
 			return count;
 		}
@@ -256,10 +262,8 @@ public class StorageUtils {
 	public static int deleteFiles(@Nullable String basePath, @NonNull String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
-			for (String path : paths) {
-				if (deleteFile(basePath + path)) {
-					count++;
-				}
+			for (final String path : paths) {
+				if (deleteFile(basePath + path)) count++;
 			}
 			return count;
 		}
@@ -280,7 +284,6 @@ public class StorageUtils {
 	 * @param path The path to be used to create <var>directory</var> parameter for editor.
 	 */
 	public static boolean deleteDirectory(@Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
-		ensureEditor();
 		return EDITOR.deleteDirectory(new File(path), filter, nameFilter);
 	}
 
@@ -313,10 +316,8 @@ public class StorageUtils {
 	public static int deleteDirectories(@Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String basePath, @NonNull String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
-			for (String path : paths) {
-				if (deleteDirectory(filter, nameFilter, basePath + path)) {
-					count++;
-				}
+			for (final String path : paths) {
+				if (deleteDirectory(filter, nameFilter, basePath + path)) count++;
 			}
 			return count;
 		}
@@ -334,7 +335,6 @@ public class StorageUtils {
 	 * @param fromPath The path to be used to create <var>toFile</var> parameter for editor.
 	 */
 	public static boolean copyFile(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
-		ensureEditor();
 		return EDITOR.copyFileContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)));
 	}
 
@@ -350,10 +350,8 @@ public class StorageUtils {
 	public static int copyFiles(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
-			for (String fromPath : fromPaths) {
-				if (copyFile(flags, toPath, fromPath)) {
-					count++;
-				}
+			for (final String fromPath : fromPaths) {
+				if (copyFile(flags, toPath, fromPath)) count++;
 			}
 			return count;
 		}
@@ -379,7 +377,6 @@ public class StorageUtils {
 	 * @param fromPath The path to be used to create <var>toDirectory</var> parameter for editor.
 	 */
 	public static boolean copyDirectory(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) throws IOException {
-		ensureEditor();
 		return EDITOR.copyDirectoryContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)), filter, nameFilter);
 	}
 
@@ -403,10 +400,8 @@ public class StorageUtils {
 	public static int copyDirectories(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
-			for (String fromPath : fromPaths) {
-				if (copyDirectory(flags, filter, nameFilter, toPath, fromPath)) {
-					count++;
-				}
+			for (final String fromPath : fromPaths) {
+				if (copyDirectory(flags, filter, nameFilter, toPath, fromPath)) count++;
 			}
 			return count;
 		}
@@ -424,7 +419,6 @@ public class StorageUtils {
 	 * @param fromPath The path to be used to create <var>toFile</var> parameter for editor.
 	 */
 	public static boolean moveFile(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
-		ensureEditor();
 		return EDITOR.moveFileContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)));
 	}
 
@@ -440,10 +434,8 @@ public class StorageUtils {
 	public static int moveFiles(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
-			for (String fromPath : fromPaths) {
-				if (copyFile(flags, toPath, fromPath)) {
-					count++;
-				}
+			for (final String fromPath : fromPaths) {
+				if (copyFile(flags, toPath, fromPath)) count++;
 			}
 			return count;
 		}
@@ -469,7 +461,6 @@ public class StorageUtils {
 	 * @param fromPath The path to be used to create <var>toDirectory</var> parameter for editor.
 	 */
 	public static boolean moveDirectory(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) throws IOException {
-		ensureEditor();
 		return EDITOR.moveDirectoryContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)), filter, nameFilter);
 	}
 
@@ -493,10 +484,8 @@ public class StorageUtils {
 	public static int moveDirectories(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
-			for (String fromPath : fromPaths) {
-				if (moveDirectory(flags, filter, nameFilter, toPath, fromPath)) {
-					count++;
-				}
+			for (final String fromPath : fromPaths) {
+				if (moveDirectory(flags, filter, nameFilter, toPath, fromPath)) count++;
 			}
 			return count;
 		}
@@ -517,20 +506,6 @@ public class StorageUtils {
 			return "";
 		}
 		final String lastPathSegment = Uri.parse(filePath).getLastPathSegment();
-		return !TextUtils.isEmpty(lastPathSegment) ? destinationPath + File.separator + lastPathSegment : destinationPath;
-	}
-
-	/**
-	 * Ensures that the {@link #EDITOR} is initialized.
-	 */
-	private static void ensureEditor() {
-		if (EDITOR == null) EDITOR = new StorageEditor();
-	}
-
-	/**
-	 * Creates a new instance of StorageUtils.
-	 */
-	private StorageUtils() {
-		// Instances are not allowed to be created publicly.
+		return TextUtils.isEmpty(lastPathSegment) ? destinationPath : destinationPath + File.separator + lastPathSegment;
 	}
 }

@@ -38,7 +38,7 @@ public class BatteryHealthReceiver extends Battery.BatteryBroadcastReceiver {
 	@NonNull
 	@Override
 	public final IntentFilter newIntentFilter() {
-		IntentFilter filter = new IntentFilter();
+		final IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_BATTERY_OKAY);
 		filter.addAction(Intent.ACTION_BATTERY_LOW);
 		return filter;
