@@ -137,14 +137,6 @@ public interface Storage {
 	 */
 
 	/**
-	 * Defines an annotation for determining set of allowed flags.
-	 */
-	@Retention(RetentionPolicy.SOURCE)
-	@IntDef(flag = true, value = {DEFAULT, OVERWRITE, COPY})
-	@interface Flags {
-	}
-
-	/**
 	 * Represents an empty set of flags for storage API. This is only for informative purpose for
 	 * {@link Storage.Result} objects when there are used storage API methods which does not takes
 	 * any flags.
@@ -167,16 +159,16 @@ public interface Storage {
 	int COPY = StorageEditor.COPY;
 
 	/**
-	 * Permissions ---------------------------------------------------------------------------------
-	 */
-
-	/**
-	 * Defines an annotation for determining set of allowed file permission flags.
+	 * Defines an annotation for determining set of allowed flags.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef(flag = true, value = {PERMISSION_READ, PERMISSION_WRITE, PERMISSION_EXECUTE})
-	@interface FilePermissions {
+	@IntDef(flag = true, value = {DEFAULT, OVERWRITE, COPY})
+	@interface Flags {
 	}
+
+	/**
+	 * Permissions ---------------------------------------------------------------------------------
+	 */
 
 	/**
 	 * Flag indicating whether to allow permission to file to be readable or not.
@@ -216,16 +208,16 @@ public interface Storage {
 	int PERMISSIONS_ALL = PERMISSION_READ | PERMISSION_WRITE | PERMISSION_EXECUTE;
 
 	/**
-	 * Storage identifiers -------------------------------------------------------------------------
-	 */
-
-	/**
-	 * Defines an annotation for determining set of available storage directories.
+	 * Defines an annotation for determining set of allowed file permission flags.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({BASE, ROOT, DATA, CACHE, INTERNAL, EXTERNAL, EXTERNAL_PACKAGE})
-	@interface StorageDir {
+	@IntDef(flag = true, value = {PERMISSION_READ, PERMISSION_WRITE, PERMISSION_EXECUTE})
+	@interface FilePermissions {
 	}
+
+	/**
+	 * Storage identifiers -------------------------------------------------------------------------
+	 */
 
 	/**
 	 * Identifier for <b>base</b> path on an Android device's file system. This identifier should be
@@ -300,6 +292,14 @@ public interface Storage {
 	 * @see #isExternalAvailable()
 	 */
 	int EXTERNAL_PACKAGE = 0x07;
+
+	/**
+	 * Defines an annotation for determining set of available storage directories.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({BASE, ROOT, DATA, CACHE, INTERNAL, EXTERNAL, EXTERNAL_PACKAGE})
+	@interface StorageDir {
+	}
 
 	/**
 	 * Actions -------------------------------------------------------------------------------------

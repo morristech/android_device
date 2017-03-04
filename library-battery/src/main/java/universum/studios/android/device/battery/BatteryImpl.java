@@ -40,10 +40,6 @@ import universum.studios.android.device.DeviceConfig;
 final class BatteryImpl implements Battery {
 
 	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -51,6 +47,10 @@ final class BatteryImpl implements Battery {
 	 * Log TAG.
 	 */
 	private static final String TAG = "BatteryImpl";
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -193,8 +193,8 @@ final class BatteryImpl implements Battery {
 
 	/**
 	 */
-	@IntRange(from = 0, to = 100)
 	@Override
+	@IntRange(from = 0, to = 100)
 	public int getStrength() {
 		this.checkDataInitialization("strength");
 		return mInfo.strength();
@@ -211,8 +211,8 @@ final class BatteryImpl implements Battery {
 
 	/**
 	 */
-	@PluggedState
 	@Override
+	@PluggedState
 	public int getPluggedState() {
 		this.checkDataInitialization("plugged state");
 		return mInfo.pluggedState;
@@ -311,7 +311,7 @@ final class BatteryImpl implements Battery {
 			mInfo.voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, mInfo.voltage);
 			this.mPersistentDataInitialized = true;
 		}
-		/**
+		/*
 		 * Update data to actual ones.
 		 */
 		// Status.
@@ -512,7 +512,7 @@ final class BatteryImpl implements Battery {
 	private void notifyBatteryStatusChange(Context context) {
 		synchronized (mStatusListeners) {
 			if (mStatusListeners.size() > 0) {
-				for (OnStatusListener listener : mStatusListeners) {
+				for (final OnStatusListener listener : mStatusListeners) {
 					listener.onStatusChange(context, this);
 				}
 			}
@@ -521,13 +521,14 @@ final class BatteryImpl implements Battery {
 		if (mPrevInfo != null) {
 			if (!isBatteryReceiverRegistered(RECEIVER_BATTERY_HEALTH)) {
 				switch (mPrevInfo.getHealthStatus(mInfo.strength())) {
-					case BatteryInfo.HEALTH_LEVEL_STATUS_UNCHANGED:
-						break;
 					case BatteryInfo.HEALTH_LEVEL_STATUS_LOW:
 						notifyBatteryHealthChange(context, true);
 						break;
 					case BatteryInfo.HEALTH_LEVEL_STATUS_OK:
 						notifyBatteryHealthChange(context, false);
+						break;
+					case BatteryInfo.HEALTH_LEVEL_STATUS_UNCHANGED:
+					default:
 						break;
 				}
 			}
@@ -549,7 +550,7 @@ final class BatteryImpl implements Battery {
 	private void notifyBatteryHealthChange(Context context, boolean low) {
 		synchronized (mHealthListeners) {
 			if (mHealthListeners.size() > 0) {
-				for (OnHealthListener listener : mHealthListeners) {
+				for (final OnHealthListener listener : mHealthListeners) {
 					if (low) listener.onHealthLow(context, this);
 					else listener.onHealthOk(context, this);
 				}
@@ -567,7 +568,7 @@ final class BatteryImpl implements Battery {
 	private void notifyBatteryPluggedStateChange(Context context, boolean plugged) {
 		synchronized (mPluggedStateListeners) {
 			if (mPluggedStateListeners.size() > 0) {
-				for (OnPluggedStateListener listener : mPluggedStateListeners) {
+				for (final OnPluggedStateListener listener : mPluggedStateListeners) {
 					if (plugged) listener.onPluggedToPowerSource(context, this);
 					else listener.onUnpluggedFromPowerSource(context, this);
 				}
@@ -711,7 +712,7 @@ final class BatteryImpl implements Battery {
 			int status = HEALTH_LEVEL_STATUS_UNCHANGED;
 			int prevHealthStrength = strength();
 			if (prevHealthStrength != currentHealthStrength) {
-				/**
+				/*
 				 * Check if the battery strength gets below/above the
 				 * LOW/OK level like so:
 				 * --------------------------------------------------
@@ -744,7 +745,8 @@ final class BatteryImpl implements Battery {
 		@SuppressWarnings("StringBufferReplaceableByString")
 		public String toString() {
 			final StringBuilder builder = new StringBuilder(64);
-			builder.append("BatteryInfo{status: ");
+			builder.append(BatteryInfo.class.getSimpleName());
+			builder.append("{status: ");
 			builder.append(status);
 			builder.append(", health: ");
 			builder.append(health);

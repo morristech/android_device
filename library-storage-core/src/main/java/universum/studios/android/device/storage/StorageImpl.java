@@ -34,6 +34,7 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import universum.studios.android.device.DeviceConfig;
@@ -44,10 +45,6 @@ import universum.studios.android.device.DeviceConfig;
  * @author Martin Albedinsky
  */
 class StorageImpl implements Storage {
-
-	/**
-	 * Interface ===================================================================================
-	 */
 
 	/**
 	 * Constants ===================================================================================
@@ -66,6 +63,10 @@ class StorageImpl implements Storage {
 	 * Constant value: <b>Android/data</b>
 	 */
 	private static final String EXTERNAL_PACKAGE_STORAGE_PARENTS_PATH = "Android" + File.separator + "data";
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
@@ -660,7 +661,7 @@ class StorageImpl implements Storage {
 	@Override
 	public long getFreeSpace(@StorageDir int storage) {
 		final File storageFile = getStorage(storage);
-		return storageFile != null ? storageFile.getFreeSpace() : 0;
+		return storageFile == null ? 0 : storageFile.getFreeSpace();
 	}
 
 	/**
@@ -723,7 +724,7 @@ class StorageImpl implements Storage {
 			return "";
 		}
 		final File storageFile = getStorage(storage);
-		return storageFile != null ? storageFile.getPath() : "";
+		return storageFile == null ? "" : storageFile.getPath();
 	}
 
 	/**
@@ -789,14 +790,11 @@ class StorageImpl implements Storage {
 			return false;
 		}
 		// Create if not exists.
-		if (!mExternalPackage.isDirectory() && !mExternalPackage.mkdirs()) {
-			this.logMessage(
-					"Failed to create external directory(" + mExternalPackage.getPath() + ") for package(" + mPackageName + ").",
-					true
-			);
-			return false;
+		if (mExternalPackage.isDirectory() || mExternalPackage.mkdirs()) {
+			return true;
 		}
-		return true;
+		this.logMessage("Failed to create external directory(" + mExternalPackage.getPath() + ") for package(" + mPackageName + ").", true);
+		return false;
 	}
 
 	/**
@@ -827,6 +825,7 @@ class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<File> getDirectoryContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
 		final File dir = this.newFile(storage, path);
 		if (dir.isDirectory()) {
@@ -836,27 +835,25 @@ class StorageImpl implements Storage {
 			} else {
 				// First, filter by file.
 				final File[] filteredFiles = dir.listFiles(filter);
-				if (!isArrayEmpty(filteredFiles)) {
-					if (nameFilter != null) {
-						final List<File> files = new ArrayList<>();
-						// Now filter by name.
-						for (File file : filteredFiles) {
-							if (nameFilter.accept(file, file.getName())) {
-								files.add(file);
-							}
-						}
-						return files;
-					}
-					return Arrays.asList(filteredFiles);
+				if (isArrayEmpty(filteredFiles)) {
+					return Collections.EMPTY_LIST;
 				}
+				if (nameFilter != null) {
+					final List<File> files = new ArrayList<>();
+					// Now filter by name.
+					for (final File file : filteredFiles) {
+						if (nameFilter.accept(file, file.getName())) {
+							files.add(file);
+						}
+					}
+					return files;
+				}
+				return Arrays.asList(filteredFiles);
 			}
 		} else {
-			this.logMessage(
-					"Cannot obtain content of directory. Directory(" + dir.getPath() + ") does not exist or it is not a directory.",
-					true
-			);
+			this.logMessage("Cannot obtain content of directory. Directory(" + dir.getPath() + ") does not exist or it is not a directory.", true);
 		}
-		return new ArrayList<>();
+		return Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -917,7 +914,7 @@ class StorageImpl implements Storage {
 	public List<File> getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
 		final List<File> files = new ArrayList<>();
 		if (paths.length > 0) {
-			for (String path : paths) {
+			for (final String path : paths) {
 				files.addAll(getDirectoryContent(storage, filter, nameFilter, path));
 			}
 			return files;
@@ -945,8 +942,9 @@ class StorageImpl implements Storage {
 				return "DATA";
 			case CACHE:
 				return "CACHE";
+			default:
+				return "";
 		}
-		return "";
 	}
 
 	/**
@@ -959,7 +957,7 @@ class StorageImpl implements Storage {
 	 */
 	String appendBasePath(int storage, String path) {
 		final String basePath = getStoragePath(storage);
-		return !TextUtils.isEmpty(basePath) ? basePath + File.separator + path : path;
+		return TextUtils.isEmpty(basePath) ? path : basePath + File.separator + path;
 	}
 
 	/**

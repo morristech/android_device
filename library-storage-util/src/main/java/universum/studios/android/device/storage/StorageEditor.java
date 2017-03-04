@@ -167,8 +167,9 @@ public class StorageEditor {
 			case XLARGE_BUFFER:
 			case XXLARGE_BUFFER:
 				return new byte[bufferType * BASE_BUFFER_SIZE];
+			default:
+				return new byte[1024];
 		}
-		return new byte[1024];
 	}
 
 	/**
@@ -210,7 +211,7 @@ public class StorageEditor {
 		boolean isDir;
 		boolean failed = false;
 		if (files.length > 0) {
-			for (File file : files) {
+			for (final File file : files) {
 				// Apply filters.
 				if ((filter != null && !filter.accept(file)) || (nameFilter != null && !nameFilter.accept(file, file.getName()))) {
 					continue;
@@ -415,7 +416,7 @@ public class StorageEditor {
 		if (files.length > 0) {
 			File tempFile;
 			synchronized (LOCK) {
-				for (File file : files) {
+				for (final File file : files) {
 					// Apply filters.
 					if ((filter != null && !filter.accept(file)) || (nameFilter != null && !nameFilter.accept(file, file.getName()))) {
 						continue;

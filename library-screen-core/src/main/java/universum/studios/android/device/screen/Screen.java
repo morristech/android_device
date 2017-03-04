@@ -115,21 +115,6 @@ public interface Screen {
 	 */
 
 	/**
-	 * Defines an annotation for determining set of available screen orientations.
-	 */
-	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({
-			ORIENTATION_CURRENT, ORIENTATION_UNSPECIFIED,
-			ORIENTATION_LANDSCAPE, ORIENTATION_PORTRAIT,
-			ORIENTATION_USER, ORIENTATION_BEHIND,
-			ORIENTATION_SENSOR, ORIENTATION_SENSOR_LANDSCAPE, ORIENTATION_SENSOR_PORTRAIT,
-			ORIENTATION_REVERSE_LANDSCAPE, ORIENTATION_REVERSE_PORTRAIT,
-			ORIENTATION_FULL_SENSOR
-	})
-	@interface Orientation {
-	}
-
-	/**
 	 * Orientation flag that is used to lock screen on the current orientation.
 	 */
 	int ORIENTATION_CURRENT = -2;
@@ -188,6 +173,21 @@ public interface Screen {
 	 * Copy of {@link ActivityInfo#SCREEN_ORIENTATION_FULL_SENSOR} flag for better access.
 	 */
 	int ORIENTATION_FULL_SENSOR = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+
+	/**
+	 * Defines an annotation for determining set of available screen orientations.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({
+			ORIENTATION_CURRENT, ORIENTATION_UNSPECIFIED,
+			ORIENTATION_LANDSCAPE, ORIENTATION_PORTRAIT,
+			ORIENTATION_USER, ORIENTATION_BEHIND,
+			ORIENTATION_SENSOR, ORIENTATION_SENSOR_LANDSCAPE, ORIENTATION_SENSOR_PORTRAIT,
+			ORIENTATION_REVERSE_LANDSCAPE, ORIENTATION_REVERSE_PORTRAIT,
+			ORIENTATION_FULL_SENSOR
+	})
+	@interface Orientation {
+	}
 
 	/**
 	 * Enums =======================================================================================

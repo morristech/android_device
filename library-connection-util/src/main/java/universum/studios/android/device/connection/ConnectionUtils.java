@@ -30,7 +30,7 @@ import android.support.annotation.Nullable;
  *
  * @author Martin Albedinsky
  */
-public class ConnectionUtils {
+public final class ConnectionUtils {
 
 	/**
 	 * Checks whether there is some connection currently established or not.
@@ -98,7 +98,7 @@ public class ConnectionUtils {
 	 */
 	public static int obtainEstablishedConnectionType(@NonNull Context context) {
 		final NetworkInfo info = obtainEstablishedConnectionInfo(context);
-		return info != null ? info.getType() : -1;
+		return info == null ? -1 : info.getType();
 	}
 
 	/**
@@ -126,9 +126,8 @@ public class ConnectionUtils {
 	}
 
 	/**
-	 * Creates a new instance of ConnectionUtils.
 	 */
 	private ConnectionUtils() {
-		// Instances are not allowed to be created publicly.
+		// Creation of instances of this class is not publicly allowed.
 	}
 }

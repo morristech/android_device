@@ -267,14 +267,6 @@ public interface Battery {
 	 */
 
 	/**
-	 * Defines an annotation for determining set of available battery receiver ids.
-	 */
-	@Retention(RetentionPolicy.SOURCE)
-	@IntDef(flag = true, value = {RECEIVER_BATTERY_STATUS, RECEIVER_BATTERY_HEALTH, RECEIVER_BATTERY_PLUGGED_STATE})
-	@interface Receiver {
-	}
-
-	/**
 	 * Flag used to identify {@link BatteryStatusReceiver}.
 	 */
 	int RECEIVER_BATTERY_STATUS = 0x00000001;
@@ -290,11 +282,11 @@ public interface Battery {
 	int RECEIVER_BATTERY_PLUGGED_STATE = 0x00000001 << 2;
 
 	/**
-	 * Defines an annotation for determining set of available battery statuses.
+	 * Defines an annotation for determining set of available battery receiver ids.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({STATUS_UNKNOWN, STATUS_CHARGING, STATUS_DISCHARGING, STATUS_NOT_CHARGING, STATUS_FULL})
-	@interface Status {
+	@IntDef(flag = true, value = {RECEIVER_BATTERY_STATUS, RECEIVER_BATTERY_HEALTH, RECEIVER_BATTERY_PLUGGED_STATE})
+	@interface Receiver {
 	}
 
 	/**
@@ -323,11 +315,11 @@ public interface Battery {
 	int STATUS_FULL = BatteryManager.BATTERY_STATUS_FULL;
 
 	/**
-	 * Defines an annotation for determining set of available battery plugged states.
+	 * Defines an annotation for determining set of available battery statuses.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({PLUGGED_UNKNOWN, PLUGGED_NONE, PLUGGED_AC, PLUGGED_USB, PLUGGED_WIRELESS})
-	@interface PluggedState {
+	@IntDef({STATUS_UNKNOWN, STATUS_CHARGING, STATUS_DISCHARGING, STATUS_NOT_CHARGING, STATUS_FULL})
+	@interface Status {
 	}
 
 	/**
@@ -371,12 +363,11 @@ public interface Battery {
 	int HEALTH_OK_LEVEL = 20;
 
 	/**
-	 * Defines an annotation for determining set of available battery healths.
+	 * Defines an annotation for determining set of available battery plugged states.
 	 */
 	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({HEALTH_UNKNOWN, HEALTH_GOOD, HEALTH_OVERHEAT, HEALTH_DEAD,
-			HEALTH_OVER_VOLTAGE, HEALTH_UNSPECIFIED_FAILURE, HEALTH_COLD})
-	@interface Health {
+	@IntDef({PLUGGED_UNKNOWN, PLUGGED_NONE, PLUGGED_AC, PLUGGED_USB, PLUGGED_WIRELESS})
+	@interface PluggedState {
 	}
 
 	/**
@@ -413,6 +404,15 @@ public interface Battery {
 	 * Copy of {@link BatteryManager#BATTERY_HEALTH_COLD} flag for better access.
 	 */
 	int HEALTH_COLD = BatteryManager.BATTERY_HEALTH_COLD;
+
+	/**
+	 * Defines an annotation for determining set of available battery healths.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({HEALTH_UNKNOWN, HEALTH_GOOD, HEALTH_OVERHEAT, HEALTH_DEAD,
+			HEALTH_OVER_VOLTAGE, HEALTH_UNSPECIFIED_FAILURE, HEALTH_COLD})
+	@interface Health {
+	}
 
 	/**
 	 * Enums =======================================================================================
@@ -525,7 +525,7 @@ public interface Battery {
 		 */
 		@NonNull
 		public static BatteryTechnology resolve(@NonNull String tagName) {
-			for (BatteryTechnology tech : BatteryTechnology.values()) {
+			for (final BatteryTechnology tech : BatteryTechnology.values()) {
 				if (tech.tagName.equalsIgnoreCase(tagName)) {
 					return tech;
 				}
@@ -777,7 +777,7 @@ public interface Battery {
 		/**
 		 * Extra key used to identify a battery receiver which received the battery intent.
 		 */
-		static final String EXTRA_RECEIVER_CLASS = "universum.studios.android.device.battery.EXTRA.ReceiverClass";
+		static final String EXTRA_RECEIVER_CLASS = Battery.class.getName() + ".EXTRA.ReceiverClass";
 
 		/**
 		 * Implementation should return new intent filter specific for its receiver action.
