@@ -99,7 +99,7 @@ final class BatteryImpl implements Battery {
 	/**
 	 * Current battery data. This is only for battery status changes management.
 	 */
-	private BatteryInfo mInfo = new BatteryInfo();
+	private final BatteryInfo mInfo = new BatteryInfo();
 
 	/**
 	 * Previous battery data. This is only for battery status changes management.
@@ -511,7 +511,7 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryStatusChange(Context context) {
 		synchronized (mStatusListeners) {
-			if (mStatusListeners.size() > 0) {
+			if (!mStatusListeners.isEmpty()) {
 				for (final OnStatusListener listener : mStatusListeners) {
 					listener.onStatusChange(context, this);
 				}
@@ -549,7 +549,7 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryHealthChange(Context context, boolean low) {
 		synchronized (mHealthListeners) {
-			if (mHealthListeners.size() > 0) {
+			if (!mHealthListeners.isEmpty()) {
 				for (final OnHealthListener listener : mHealthListeners) {
 					if (low) listener.onHealthLow(context, this);
 					else listener.onHealthOk(context, this);
@@ -567,7 +567,7 @@ final class BatteryImpl implements Battery {
 	 */
 	private void notifyBatteryPluggedStateChange(Context context, boolean plugged) {
 		synchronized (mPluggedStateListeners) {
-			if (mPluggedStateListeners.size() > 0) {
+			if (!mPluggedStateListeners.isEmpty()) {
 				for (final OnPluggedStateListener listener : mPluggedStateListeners) {
 					if (plugged) listener.onPluggedToPowerSource(context, this);
 					else listener.onUnpluggedFromPowerSource(context, this);
@@ -711,7 +711,7 @@ final class BatteryImpl implements Battery {
 		 */
 		int getHealthStatus(int currentHealthStrength) {
 			int status = HEALTH_LEVEL_STATUS_UNCHANGED;
-			int prevHealthStrength = strength();
+			final int prevHealthStrength = strength();
 			if (prevHealthStrength != currentHealthStrength) {
 				/*
 				 * Check if the battery strength gets below/above the

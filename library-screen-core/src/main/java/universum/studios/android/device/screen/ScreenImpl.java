@@ -50,7 +50,7 @@ final class ScreenImpl implements Screen {
 	/**
 	 * Log TAG.
 	 */
-	private static final String TAG = "ScreenImpl";
+	// private static final String TAG = "ScreenImpl";
 
 	/**
 	 * Interface ===================================================================================
@@ -113,12 +113,12 @@ final class ScreenImpl implements Screen {
 	/**
 	 * Density of the current Android device's screen.
 	 */
-	private ScreenDensity mDensity = ScreenDensity.UNKNOWN;
+	private final ScreenDensity mDensity;
 
 	/**
 	 * Raw density of the current Android device's screen.
 	 */
-	private int mRawDensity = -1;
+	private final int mRawDensity;
 
 	/**
 	 * Actual orientation of the current Android device's screen.

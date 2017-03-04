@@ -831,7 +831,7 @@ final class StorageImpl implements Storage {
 		if (dir.isDirectory()) {
 			if (filter == null) {
 				final File[] files = dir.listFiles(nameFilter);
-				return !isArrayEmpty(files) ? Arrays.asList(files) : new ArrayList<File>(0);
+				return isArrayEmpty(files) ? Collections.EMPTY_LIST : Arrays.asList(files);
 			} else {
 				// First, filter by file.
 				final File[] filteredFiles = dir.listFiles(filter);

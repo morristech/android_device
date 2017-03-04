@@ -31,7 +31,7 @@ import android.support.annotation.NonNull;
  *
  * @author Martin Albedinsky
  */
-public final class BatteryStatusReceiver extends Battery.BatteryBroadcastReceiver {
+public class BatteryStatusReceiver extends Battery.BatteryBroadcastReceiver {
 
 	/**
 	 * Returns the intent filter for {@link Intent#ACTION_BATTERY_CHANGED} action which should be used

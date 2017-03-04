@@ -136,7 +136,7 @@ public class StorageEditor {
 	/**
 	 * Matcher to match file name and extract its type.
 	 */
-	private static final Matcher FILE_NAME_MATCHER = Pattern.compile("^(.*)\\.(.+)$").matcher("");
+	private final Matcher mFileNameMatcher = Pattern.compile("^(.*)\\.(.+)$").matcher("");
 
 	/**
 	 * Members =====================================================================================
@@ -285,7 +285,7 @@ public class StorageEditor {
 	 */
 	private boolean copyFileContentInner(int flags, File fromFile, File toFile) throws IOException {
 		synchronized (LOCK) {
-			String toFilePath = toFile != null ? toFile.getPath() : "";
+			String toFilePath = toFile == null ? "" : toFile.getPath();
 			if (TextUtils.isEmpty(toFilePath)) {
 				if ((flags & COPY) == 0) {
 					logError("Failed to copy content of file('" + fromFile.getPath() + "') without StorageEditor.COPY flag. Such a file already exists.");
@@ -411,7 +411,7 @@ public class StorageEditor {
 	 */
 	private boolean copyDirectoryContentInner(int flags, File fromDirectory, File toDirectory, FileFilter filter, FilenameFilter nameFilter) throws IOException {
 		final File[] files = fromDirectory.listFiles();
-		String toDirectoryPath = toDirectory != null ? toDirectory.getPath() : "";
+		String toDirectoryPath = toDirectory == null ? "" : toDirectory.getPath();
 		boolean failed = false;
 		if (files.length > 0) {
 			File tempFile;
@@ -482,8 +482,8 @@ public class StorageEditor {
 	 * @param filename The name of file which to add at the end of the given path.
 	 * @return Appended path or <var>filename</var> if the given path is empty.
 	 */
-	private static String appendPathWithFilename(String path, String filename) {
-		return !TextUtils.isEmpty(path) ? path + File.separator + filename : "";
+	private String appendPathWithFilename(String path, String filename) {
+		return TextUtils.isEmpty(path) ? "" : path + File.separator + filename;
 	}
 
 	/**
@@ -495,7 +495,7 @@ public class StorageEditor {
 	 * @param suffix The suffix which to add at the end of the given file's path.
 	 * @return New file with appended path.
 	 */
-	private static File appendPath(File file, String suffix) {
+	private File appendPath(File file, String suffix) {
 		String filePath = file.getPath();
 		if (TextUtils.isEmpty(filePath)) {
 			return file;
@@ -504,8 +504,8 @@ public class StorageEditor {
 			return new File(filePath + suffix);
 		}
 		final String lastPathSegment = Uri.parse(filePath).getLastPathSegment();
-		if (FILE_NAME_MATCHER.reset(lastPathSegment).matches()) {
-			final String fileType = FILE_NAME_MATCHER.group(2);
+		if (mFileNameMatcher.reset(lastPathSegment).matches()) {
+			final String fileType = mFileNameMatcher.group(2);
 			// Remove the type suffix from path.
 			filePath = filePath.substring(0, filePath.length() - fileType.length() - 1);
 			return new File(filePath + suffix + "." + fileType);
