@@ -44,7 +44,7 @@ import universum.studios.android.device.DeviceConfig;
  *
  * @author Martin Albedinsky
  */
-class StorageImpl implements Storage {
+final class StorageImpl implements Storage {
 
 	/**
 	 * Constants ===================================================================================

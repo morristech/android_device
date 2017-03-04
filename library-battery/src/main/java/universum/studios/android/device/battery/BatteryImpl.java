@@ -636,9 +636,10 @@ final class BatteryImpl implements Battery {
 		int voltage = -1;
 
 		/**
-		 * Creates a new empty instance of BatteryInfo unknown data for all battery parameters.
+		 * Creates a new empty instance of BatteryInfo.
 		 */
 		BatteryInfo() {
+			// Use default values.
 		}
 
 		/**
@@ -660,7 +661,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Resets the current value of health state of this info to {@link #HEALTH_UNKNOWN}.
 		 */
-		private void resetHealthState() {
+		void resetHealthState() {
 			// We don't know anymore the actual health state of the battery.
 			this.health = HEALTH_UNKNOWN;
 		}
@@ -668,7 +669,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Resets the current value of plugged state of this info to {@link #PLUGGED_UNKNOWN}.
 		 */
-		final void resetPluggedState() {
+		void resetPluggedState() {
 			// We don't know anymore the actual plugged state of the battery.
 			this.pluggedState = PLUGGED_UNKNOWN;
 		}
@@ -677,7 +678,7 @@ final class BatteryImpl implements Battery {
 		 * Resets the current value of status to {@link #STATUS_UNKNOWN} and value of strength
 		 * to {@code -1} of this info.
 		 */
-		final void resetStatusData() {
+		void resetStatusData() {
 			// Reset all dynamically changing states.
 			this.status = STATUS_UNKNOWN;
 			this.strength = this.temperature = -1;
@@ -690,7 +691,7 @@ final class BatteryImpl implements Battery {
 		 * @param currentStatus Current status to compare with the current plugged state of this info.
 		 * @return {@code True} if changed, {@code false} otherwise.
 		 */
-		final boolean hasPluggedStateChanged(int currentStatus) {
+		boolean hasPluggedStateChanged(int currentStatus) {
 			return pluggedState != PLUGGED_UNKNOWN && pluggedState != currentStatus;
 		}
 
@@ -699,7 +700,7 @@ final class BatteryImpl implements Battery {
 		 *
 		 * @return Current strength multiplied by {@code 100}.
 		 */
-		final int strength() {
+		int strength() {
 			return (int) (mInfo.strength * 100);
 		}
 
@@ -708,7 +709,7 @@ final class BatteryImpl implements Battery {
 		 * @return On of the {@link #HEALTH_LEVEL_STATUS_UNCHANGED}, {@link #HEALTH_LEVEL_STATUS_LOW},
 		 * {@link #HEALTH_LEVEL_STATUS_OK}.
 		 */
-		final int getHealthStatus(int currentHealthStrength) {
+		int getHealthStatus(int currentHealthStrength) {
 			int status = HEALTH_LEVEL_STATUS_UNCHANGED;
 			int prevHealthStrength = strength();
 			if (prevHealthStrength != currentHealthStrength) {
@@ -735,7 +736,7 @@ final class BatteryImpl implements Battery {
 		/**
 		 * Logs the current data of this info to log-cat console.
 		 */
-		final void logCurrentData() {
+		void logCurrentData() {
 			if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, toString());
 		}
 

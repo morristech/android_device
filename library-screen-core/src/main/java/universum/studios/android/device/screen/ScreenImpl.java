@@ -561,6 +561,9 @@ final class ScreenImpl implements Screen {
 						// Phone in reverse landscape mode.
 						orientation = ORIENTATION_REVERSE_LANDSCAPE;
 						break;
+					default:
+						// Unknown current landscape rotation.
+						break;
 				}
 				break;
 			case Configuration.ORIENTATION_PORTRAIT:
@@ -577,6 +580,9 @@ final class ScreenImpl implements Screen {
 					case ROTATION_180:
 						// Phone in reverse portrait mode.
 						orientation = ORIENTATION_REVERSE_PORTRAIT;
+						break;
+					default:
+						// Unknown current portrait rotation.
 						break;
 				}
 				break;

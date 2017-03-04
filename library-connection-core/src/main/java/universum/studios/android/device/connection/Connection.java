@@ -274,6 +274,8 @@ public interface Connection {
 		 * <li><i>Original name:</i> <b>Mobile (HIPRI)</b></li>
 		 * <li><i>Preferences key:</i> <b>NETWORK_TYPE.MOBILE_HIPRI</b></li>
 		 * </ul>
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_HIPRI}.
 		 */
 		@Deprecated
 		MOBILE_HIPRI(ConnectivityManager.TYPE_MOBILE_HIPRI, "Mobile (HIPRI)", "NETWORK_TYPE.MOBILE_HIPRI"),
@@ -286,6 +288,8 @@ public interface Connection {
 		 * <li><i>Original name:</i> <b>Mobile (MMS)</b></li>
 		 * <li><i>Preferences key:</i> <b>NETWORK_TYPE.MOBILE_MMS</b></li>
 		 * </ul>
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_MMS}.
 		 */
 		@Deprecated
 		MOBILE_MMS(ConnectivityManager.TYPE_MOBILE_MMS, "Mobile (MMS)", "NETWORK_TYPE.MOBILE_MMS"),
@@ -298,6 +302,8 @@ public interface Connection {
 		 * <li><i>Original name:</i> <b>Mobile (SUPL)</b></li>
 		 * <li><i>Preferences key:</i> <b>NETWORK_TYPE.MOBILE_SUPL</b></li>
 		 * </ul>
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_SUPL}.
 		 */
 		@Deprecated
 		MOBILE_SUPL(ConnectivityManager.TYPE_MOBILE_SUPL, "Mobile (SUPL)", "NETWORK_TYPE.MOBILE_SUPL"),
