@@ -70,7 +70,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 * Connectivity manager which provides current connection info.
 	 */
-	private ConnectivityManager mConnectivityManager;
+	private final ConnectivityManager mConnectivityManager;
 
 	/**
 	 * Default connection receiver (broadcast receiver) to receive connection changes.

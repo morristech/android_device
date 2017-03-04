@@ -321,8 +321,8 @@ final class BatteryImpl implements Battery {
 				BatteryManager.EXTRA_TEMPERATURE,
 				mInfo.temperature);
 		// Strength.
-		int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-		int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 1);
+		final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		final int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 1);
 		final float strength = level / (float) scale;
 		if (strength >= 0) {
 			mInfo.strength = strength;

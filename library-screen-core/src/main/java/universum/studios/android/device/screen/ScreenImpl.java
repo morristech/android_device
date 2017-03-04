@@ -108,7 +108,7 @@ final class ScreenImpl implements Screen {
 	/**
 	 * Type of the current Android device's screen.
 	 */
-	private ScreenType mType = ScreenType.UNKNOWN;
+	private final ScreenType mType;
 
 	/**
 	 * Density of the current Android device's screen.
@@ -462,7 +462,7 @@ final class ScreenImpl implements Screen {
 		}
 		// Create new window parameters.
 		final Window window = activity.getWindow();
-		WindowManager.LayoutParams layoutParams = window.getAttributes();
+		final WindowManager.LayoutParams layoutParams = window.getAttributes();
 		layoutParams.screenBrightness = ((brightness == 0) ? ++brightness : brightness) / 100f;
 		// Set new brightness to the current application window.
 		window.setAttributes(layoutParams);

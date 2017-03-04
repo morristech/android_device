@@ -116,7 +116,7 @@ final class StorageImpl implements Storage {
 	 * An application package name to create specific sub-directory in the external storage if it is
 	 * available.
 	 */
-	private String mPackageName;
+	private final String mPackageName;
 
 	/**
 	 * File representing the root directory of the external file system.
