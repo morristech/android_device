@@ -46,7 +46,7 @@ task cleanArtifacts(type: Delete) {
 task updateArtifacts() {
     subprojects.findAll {
         if (it.name.startsWith("library")) {
-            dependsOn ':' + it.name + ':updateLocalArtifacts'
+            dependsOn ':' + it.name + ':updateArtifacts'
         }
     }
 }
