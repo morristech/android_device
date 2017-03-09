@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ScreenUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.screen</a> &gt; <span class="el_source">ScreenUtils.java</span></div><h1>ScreenUtils.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.screen;
+
+import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
+/**
+ * Simple utility class specifying API allowing to manage screen of the current Android device.
+ *
+ * @author Martin Albedinsky
+ */
+public final class ScreenUtils {
+
+	/**
+	 */
+<span class="nc" id="L36">	private ScreenUtils() {</span>
+		// Creation of instances of this class is not publicly allowed.
+<span class="nc" id="L38">	}</span>
+
+	/**
+	 * Hides soft keyboard from the current window.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this will not work when you want to hide soft keyboard while a dialog is
+	 * visible, use {@link #hideSoftKeyboard(View)} instead.
+	 *
+	 * @param activity Current activity context to obtain the current focused view.
+	 * @return {@code True} if hiding was successful, {@code false} if a window of the given
+	 * activity does not have focused view at this time.
+	 */
+	public static boolean hideSoftKeyboard(@NonNull Activity activity) {
+<span class="nc" id="L51">		final View focusedView = activity.getWindow().getCurrentFocus();</span>
+<span class="nc bnc" id="L52" title="All 4 branches missed.">		return focusedView != null &amp;&amp; hideSoftKeyboard(focusedView);</span>
+	}
+
+	/**
+	 * Hides soft keyboard from the current window using token of the given focused view.
+	 *
+	 * @param focusedView The view which has focus at this time.
+	 * @return {@code True} if hiding was successful, {@code false} if the view does not
+	 * have focus at this time.
+	 */
+	public static boolean hideSoftKeyboard(@NonNull View focusedView) {
+<span class="nc bnc" id="L63" title="All 4 branches missed.">		if (focusedView.getContext() == null || !focusedView.hasFocus()) {</span>
+<span class="nc" id="L64">			return false;</span>
+		}
+<span class="nc" id="L66">		final InputMethodManager imm = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);</span>
+<span class="nc" id="L67">		return imm.hideSoftInputFromWindow(focusedView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);</span>
+	}
+
+	/**
+	 * Shows soft keyboard on the current window.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this will not work when you want to show soft keyboard while a dialog is
+	 * visible, use {@link #showSoftKeyboard(View)} instead.
+	 *
+	 * @param activity Current activity context to obtain the current focused view.
+	 * @return {@code True} if showing was successful, {@code false} otherwise.
+	 */
+	public static boolean showSoftKeyboard(@NonNull Activity activity) {
+<span class="nc" id="L80">		final View view = activity.getWindow().getCurrentFocus();</span>
+<span class="nc bnc" id="L81" title="All 4 branches missed.">		return view != null &amp;&amp; showSoftKeyboard(view);</span>
+	}
+
+	/**
+	 * Shows soft keyboard on the current window using token of the given focused view.
+	 *
+	 * @param focusedView The view which has focus at this time. If the view does not have focus,
+	 *                    focus for that view will be requested by {@link View#requestFocus()}.
+	 * @return {@code True} if showing was successful, {@code false} otherwise.
+	 */
+	public static boolean showSoftKeyboard(@NonNull View focusedView) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">		if (focusedView.getContext() == null) {</span>
+<span class="nc" id="L93">			return false;</span>
+		}
+<span class="nc bnc" id="L95" title="All 4 branches missed.">		if (focusedView.hasFocus() || focusedView.requestFocus()) {</span>
+<span class="nc" id="L96">			final InputMethodManager imm = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);</span>
+<span class="nc" id="L97">			return imm.showSoftInput(focusedView, InputMethodManager.RESULT_UNCHANGED_SHOWN);</span>
+		}
+<span class="nc" id="L99">		return false;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

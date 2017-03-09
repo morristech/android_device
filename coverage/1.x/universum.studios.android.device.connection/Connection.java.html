@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Connection.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.connection</a> &gt; <span class="el_source">Connection.java</span></div><h1>Connection.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.connection;
+
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+/**
+ * Connection interface specifies API through which an actual information about the Android device's
+ * screen may be accessed.
+ * &lt;p&gt;
+ * A connection implementation may be obtained via {@link Connection.Provider#getConnection(Context) Connection.PROVIDER.getConnection(Context)}.
+ * &lt;p&gt;
+ * Below are listed methods provided by the this interface:
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #getConnectionType()}&lt;/li&gt;
+ * &lt;li&gt;{@link #getConnectionInfo(Connection.ConnectionType)}&lt;/li&gt;
+ * &lt;li&gt;{@link #isConnected()}&lt;/li&gt;
+ * &lt;li&gt;{@link #isConnected(Connection.ConnectionType)}&lt;/li&gt;
+ * &lt;li&gt;{@link #isConnectedOrConnecting()}&lt;/li&gt;
+ * &lt;li&gt;{@link #isConnectedOrConnecting(Connection.ConnectionType)}&lt;/li&gt;
+ * &lt;li&gt;{@link #isAvailable(Connection.ConnectionType)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;Listening for changes in the connection&lt;/h3&gt;
+ * The following code snippet shows, how to properly register connection receivers and where to handle
+ * the desired callbacks.
+ * &lt;pre&gt;
+ * public class ConnectionActivity extends Activity {
+ *
+ *      // Connection listener.
+ *      private final Connection.OnConnectionListener CONNECTION_LISTENER = new Connection.OnConnectionListener() {
+ *
+ *          &amp;#064;Override
+ *          public void onConnectionEstablished(&amp;#064;NonNull ConnectionType type, &amp;#064;Nullable NetworkInfo info, &amp;#064;NonNull Context context) {
+ *              // Handle here new established connection.
+ *          }
+ *
+ *          &amp;#064;Override
+ *          public void onConnectionLost(&amp;#064;NonNull ConnectionType type, &amp;#064;NonNull Context context) {
+ *              // Handle here lost connection.
+ *          }
+ *      }
+ *
+ *      // Connection implementation.
+ *      private Connection mConnection;
+ *
+ *      &amp;#064;Override
+ *      protected void onCreate(Bundle savedInstanceState) {
+ *          super.onCreate(savedInstanceState);
+ *           // ...
+ *           // Get the connection API implementation.
+ *           this.mConnection = Connection.PROVIDER.getConnection(this);
+ *           // Register connection listener to handle changes in network connection.
+ *           mConnection.registerOnConnectionListener(CONNECTION_LISTENER);
+ *           // ...
+ *      }
+ *
+ *      &amp;#064;Override
+ *      protected void onResume() {
+ *          super.onResume();
+ *          // Register connection broadcast receiver so the Connection implementation will receive
+ *          // info about the established/lost connection.
+ *          mConnection.registerConnectionReceiver(this);
+ *      }
+ *
+ *      &amp;#064;Override
+ *      protected void onPause() {
+ *          super.onPause();
+ *          // Un-register all registered receivers.
+ *          mConnection.unregisterConnectionReceiver(this);
+ *      }
+ *
+ *      &amp;#064;Override
+ *      protected void onDestroy() {
+ *          super.onDestroy();
+ *          // Un-register connection listener.
+ *          mConnection.unregisterOnConnectionListener(CONNECTION_LISTENER);
+ *      }
+ * }
+ * &lt;/pre&gt;
+ *
+ * @author Martin Albedinsky
+ */
+public interface Connection {
+
+	/**
+	 * Provider ====================================================================================
+	 */
+
+	/**
+	 * Interface for provider that may be used to access implementation of {@link Connection}.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface Provider {
+
+		/**
+		 * Provides a singleton implementation of {@link Connection}.
+		 *
+		 * @param context Context used by the connection implementation to access actual connection
+		 *                data.
+		 * @return Connection implementation with actual connection data already available.
+		 */
+		@NonNull
+		Connection getConnection(@NonNull Context context);
+	}
+
+	/**
+	 * A {@link Provider} implementation that may be used to access implementation of {@link Connection}.
+	 */
+<span class="nc" id="L131">	Provider PROVIDER = new Provider() {</span>
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public Connection getConnection(@NonNull Context context) {
+<span class="nc" id="L138">			return ConnectionImpl.getsInstance(context);</span>
+		}
+	};
+
+	/**
+	 * Listeners ===================================================================================
+	 */
+
+	/**
+	 * Listener that may be used to receive callback with info about changed network connection.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface OnConnectionListener {
+
+		/**
+		 * Invoked whenever registered {@link ConnectionStateReceiver} revives an Intent for the
+		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is some connection established.
+		 * &lt;p&gt;
+		 * &lt;b&gt;Note:&lt;/b&gt; this is also fired while connection receiver is being registered via
+		 * {@link #registerConnectionReceiver(Context)} and there is currently established some connection.
+		 *
+		 * @param context Current application context.
+		 * @param type    Type of the connection which was just now established or was already established
+		 *                while this callback was being registered.
+		 * @param info    Info about the current established connection.
+		 */
+		void onConnectionEstablished(@NonNull Context context, @NonNull ConnectionType type, @Nullable NetworkInfo info);
+
+		/**
+		 * Invoked whenever registered {@link ConnectionStateReceiver} receives an Intent for the
+		 * {@link ConnectivityManager#CONNECTIVITY_ACTION} and there is no connection available.
+		 * &lt;p&gt;
+		 * &lt;b&gt;Note:&lt;/b&gt; this is also fired while connection receiver is being registered via
+		 * {@link #registerConnectionReceiver(Context)} and there isn't currently any connection available.
+		 *
+		 * @param context Current application context.
+		 * @param type    Type of the connection which the Android device just lost or {@link ConnectionType#UNAVAILABLE UNAVAILABLE}
+		 *                if there was no connection available while this callback was being registered.
+		 */
+		void onConnectionLost(@NonNull Context context, @NonNull ConnectionType type);
+	}
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Enums =======================================================================================
+	 */
+
+	/**
+	 * Represents type of the Android device's connection.
+	 * &lt;p&gt;
+	 * See {@link ConnectivityManager} for types supported from the
+	 * {@link android.os.Build.VERSION_CODES#HONEYCOMB_MR2 API level 13} and higher.
+	 *
+	 * @author Martin Albedinsky
+	 */
+<span class="nc" id="L197">	@SuppressWarnings(&quot;deprecation&quot;)</span>
+	enum ConnectionType {
+
+		/**
+		 * Connection type indicating that there is no connection currently available.
+		 * &lt;p&gt;
+		 * &lt;i&gt;Constant value:&lt;/i&gt; &lt;b&gt;-1&lt;/b&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Unavailable&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.UNAVAILABLE&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L209">		UNAVAILABLE(-1, &quot;Unavailable&quot;, &quot;NETWORK_TYPE.UNAVAILABLE&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;bluetooth&lt;/b&gt;.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_BLUETOOTH}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Bluetooth&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.BLUETOOTH&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @since {@link android.os.Build.VERSION_CODES#HONEYCOMB_MR2 API level 13}
+		 */
+<span class="nc" id="L221">		BLUETOOTH(ConnectivityManager.TYPE_BLUETOOTH, &quot;Bluetooth&quot;, &quot;NETWORK_TYPE.BLUETOOTH&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is &lt;b&gt;dummy&lt;/b&gt;.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_DUMMY}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Dummy&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.DUMMY&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @since {@link android.os.Build.VERSION_CODES#HONEYCOMB_MR2 API level 13}
+		 */
+<span class="nc" id="L233">		DUMMY(ConnectivityManager.TYPE_DUMMY, &quot;Dummy&quot;, &quot;NETWORK_TYPE.DUMMY&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;ethernet&lt;/b&gt;.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_ETHERNET}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Ethernet&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.ETHERNET&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @since {@link android.os.Build.VERSION_CODES#HONEYCOMB_MR2 API level 13}
+		 */
+<span class="nc" id="L245">		ETHERNET(ConnectivityManager.TYPE_ETHERNET, &quot;Ethernet&quot;, &quot;NETWORK_TYPE.ETHERNET&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough common
+		 * &lt;b&gt;mobile&lt;/b&gt; network (&lt;i&gt;3G, ...&lt;/i&gt;).
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_MOBILE}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Mobile&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.MOBILE&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L256">		MOBILE(ConnectivityManager.TYPE_MOBILE, &quot;Mobile&quot;, &quot;NETWORK_TYPE.MOBILE&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;mobile&lt;/b&gt;
+		 * network (&lt;i&gt;DUN traffic&lt;/i&gt;).
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_MOBILE_DUN}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Mobile (DUN)&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.MOBILE_DUN&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L267">		MOBILE_DUN(ConnectivityManager.TYPE_MOBILE_DUN, &quot;Mobile (DUN)&quot;, &quot;NETWORK_TYPE.MOBILE_DUN&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;mobile&lt;/b&gt;
+		 * network.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_MOBILE_HIPRI}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Mobile (HIPRI)&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.MOBILE_HIPRI&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_HIPRI}.
+		 */
+<span class="nc" id="L280">		@Deprecated</span>
+		MOBILE_HIPRI(ConnectivityManager.TYPE_MOBILE_HIPRI, &quot;Mobile (HIPRI)&quot;, &quot;NETWORK_TYPE.MOBILE_HIPRI&quot;),
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;mobile&lt;/b&gt;
+		 * network specific for Multimedia Messaging Services.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_MOBILE_MMS}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Mobile (MMS)&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.MOBILE_MMS&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_MMS}.
+		 */
+<span class="nc" id="L294">		@Deprecated</span>
+		MOBILE_MMS(ConnectivityManager.TYPE_MOBILE_MMS, &quot;Mobile (MMS)&quot;, &quot;NETWORK_TYPE.MOBILE_MMS&quot;),
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;mobile&lt;/b&gt;
+		 * network which can be used to use Secure User Plane Location servers.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_MOBILE_SUPL}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Mobile (SUPL)&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.MOBILE_SUPL&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 *
+		 * @deprecated See {@link ConnectivityManager#TYPE_MOBILE_SUPL}.
+		 */
+<span class="nc" id="L308">		@Deprecated</span>
+		MOBILE_SUPL(ConnectivityManager.TYPE_MOBILE_SUPL, &quot;Mobile (SUPL)&quot;, &quot;NETWORK_TYPE.MOBILE_SUPL&quot;),
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;Wi-Fi&lt;/b&gt;
+		 * network access point.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_WIFI}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;Wi-Fi&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.WIFI&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L320">		WIFI(ConnectivityManager.TYPE_WIFI, &quot;Wi-Fi&quot;, &quot;NETWORK_TYPE.WIFI&quot;),</span>
+		/**
+		 * Connection type indicating that the current connection is established trough &lt;b&gt;WiMAX&lt;/b&gt;
+		 * specific for data connection.
+		 * &lt;p&gt;
+		 * From {@link ConnectivityManager#TYPE_WIMAX}
+		 * &lt;ul&gt;
+		 * &lt;li&gt;&lt;i&gt;Original name:&lt;/i&gt; &lt;b&gt;WiMAX&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;&lt;i&gt;Preferences key:&lt;/i&gt; &lt;b&gt;NETWORK_TYPE.WIMAX&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L331">		WIMAX(ConnectivityManager.TYPE_WIMAX, &quot;WiMAX&quot;, &quot;NETWORK_TYPE.WIMAX&quot;);</span>
+
+		/**
+		 * The flag provided by {@link ConnectivityManager} for this connectivity type.
+		 */
+		public final int systemConstant;
+
+		/**
+		 * Original name of this connection type. Can be used to present this connection type by
+		 * its name in an Android application's UI.
+		 */
+		public final String originalName;
+
+		/**
+		 * The key under which may be this connection type saved within shared preferences.
+		 */
+		public final String preferencesKey;
+
+		/**
+		 * Creates a new instance of ConnectionType with the given ConnectivityManager flag, original
+		 * name and preferences key.
+		 * name.
+		 *
+		 * @param id       Id of connectivity type as flag provided by {@link ConnectivityManager}.
+		 * @param origName Original name of this connectivity type.
+		 * @param prefsKey The key under which may be this connectivity type saved into shared preferences.
+		 */
+<span class="nc" id="L358">		ConnectionType(int id, String origName, String prefsKey) {</span>
+<span class="nc" id="L359">			this.systemConstant = id;</span>
+<span class="nc" id="L360">			this.preferencesKey = prefsKey;</span>
+<span class="nc" id="L361">			this.originalName = origName;</span>
+<span class="nc" id="L362">		}</span>
+
+		/**
+		 * Resolves an instance of ConnectionType according to the given &lt;var&gt;typeId&lt;/var&gt; from the
+		 * current set of ConnectionType values.
+		 *
+		 * @param systemConstant An id ({@link #systemConstant}) of the the desired connection type
+		 *                       to resolve.
+		 * @return Resolved connection type instance or {@link ConnectionType#UNAVAILABLE} if there
+		 * is no connection type with the requested constant.
+		 */
+		@NonNull
+		public static ConnectionType resolve(int systemConstant) {
+<span class="nc bnc" id="L375" title="All 2 branches missed.">			for (ConnectionType type : ConnectionType.values()) {</span>
+<span class="nc bnc" id="L376" title="All 2 branches missed.">				if (type.systemConstant == systemConstant) return type;</span>
+			}
+<span class="nc" id="L378">			return UNAVAILABLE;</span>
+		}
+	}
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Checks whether the Android device has some connection or is currently in the process to establish
+	 * some connection.
+	 * &lt;p&gt;
+	 * See {@link NetworkInfo#isConnectedOrConnecting()} for additional info.
+	 *
+	 * @return {@code True} if some connection is established or will be established in a while,
+	 * {@code false} otherwise.
+	 * @see #isConnected()
+	 * @see #getConnectionType()
+	 */
+	boolean isConnectedOrConnecting();
+
+	/**
+	 * Checks whether the Android device has some connection currently established.
+	 * &lt;p&gt;
+	 * See {@link NetworkInfo#isConnected()} for additional info.
+	 *
+	 * @return {@code True} if some connection is established, {@code false} otherwise.
+	 * @see #isConnectedOrConnecting()
+	 * @see #getConnectionType()
+	 */
+	boolean isConnected();
+
+	/**
+	 * Checks whether the Android device has established the connection or is currently in the process
+	 * to establish the connection for the requested &lt;var&gt;connectionType&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * See {@link NetworkInfo#isConnectedOrConnecting()} for additional info.
+	 *
+	 * @param connectionType Type of the connection of which the current state should be checked.
+	 * @return {@code True} if connection is established or is in the process of being established,
+	 * {@code false} otherwise.
+	 */
+	boolean isConnectedOrConnecting(@NonNull ConnectionType connectionType);
+
+	/**
+	 * Checks whether the Android device has established the connection for the requested &lt;var&gt;connectionType&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * See {@link NetworkInfo#isConnected()} for additional info.
+	 *
+	 * @param connectionType Type of the connection of which the current state should be checked.
+	 * @return {@code True} if connection is established, {@code false} otherwise.
+	 * @see #isConnectedOrConnecting(Connection.ConnectionType)
+	 */
+	boolean isConnected(@NonNull ConnectionType connectionType);
+
+	/**
+	 * Checks whether the Android device can establish connection for the requested &lt;var&gt;connectionType&lt;/var&gt;
+	 * &lt;p&gt;
+	 * See {@link NetworkInfo#isAvailable()} for additional info.
+	 *
+	 * @param connectionType Type of the connection of which availability should be checked.
+	 * @return {@code True} if the requested connection can be established, {@code false}
+	 * if establishing of the requested connection is not possible due to current network conditions.
+	 */
+	boolean isAvailable(@NonNull ConnectionType connectionType);
+
+	/**
+	 * Returns type of the current established connection.
+	 *
+	 * @return One of {@link Connection.ConnectionType} values or  {@link Connection.ConnectionType#UNAVAILABLE}
+	 * if there is no connection currently available.
+	 */
+	@NonNull
+	ConnectionType getConnectionType();
+
+	/**
+	 * Returns the current info about the requested &lt;var&gt;connectionType&lt;/var&gt;.
+	 *
+	 * @param connectionType Type of the connection of which current info should be obtained.
+	 * @return Info of the requested connection type.
+	 * @see #getConnectionType()
+	 */
+	@Nullable
+	NetworkInfo getConnectionInfo(@NonNull ConnectionType connectionType);
+
+	/**
+	 * Registers a callback to be invoked when some connection change occur.
+	 *
+	 * @param listener Callback to register.
+	 * @see #registerConnectionReceiver(Context)
+	 */
+	void registerOnConnectionListener(@NonNull OnConnectionListener listener);
+
+	/**
+	 * Un-registers the given connection callback.
+	 *
+	 * @param listener Callback to un-register.
+	 */
+	void unregisterOnConnectionListener(@NonNull OnConnectionListener listener);
+
+	/**
+	 * Registers {@link ConnectionStateReceiver} to receive broadcasts about the current connection
+	 * state.
+	 *
+	 * @param context The main activity of application.
+	 * @see #registerOnConnectionListener(Connection.OnConnectionListener)
+	 * @see #unregisterConnectionReceiver(Context)
+	 */
+	void registerConnectionReceiver(@NonNull Context context);
+
+	/**
+	 * Returns flag indicating whether {@link ConnectionStateReceiver} is currently registered or not.
+	 *
+	 * @return {@code True} if receiver is registered, {@code false} otherwise.
+	 */
+	boolean isConnectionReceiverRegistered();
+
+	/**
+	 * Un-registers registered {@link ConnectionStateReceiver}.
+	 *
+	 * @param context Context in which was connection receiver registered before.
+	 * @see #registerConnectionReceiver(Context)
+	 */
+	void unregisterConnectionReceiver(@NonNull Context context);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

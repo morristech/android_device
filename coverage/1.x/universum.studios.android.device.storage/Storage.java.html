@@ -1,0 +1,1448 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Storage.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.storage</a> &gt; <span class="el_source">Storage.java</span></div><h1>Storage.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.storage;
+
+import android.content.Context;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.List;
+
+/**
+ * Storage interface specifies API through which an actual information about the Android device's
+ * storage may be accessed. Also this interface may be used to create, delete, copy or move files
+ * on the Android devide's file system.
+ * &lt;p&gt;
+ * A storage implementation may be obtained via {@link Storage.Provider#getStorage(Context) Storage.PROVIDER.getStorage(Context)}.
+ * &lt;p&gt;
+ * Below are listed methods to manage files on the file system provided by the this interface:
+ *
+ * &lt;h3&gt;To create files and directories&lt;/h3&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #createFile(String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createFile(int, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createFiles(String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createFiles(int, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createDirectory(String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createDirectory(int, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createDirectories(String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #createDirectories(int, String...)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;To delete files or directories&lt;/h3&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #deleteFile(String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteFile(int, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteFiles(String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteFiles(int, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectory(String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectory(int, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectories(String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectories(int, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #deleteDirectories(int, FileFilter, FilenameFilter, String...)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;To copy files or directories&lt;/h3&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #copyFile(int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyFile(int, int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyFiles(int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyFiles(int, int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectory(int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectory(int, int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectories(int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectories(int, int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #copyDirectories(int, int, FileFilter, FilenameFilter, String, String...)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;To move files or directories&lt;/h3&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #moveFile(int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveFile(int, int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveFiles(int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveFiles(int, int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectory(int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectory(int, int, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectories(int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectories(int, int, String, String...)}&lt;/li&gt;
+ * &lt;li&gt;{@link #moveDirectories(int, int, FileFilter, FilenameFilter, String, String...)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * @author Martin Albedinsky
+ */
+public interface Storage {
+
+	/**
+	 * Provider ====================================================================================
+	 */
+
+	/**
+	 * Interface for provider that may be used to access implementation of {@link Storage}.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	interface Provider {
+
+		/**
+		 * Provides a singleton implementation of {@link Storage}.
+		 *
+		 * @param context Context used by the storage implementation to access actual storage data.
+		 * @return Storage implementation with actual storage data already available.
+		 */
+		@NonNull
+		Storage getStorage(@NonNull Context context);
+	}
+
+	/**
+	 * A {@link Provider} implementation that may be used to access implementation of {@link Storage}.
+	 */
+<span class="nc" id="L124">	Provider PROVIDER = new Provider() {</span>
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public Storage getStorage(@NonNull Context context) {
+<span class="nc" id="L131">			return StorageImpl.getInstance(context);</span>
+		}
+	};
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Represents an empty set of flags for storage API. This is only for informative purpose for
+	 * {@link Storage.Result} objects when there are used storage API methods which does not takes
+	 * any flags.
+	 */
+	int NO_FLAGS = -1;
+
+	/**
+	 * Copied flag from {@link StorageEditor#DEFAULT} for better access.
+	 */
+	int DEFAULT = StorageEditor.DEFAULT;
+
+	/**
+	 * Copied flag from {@link StorageEditor#OVERWRITE} for better access.
+	 */
+	int OVERWRITE = StorageEditor.OVERWRITE;
+
+	/**
+	 * Copied flag from {@link StorageEditor#COPY} for better access.
+	 */
+	int COPY = StorageEditor.COPY;
+
+	/**
+	 * Defines an annotation for determining set of allowed flags.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef(flag = true, value = {DEFAULT, OVERWRITE, COPY})
+	@interface Flags {
+	}
+
+	/**
+	 * Permissions ---------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Flag indicating whether to allow permission to file to be readable or not.
+	 */
+	int PERMISSION_READ = 0x00000001;
+
+	/**
+	 * Flag indicating whether to allow permission to file to be writable or not.
+	 */
+	int PERMISSION_WRITE = 0x00000001 &lt;&lt; 1;
+
+	/**
+	 * Flag indicating whether to allow permission to file to be executable or not.
+	 */
+	int PERMISSION_EXECUTE = 0x00000001 &lt;&lt; 2;
+
+	/**
+	 * &lt;b&gt;Read + Write&lt;/b&gt; file permissions.
+	 * &lt;h3&gt;Flags&lt;/h3&gt;
+	 * &lt;ul&gt;
+	 * &lt;li&gt;read:        &lt;b&gt;true&lt;/b&gt;&lt;/li&gt;
+	 * &lt;li&gt;write:       &lt;b&gt;true&lt;/b&gt;&lt;/li&gt;
+	 * &lt;li&gt;execute:     &lt;b&gt;false&lt;/b&gt;&lt;/li&gt;
+	 * &lt;/ul&gt;
+	 */
+	int PERMISSIONS_READ_WRITE = PERMISSION_READ | PERMISSION_WRITE;
+
+	/**
+	 * &lt;b&gt;All&lt;/b&gt; file permissions.
+	 * &lt;h3&gt;Flags&lt;/h3&gt;
+	 * &lt;ul&gt;
+	 * &lt;li&gt;read:        &lt;b&gt;true&lt;/b&gt;&lt;/li&gt;
+	 * &lt;li&gt;write:       &lt;b&gt;true&lt;/b&gt;&lt;/li&gt;
+	 * &lt;li&gt;executed:    &lt;b&gt;true&lt;/b&gt;&lt;/li&gt;
+	 * &lt;/ul&gt;
+	 */
+	int PERMISSIONS_ALL = PERMISSION_READ | PERMISSION_WRITE | PERMISSION_EXECUTE;
+
+	/**
+	 * Defines an annotation for determining set of allowed file permission flags.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef(flag = true, value = {PERMISSION_READ, PERMISSION_WRITE, PERMISSION_EXECUTE})
+	@interface FilePermissions {
+	}
+
+	/**
+	 * Storage identifiers -------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Identifier for &lt;b&gt;base&lt;/b&gt; path on an Android device's file system. This identifier should be
+	 * used whenever the passed path to this API represents a full path to the desired file, so should
+	 * not be prepended.
+	 */
+	int BASE = 0x00;
+
+	/**
+	 * Identifier for the &lt;b&gt;root&lt;/b&gt; directory of an Android device's file system.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this is only &lt;b&gt;read-only&lt;/b&gt; file storage.
+	 * &lt;p&gt;
+	 * See {@link android.os.Environment#getRootDirectory()} for additional info.
+	 */
+	int ROOT = 0x01;
+
+	/**
+	 * Identifier for the &lt;b&gt;data&lt;/b&gt; directory of an Android device's file system.
+	 * &lt;p&gt;
+	 * See {@link android.os.Environment#getDataDirectory()} for additional info.
+	 */
+	int DATA = 0x02;
+
+	/**
+	 * Identifier for the &lt;b&gt;cache&lt;/b&gt; directory of an Android device's file system.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this directory is created for each of Android applications (respectively),
+	 * identified by theirs &lt;i&gt;package name&lt;/i&gt;, and is meant to be used for caching all necessary
+	 * data of the particular Android application. This directory can be accessed/managed only by
+	 * application for which was this directory created.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Files from this directory will be deleted as first when the Android device runs low on storage.&lt;/b&gt;
+	 * &lt;p&gt;
+	 * &lt;b&gt;Once the application is uninstalled, this directory will be deleted.&lt;/b&gt;
+	 * &lt;p&gt;
+	 * See {@link android.content.Context#getCacheDir()} for additional info.
+	 */
+	int CACHE = 0x04;
+
+	/**
+	 * Identifier for the &lt;b&gt;internal&lt;/b&gt; directory of an Android device's file system.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this directory (like {@link #CACHE}) is created for each of Android applications
+	 * (respectively), and is meant to be used for storing all necessary data of the particular Android
+	 * application.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Once the application is uninstalled, this directory will be deleted.&lt;/b&gt;
+	 * &lt;p&gt;
+	 * See {@link android.content.Context#getFilesDir()} for additional info.
+	 */
+	int INTERNAL = 0x05;
+
+	/**
+	 * Identifier for the &lt;b&gt;external&lt;/b&gt; directory of an Android device's file system. This will in
+	 * most cases point to the mounted &lt;b&gt;SD card&lt;/b&gt; if available.
+	 * &lt;p&gt;
+	 * See {@link android.os.Environment#getExternalStorageDirectory()} for additional info.
+	 *
+	 * @see #isExternalAvailable()
+	 */
+	int EXTERNAL = 0x06;
+
+	/**
+	 * Identifier for the &lt;b&gt;external-package&lt;/b&gt; directory of an Android device's file system created
+	 * especially for the particular Android application on the external file storage at path:
+	 * /Android/data/&lt;b&gt;app.package.name&lt;/b&gt;/.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this directory is created when {@link #getStorage(int) getStorage(EXTERNAL_PACKAGE)}
+	 * is being first time called and the external storage is at that particular time available.
+	 *
+	 * @see #isExternalAvailable()
+	 */
+	int EXTERNAL_PACKAGE = 0x07;
+
+	/**
+	 * Defines an annotation for determining set of available storage directories.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({BASE, ROOT, DATA, CACHE, INTERNAL, EXTERNAL, EXTERNAL_PACKAGE})
+	@interface StorageDir {
+	}
+
+	/**
+	 * Actions -------------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Flag identifying &lt;b&gt;create&lt;/b&gt; action on file system.
+	 * &lt;p&gt;
+	 * This flag is used by {@link Storage.Result} and {@link Storage.Results} to identify for which
+	 * action was the specific result created.
+	 */
+	int ACTION_CREATE = 0x01;
+
+	/**
+	 * Flag identifying &lt;b&gt;delete&lt;/b&gt; action on file system.
+	 * &lt;p&gt;
+	 * This flag is used by {@link Storage.Result} and {@link Storage.Results} to identify for which
+	 * action was the specific result created.
+	 */
+	int ACTION_DELETE = 0x02;
+
+	/**
+	 * Flag identifying &lt;b&gt;copy&lt;/b&gt; action on file system.
+	 * &lt;p&gt;
+	 * This flag is used by {@link Storage.Result} and {@link Storage.Results} to identify for which
+	 * action was the specific result created.
+	 */
+	int ACTION_COPY = 0x03;
+
+	/**
+	 * Flag identifying &lt;b&gt;move&lt;/b&gt; action on file system.
+	 * &lt;p&gt;
+	 * This flag is used by {@link Storage.Result} and {@link Storage.Results} to identify for which
+	 * action was the specific result created.
+	 */
+	int ACTION_MOVE = 0x04;
+
+	/**
+	 * Error codes ---------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Code representing no error. Only for internal purpose.
+	 */
+	int NO_ERROR = 0x00;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} when there was requested some
+	 * storage API action but no paths for such a action were specified.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;0&lt;/b&gt;
+	 */
+	int ERROR_EMPTY_REQUEST = -0x0000;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} when {@link java.io.IOException}
+	 * occurred while performing some of the storage API actions.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-1&lt;/b&gt;
+	 */
+	int ERROR_IO = -0x01;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} when there was requested some
+	 * action which is not supported by this storage API.
+	 * &lt;p&gt;
+	 * This can be for example, when trying to move directory to itself.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-2&lt;/b&gt;
+	 */
+	int ERROR_UNSUPPORTED_OPERATION = -0x02;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} when there was requested some
+	 * action to be performed by this storage API, but this action failed because of the specified
+	 * &lt;b&gt;flags&lt;/b&gt; for this action or because of constraints of this storage API.
+	 * &lt;p&gt;
+	 * This can be for example when requesting &lt;b&gt;copy&lt;/b&gt; action for some files which should be copied
+	 * into the same directory as they are right now, but without {@link #COPY} flag.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-3&lt;/b&gt;
+	 */
+	int ERROR_API = -0x03;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} whenever there is requested
+	 * some action to be performed by this storage API with a file which actually does not exists.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-17&lt;/b&gt;
+	 */
+	int ERROR_FILE_NOT_FOUND = -0x11;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} whenever there is requested
+	 * some action to be performed by this storage API with a file but the destination path points
+	 * to a directory.
+	 * &lt;p&gt;
+	 * This can be for example, when trying to &lt;b&gt;copy&lt;/b&gt; a file to another directory where in this
+	 * particular directory already exists a directory with the same name as the requested file.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-18&lt;/b&gt;
+	 */
+	int ERROR_FILE_SAME_AS_DIRECTORY = -0x12;
+
+	/**
+	 * Error set to {@link Storage.Result} or {@link Storage.Results} whenever there is requested
+	 * some action to be performed by this storage API with a directory but the destination path points
+	 * to a file.
+	 * &lt;p&gt;
+	 * This can be for example, when trying to &lt;b&gt;move&lt;/b&gt; a directory to another directory where in
+	 * this particular directory already exists a file with the same name as the requested directory.
+	 * &lt;p&gt;
+	 * Constant value: &lt;b&gt;-19&lt;/b&gt;
+	 */
+	int ERROR_DIRECTORY_SAME_AS_FILE = -0x13;
+
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Constant used to increase amount of bits when moving between different storage units by
+	 * {@link Storage.Unit}.
+	 */
+	int KILO = 128;
+
+	/**
+	 * Enums =======================================================================================
+	 */
+
+	/**
+	 * Represents unit to measure files on an Android device's file system.
+	 *
+	 * @author Martin Albedinsky
+	 */
+<span class="nc" id="L438">	enum Unit {</span>
+
+		/**
+		 * Storage unit size of one &lt;b&gt;bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;0.125&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L448">		b(&quot;Bit&quot;, 1),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;8&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L457">		B(&quot;Byte&quot;, 8 * b.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;kilo-bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1,024&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;128&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L466">		Kb(&quot;Kilobit&quot;, KILO * B.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;kilo-byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;8,192&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1,024&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L475">		KB(&quot;Kilobyte&quot;, B.bits * Kb.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;mega-bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1,048,576&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;131,072&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L484">		Mb(&quot;Megabit&quot;, KILO * KB.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;mega-byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;8,388,608&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1,048,576&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L493">		MB(&quot;Megabyte&quot;, B.bits * Mb.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;giga-bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1,073,741,824&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;134,217,728&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L502">		Gb(&quot;Gigabit&quot;, KILO * MB.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;giga-byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;8,589,934,592&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1,073,741,824&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L511">		GB(&quot;Gigabyte&quot;, B.bits * Gb.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;tera-bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1,099,511,627,776&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;137,438,953,472&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L520">		Tb(&quot;Terabit&quot;, KILO * GB.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;tera-byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;8,796,093,022,208&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1,099,511,627,776&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L529">		TB(&quot;Terabyte&quot;, B.bits * Tb.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;peta-bit&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;1,125,899,906,842,624&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;140,737,488,355,328&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L538">		Pb(&quot;Petabit&quot;, KILO * TB.bits),</span>
+		/**
+		 * Storage unit size of one &lt;b&gt;peta-byte&lt;/b&gt;.
+		 * &lt;h3&gt;Size:&lt;/h3&gt;
+		 * &lt;ul&gt;
+		 * &lt;li&gt;bits: &lt;b&gt;9,007,199,254,740,992&lt;/b&gt;&lt;/li&gt;
+		 * &lt;li&gt;bytes: &lt;b&gt;1,125,899,906,842,624&lt;/b&gt;&lt;/li&gt;
+		 * &lt;/ul&gt;
+		 */
+<span class="nc" id="L547">		PB(&quot;Petabyte&quot;, B.bits * Pb.bits);</span>
+
+		/**
+		 * Full name of this storage unit. Like &lt;b&gt;Megabyte&lt;/b&gt; for &lt;i&gt;MB&lt;/i&gt;.
+		 */
+		public final String fullName;
+
+		/**
+		 * Amount of bits represented by this storage unit.
+		 */
+		public final long bits;
+
+		/**
+		 * Amount of bytes ({@code bits / 8}) represented by this storage unit.
+		 */
+		public final float bytes;
+
+		/**
+		 * Creates a new instance of storage Unit with the given full name and amount of bits.
+		 *
+		 * @param fullName The name for this storage unit.
+		 * @param bits     Amount of bits represented by this unit.
+		 */
+<span class="nc" id="L570">		Unit(String fullName, long bits) {</span>
+<span class="nc" id="L571">			this.fullName = fullName;</span>
+<span class="nc" id="L572">			this.bits = bits;</span>
+<span class="nc" id="L573">			this.bytes = bits / 8.0f;</span>
+<span class="nc" id="L574">		}</span>
+
+		/**
+		 * Formats the given amount of &lt;var&gt;bits&lt;/var&gt; to format specific for this storage unit.
+		 * &lt;p&gt;
+		 * For example, {@link Unit#MB Unit.MB.formatBits(8388608)} will result in {@code 1} which
+		 * can be printed as {@code 1 MB}.
+		 *
+		 * @param bits The amount of bits to format to this storage unit's representative value.
+		 * @return Formatted representative value of this storage unit for the given amount of bits.
+		 * @see #formatBytes(long)
+		 */
+		public float formatBits(long bits) {
+<span class="nc" id="L587">			return bits / (float) this.bits;</span>
+		}
+
+		/**
+		 * Formats the given amount of &lt;var&gt;bytes&lt;/var&gt; to format specific for this storage unit.
+		 * &lt;p&gt;
+		 * For example, {@link Unit#MB Unit.MB.formatBytes(1048576)} will result in {@code 1} which
+		 * can be printed as {@code 1 MB}.
+		 *
+		 * @param bytes The amount of bytes to format to this storage unit's representative value.
+		 * @return Formatted representative value of this storage unit for the given amount of bytes.
+		 * @see #formatBits(long)
+		 */
+		public float formatBytes(long bytes) {
+<span class="nc" id="L601">			return bytes / this.bytes;</span>
+		}
+	}
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Same as {@link #createFile(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result createFile(@NonNull String path);
+
+	/**
+	 * Creates a &lt;b&gt;file&lt;/b&gt; with the given &lt;var&gt;path&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#createFile(String)} for additional info.
+	 *
+	 * @param storage An identifier of the storage of which path to use as {@code base path} for
+	 *                the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                full path to the file which should be created.
+	 * @param path    The path to the file which should be created.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result createFile(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Same as {@link #createFiles(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results createFiles(@NonNull String... paths);
+
+	/**
+	 * Creates all &lt;b&gt;files&lt;/b&gt; with the given &lt;var&gt;paths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #createFile(int, String)} method, so the given paths will
+	 * be looped to perform the requested action for each of them.
+	 *
+	 * @param paths Set of paths of files which should be created.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results createFiles(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Same as {@link #createDirectory(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result createDirectory(@NonNull String path);
+
+	/**
+	 * Creates a &lt;b&gt;directory&lt;/b&gt; with the given &lt;var&gt;path&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#createDirectory(String)} for additional info.
+	 *
+	 * @param storage An identifier of the storage of which path to use as {@code base path} for
+	 *                the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                full path to the directory which should be created.
+	 * @param path    The path to the directory which should be created.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result createDirectory(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Same as {@link #createDirectories(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results createDirectories(@NonNull String... paths);
+
+	/**
+	 * Creates all &lt;b&gt;directories&lt;/b&gt; with the given &lt;var&gt;paths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #createDirectory(int, String)} method, so the given paths
+	 * will be looped to perform the requested action for each of them.
+	 *
+	 * @param paths Set of paths of directories which should be created.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results createDirectories(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Same as {@link #deleteFile(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result deleteFile(@NonNull String path);
+
+	/**
+	 * Deletes a file at the given &lt;var&gt;path&lt;/var&gt; from this Android device's storage.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#deleteFile(String)} for additional info.
+	 *
+	 * @param storage An identifier of the storage of which path to use as {@code base path} for
+	 *                the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                full path to the file which should be deleted.
+	 * @param path    The path to the file which should be deleted.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result deleteFile(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Same as {@link #deleteFiles(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results deleteFiles(@NonNull String... paths);
+
+	/**
+	 * Deletes all files at the given &lt;var&gt;paths&lt;/var&gt; from this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #deleteFile(int, String)} method, so the given paths will
+	 * be looped to perform the requested action for each of them.
+	 *
+	 * @param paths Set of paths to files which should be deleted.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results deleteFiles(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Same as {@link #deleteDirectory(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result deleteDirectory(@NonNull String path);
+
+	/**
+	 * Same as {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)} with {@code null}
+	 * filters.
+	 */
+	@NonNull
+	Result deleteDirectory(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Deletes a directory at the given &lt;var&gt;path&lt;/var&gt; from this Android device's storage.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that if this method is used with valid &lt;b&gt;filters&lt;/b&gt;, sub-directories
+	 * (and theirs sub-directories, ...) of the requested directory which has some content left after
+	 * deleting process will remain and will be not deleted. This also applies to the requested directory.
+	 * This can be used to not delete whole directory, but only the desired files of such a directory.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#deleteDirectory(FileFilter, FilenameFilter, String)} for additional
+	 * info.
+	 *
+	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
+	 *                   the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                   full path to the file which should be deleted.
+	 * @param filter     If not {@code null}, this filter will be used to delete only files of
+	 *                   the requested directory which passes through this filter, all other files
+	 *                   will be not deleted.
+	 * @param nameFilter If not {@code null}, this filter will be used to delete only files of
+	 *                   the requested directory with names which passes through this filter, all
+	 *                   other files will be not deleted.
+	 * @param path       The path to the directory which should be deleted or of which filtered files
+	 *                   should be deleted.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result deleteDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+
+	/**
+	 * Same as {@link #deleteDirectories(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results deleteDirectories(@NonNull String... paths);
+
+	/**
+	 * Same as {@link #deleteDirectories(int, FileFilter, FilenameFilter, String...)} with {@code null}
+	 * filters.
+	 */
+	@NonNull
+	Results deleteDirectories(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Deletes all directories at the given &lt;var&gt;paths&lt;/var&gt; from this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}
+	 * method, so the given paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param paths Set of paths to directories which should be deleted.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results deleteDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+
+	/**
+	 * Same as {@link #deleteFileOrDirectory(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result deleteFileOrDirectory(@NonNull String path);
+
+	/**
+	 * Same as {@link #deleteFileOrDirectory(int, FileFilter, FilenameFilter, String)} with
+	 * {@code null} filters.
+	 */
+	@NonNull
+	Result deleteFileOrDirectory(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Performs {@link #deleteFile(int, String)} or {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}
+	 * depends on whether the given &lt;var&gt;path&lt;/var&gt; points to a file or to a directory.
+	 */
+	@NonNull
+	Result deleteFileOrDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+
+	/**
+	 * Same as {@link #deleteFilesOrDirectories(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results deleteFilesOrDirectories(@NonNull String... paths);
+
+	/**
+	 * Same as {@link #deleteFilesOrDirectories(int, FileFilter, FilenameFilter, String...)} with
+	 * {@code null} filters.
+	 */
+	@NonNull
+	Results deleteFilesOrDirectories(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Performs {@link #deleteFile(int, String)} or {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}
+	 * for each of the given &lt;var&gt;paths&lt;/var&gt; depends on whether the iterated path points to a file
+	 * or to a directory.
+	 */
+	@NonNull
+	Results deleteFilesOrDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+
+	/**
+	 * Same as {@link #copyFile(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result copyFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Copies a file from the given &lt;var&gt;fromPath&lt;/var&gt; to the given &lt;var&gt;toPath&lt;/var&gt; on this Android
+	 * device's storage.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#deleteFile(String)} for additional info.
+	 *
+	 * @param storage  An identifier of the storage of which path to use as {@code base path} for
+	 *                 the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                 full path to the file which should be copied.
+	 * @param flags    Set of flags to be taken into count when performing this action. Use for example
+	 *                 {@link #COPY} flag to create copy at the same path as the specified &lt;var&gt;fromPath&lt;/var&gt;
+	 *                 with {@code -Copy} suffix.
+	 * @param toPath   The path to the file where should be the requested file copied. If there is no
+	 *                 existing file at this path, a new one will be created.
+	 * @param fromPath The path to the file which should be copied.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result copyFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #copyFiles(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results copyFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Copies all files at the given &lt;var&gt;fromPaths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #copyFile(int, int, String, String)} method, so the given
+	 * paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param fromPaths Set of paths to files which should be copied.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results copyFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #copyFile(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result copyDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
+	 * {@code null} filters, so whole content of the requested directory will be copied.
+	 */
+	@NonNull
+	Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Copies a directory from the given &lt;var&gt;fromPath&lt;/var&gt; to the given &lt;var&gt;toPath&lt;/var&gt; on this
+	 * Android device's storage.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that if this method is used with valid &lt;b&gt;filters&lt;/b&gt;, only files which passes
+	 * the given filters will be copied to the requested destination. This can be used to not copy
+	 * whole directory, but only the desired files of such a directory.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#copyDirectory(int, FileFilter, FilenameFilter, String, String)} for
+	 * additional info.
+	 *
+	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
+	 *                   the given paths. Use {@link #BASE} when the given paths represents full paths
+	 *                   for the directory which should be copied.
+	 * @param flags      Set of flags to be taken into count when performing this action. Use for example
+	 *                   {@link #COPY} flag to create copy at the same path as the specified &lt;var&gt;fromPath&lt;/var&gt;
+	 *                   with {@code -Copy} suffix.
+	 * @param filter     If not {@code null}, this filter will be used to copy only files of the
+	 *                   requested directory which passes through this filter, all other files will
+	 *                   be not copied.
+	 * @param nameFilter If not {@code null}, this filter will be used to copy only files of the
+	 *                   requested directory with names which passes through this filter, all other
+	 *                   files will be not copied.
+	 * @param toPath     The path to the directory where should be the requested directory or its filtered
+	 *                   files copied. If there is no existing directory at this path, a new one will
+	 *                   be created.
+	 * @param fromPath   The path to the directory which or of which filtered files should be copied.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #copyDirectories(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results copyDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #copyDirectories(int, int, FileFilter, FilenameFilter, String, String...)} with
+	 * {@code null} filters, so whole content of the requested directories will be copied.
+	 */
+	@NonNull
+	Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Copies all directories at the given &lt;var&gt;fromPaths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}
+	 * method, so the given  paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param fromPaths Set of paths to directories which should be copied.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #copyFileOrDirectory(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result copyFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #copyFileOrDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
+	 * {@code null} filters.
+	 */
+	@NonNull
+	Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Performs {@link #copyFile(int, int, String, String)} or {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}
+	 * depends on whether the given &lt;var&gt;fromPath&lt;/var&gt; points to a file or to a directory.
+	 */
+	@NonNull
+	Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #copyFilesOrDirectories(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results copyFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #copyFilesOrDirectories(int, int, FileFilter, FilenameFilter, String, String...)}
+	 * with {@code null} filters.
+	 */
+	@NonNull
+	Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Performs {@link #copyFile(int, int, String, String)} or {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}
+	 * for each of the given &lt;var&gt;fromPaths&lt;/var&gt; depends on whether the iterated path points to a file
+	 * or to a directory.
+	 */
+	@NonNull
+	Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #moveFile(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result moveFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Moves a file from the given &lt;var&gt;fromPath&lt;/var&gt; to the given &lt;var&gt;toPath&lt;/var&gt; on this Android
+	 * device's storage.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#moveFile(int, String, String)} for additional info.
+	 *
+	 * @param storage  An identifier of the storage of which path to use as {@code base path} for
+	 *                 the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                 full path to the file which should be copied.
+	 * @param flags    Set of flags to be taken into count when performing this action. Use for example
+	 *                 {@link #OVERWRITE} flag to overwrite the existing file at the specified &lt;var&gt;toPath&lt;/var&gt;.
+	 * @param toPath   The path to the file where should be the requested file copied. If there is no
+	 *                 existing file at this path, a new one will be created.
+	 * @param fromPath The path to the file which should be copied.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result moveFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #moveFiles(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results moveFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Moves all files at the given &lt;var&gt;fromPaths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #moveFile(int, int, String, String)} method, so the given
+	 * paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param fromPaths Set of paths to files which should be moved.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results moveFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #moveFile(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result moveDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
+	 * {@code null} filters, so whole content of the requested directory will be copied.
+	 */
+	@NonNull
+	Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Moves a directory from the given &lt;var&gt;fromPath&lt;/var&gt; to the given &lt;var&gt;toPath&lt;/var&gt; on this
+	 * Android device's storage.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that if this method is used with valid &lt;b&gt;filters&lt;/b&gt;, only files which passes
+	 * the given filters will be moved to the requested destination. This can be used to not move
+	 * whole directory, but only the desired files of such a directory.
+	 * &lt;p&gt;
+	 * See {@link StorageUtils#moveDirectory(int, String, String)} for additional info.
+	 *
+	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
+	 *                   the given paths. Use {@link #BASE} when the given paths represents full paths
+	 *                   for the directory which should be copied.
+	 * @param flags      Set of flags to be taken into count when performing this action. Use for example
+	 *                   {@link #OVERWRITE} flag to overwrite the existing directory at the specified
+	 *                   &lt;var&gt;toPath&lt;/var&gt;.
+	 * @param filter     If not {@code null}, this filter will be used to move only files of the
+	 *                   requested directory which passes through this filter, all other files will
+	 *                   be not moved.
+	 * @param nameFilter If not {@code null}, this filter will be used to move only files of the
+	 *                   requested directory with names which passes through this filter, all other
+	 *                   files will be not moved.
+	 * @param toPath     The path to the directory where should be the requested directory or its filtered
+	 *                   files copied. If there is no existing directory at this path, a new one will
+	 *                   be created.
+	 * @param fromPath   The path to the directory which or of which filtered files should be moved.
+	 * @return Result data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #moveDirectories(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results moveDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #moveDirectories(int, int, FileFilter, FilenameFilter, String, String...)} with
+	 * {@code null} filters, so whole content of the requested directories will be copied.
+	 */
+	@NonNull
+	Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Moves all directories at the given &lt;var&gt;fromPaths&lt;/var&gt; on this Android device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #moveFile(int, int, String, String)} method, so the given
+	 * paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param fromPaths Set of paths to directories which should be moved.
+	 * @return Results data for this action to identify whether this action succeeded or failed.
+	 */
+	@NonNull
+	Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #moveFileOrDirectory(int, int, String, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Result moveFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #moveFileOrDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
+	 * {@code null} filters.
+	 */
+	@NonNull
+	Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Performs {@link #moveFile(int, int, String, String)} or {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)}
+	 * depends on whether the given &lt;var&gt;fromPath&lt;/var&gt; points to a file or to a directory.
+	 */
+	@NonNull
+	Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+
+	/**
+	 * Same as {@link #moveFilesOrDirectories(int, int, String, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	Results moveFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #moveFilesOrDirectories(int, int, FileFilter, FilenameFilter, String, String...)}
+	 * with {@code null} filters.
+	 */
+	@NonNull
+	Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Performs {@link #moveFile(int, int, String, String)} or {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)}
+	 * for each of the given &lt;var&gt;fromPaths&lt;/var&gt; depends on whether the iterated path points to a file
+	 * or to a directory.
+	 */
+	@NonNull
+	Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+
+	/**
+	 * Same as {@link #changeFilePermissions(int, String, int, boolean)} for {@link #BASE} storage.
+	 */
+	boolean changeFilePermissions(@NonNull String path, @FilePermissions int permissions, boolean ownerOnly);
+
+	/**
+	 * Changes &lt;b&gt;read/write&lt;/b&gt; permissions of a file on the given &lt;var&gt;path&lt;/var&gt; of this Android
+	 * device's storage.
+	 *
+	 * @param storage     An identifier of the storage of which path to use as {@code base path} for
+	 *                    the given &lt;var&gt;path&lt;/var&gt;. Use {@link #BASE} when the given path represents
+	 *                    full path to the file of which read/write permissions should be changed.
+	 * @param path        The path to the file of which permissions should be changed.
+	 * @param permissions The desired read/write/execute permissions. One of {@link #PERMISSION_READ},
+	 *                    {@link #PERMISSION_WRITE}, {@link #PERMISSION_EXECUTE} or combination of
+	 *                    them.
+	 * @param ownerOnly   If {@code true} only owner will have the specified permissions, otherwise
+	 *                    any one will have them.
+	 * @return {@code True} if all permissions were successfully changed, {@code false}
+	 * otherwise.
+	 */
+	boolean changeFilePermissions(@StorageDir int storage, @NonNull String path, @FilePermissions int permissions, boolean ownerOnly);
+
+	/**
+	 * Checks whether there is some external storage mounted to this Android device or not. If this
+	 * check returns {@code true}, the current external storage can be used for &lt;b&gt;read + write&lt;/b&gt;
+	 * access.
+	 * &lt;p&gt;
+	 * See {@link android.os.Environment#getExternalStorageState()} and {@link android.os.Environment#MEDIA_MOUNTED}
+	 * for more info.
+	 *
+	 * @return {@code True} if some external storage is mounted to this Android device,
+	 * {@code false} otherwise.
+	 * @see #isExternalReadOnly()
+	 * @see #isExternalAvailable()
+	 */
+	boolean isExternalMounted();
+
+	/**
+	 * Checks whether the current mounted external storage is in &lt;b&gt;read only&lt;/b&gt; state or not.
+	 * &lt;p&gt;
+	 * See {@link android.os.Environment#getExternalStorageState()} and {@link android.os.Environment#MEDIA_MOUNTED_READ_ONLY}
+	 * for more info.
+	 *
+	 * @return {@code True} if the currently mounted external storage to this Android device is
+	 * in &lt;b&gt;read only&lt;/b&gt; state, {@code false} if there is no external storage mounted or the
+	 * current one can be used for &lt;b&gt;read + write&lt;/b&gt; operations.
+	 * @see #isExternalMounted()
+	 * @see #isExternalAvailable()
+	 */
+	boolean isExternalReadOnly();
+
+	/**
+	 * Checks whether there is some external storage available on this Android device which can be
+	 * used to store some data.
+	 *
+	 * @return {@code True} if there is some external storage mounted and can be used for
+	 * &lt;b&gt;read + write&lt;/b&gt; access or at least for &lt;b&gt;read&lt;/b&gt; access if it is in {@link android.os.Environment#MEDIA_MOUNTED_READ_ONLY}
+	 * state.
+	 * @see #isExternalMounted()
+	 * @see #isExternalReadOnly()
+	 */
+	boolean isExternalAvailable();
+
+	/**
+	 * Checks whether there is the specified amount of &lt;var&gt;bytes&lt;/var&gt; available on the requested
+	 * &lt;var&gt;storage&lt;/var&gt; type.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that for {@link #BASE} this will always returns {@code false}, because this
+	 * identifier doesn't represents any storage.
+	 * &lt;p&gt;
+	 * See {@link File#getFreeSpace()} for additional info.
+	 *
+	 * @param storage An identifier of the storage of which free space to check.
+	 * @param bytes   The desired amount of bytes to check against.
+	 * @return {@code True} if there is at least the desired amount of bytes available for storing
+	 * of new files on the requested storage, {@code false} otherwise.
+	 */
+	boolean hasFreeSpace(@StorageDir int storage, long bytes);
+
+	/**
+	 * Returns the currently available free space on the requested storage type.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that for {@link #BASE} this will always returns {@code 0}, because this
+	 * identifier doesn't represents any storage.
+	 *
+	 * @param storage An identifier of the storage of which free space to obtain.
+	 * @return The amount of bytes which are at this time available for storing of new files on the
+	 * requested storage.
+	 */
+	long getFreeSpace(@StorageDir int storage);
+
+	/**
+	 * Returns a file representing the directory on this Android device's file system.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that for {@link #BASE} this will always returns {@code null}, because this
+	 * identifier doesn't represents any storage.
+	 *
+	 * @param storage An identifier of the storage of which directory to obtain.
+	 * @return The directory for the desired storage, or {@code null} unknown storage type was
+	 * requested.
+	 */
+	@Nullable
+	File getStorage(@StorageDir int storage);
+
+	/**
+	 * Returns a path obtained from the requested storage by {@link #getStorage(int) getStorage(int).getPath()}.
+	 *
+	 * @return The path of the requested storage type.
+	 */
+	@NonNull
+	String getStoragePath(@StorageDir int storage);
+
+	/**
+	 * Returns a file eventually stored on the specified &lt;var&gt;storage&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this method only builds the path to the requested file and creates an instance
+	 * of File.
+	 *
+	 * @param storage An identifier of the storage of which path to use as base path for the requested
+	 *                file.
+	 * @param path    Relative path to the desired file which is stored at storage with the specified
+	 *                identifier.
+	 * @return A new instance of File with the path created from the path of the given &lt;var&gt;storage&lt;/var&gt;
+	 * appended by the given relative file &lt;var&gt;path&lt;/var&gt;.
+	 */
+	@NonNull
+	File getFile(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Same as {@link #getDirectoryContent(int, String)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoryContent(@NonNull String path);
+
+	/**
+	 * Same as {@link #getDirectoryContent(int, FileFilter, FilenameFilter, String)}
+	 * with {@code null} filters.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoryContent(@StorageDir int storage, @NonNull String path);
+
+	/**
+	 * Lists all files stored within a directory at the given &lt;var&gt;path&lt;/var&gt; on this Android device's
+	 * storage.
+	 * &lt;p&gt;
+	 * See {@link File#listFiles(FileFilter)} and {@link File#listFiles(FilenameFilter)}
+	 * for additional info.
+	 *
+	 * @param storage    An identifier of the storage of which path to use as {@code base path} for
+	 *                   the given path. Use {@link #BASE} when the given path represents full path
+	 *                   to the directory of which files to list.
+	 * @param filter     If not {@code null}, this filter will be used to filter the desired
+	 *                   types of files.
+	 * @param nameFilter If not {@code null}, this filter will be used to filter the desired
+	 *                   files by their names.
+	 * @param path       The path to the directory of which files to list.
+	 * @return List of files listed from the requested directory, or empty list if the directory on
+	 * the specified path doesn't exists or is not a directory or just none file passes through the
+	 * given filters.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoryContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+
+	/**
+	 * Same as {@link #getDirectoriesContent(int, String...)} for {@link #BASE} storage.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoriesContent(@NonNull String... paths);
+
+	/**
+	 * Same as {@link #getDirectoriesContent(int, FileFilter, FilenameFilter, String...)}
+	 * with {@code null} filters.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoriesContent(@StorageDir int storage, @NonNull String... paths);
+
+	/**
+	 * Lists all files stored within directories at the given &lt;var&gt;paths&lt;/var&gt; on this Android
+	 * device's storage.
+	 * &lt;p&gt;
+	 * This is a bulk operation for {@link #getDirectoryContent(int, FileFilter, FilenameFilter, String)}
+	 * method, so the given paths will be looped to perform the requested action for each of them.
+	 *
+	 * @param paths Set of paths to directories of which files should be listed.
+	 * @return List with all files obtained from {@link #getDirectoryContent(int, FileFilter, FilenameFilter, String)}
+	 * for each of the given &lt;var&gt;paths&lt;/var&gt;.
+	 */
+	@NonNull
+	List&lt;File&gt; getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * This class represents the base structure for results which may be returned by this storage API
+	 * when invoking some of its methods.
+	 */
+	abstract class BaseResult {
+
+		/**
+		 * Identifier of action for which was this result created. One of {@link #ACTION_CREATE},
+		 * {@link #ACTION_DELETE}, {@link #ACTION_COPY} or {@link #ACTION_MOVE}.
+		 */
+		public final int action;
+
+		/**
+		 * Message for this result. This can be &lt;b&gt;info&lt;/b&gt; message or &lt;b&gt;error&lt;/b&gt; message, depends
+		 * on for which purpose was this result created.
+		 */
+		@NonNull
+		public final String message;
+
+		/**
+		 * Same flags as passed to the storage API method for which was this result created.
+		 */
+		public final int flags;
+
+		/**
+		 * Flag indicating whether this result was created as error or not.
+		 * &lt;p&gt;
+		 * If {@code true}, the {@link #errorCode} will point to the specific error which occurred
+		 * during execution of the requested {@link #action}.
+		 */
+		public final boolean isError;
+
+		/**
+		 * Code specific to error which occurred during execution of the requested {@link #action}.
+		 * &lt;p&gt;
+		 * See all &lt;b&gt;Storage.ERROR_...&lt;/b&gt; which can be raised by this storage API.
+		 */
+		public final int errorCode;
+
+		/**
+		 * Creates a new instance of BaseResult.
+		 *
+		 * @param action  The action for which is this result being created.
+		 * @param message Message for this result.
+		 * @param flags   Flags passed to the method which is represented by the given &lt;var&gt;action&lt;/var&gt;.
+		 * @param error   Error code if this result represents error.
+		 */
+<span class="nc" id="L1379">		BaseResult(int action, @NonNull String message, int flags, int error) {</span>
+<span class="nc" id="L1380">			this.action = action;</span>
+<span class="nc" id="L1381">			this.message = message;</span>
+<span class="nc" id="L1382">			this.flags = flags;</span>
+<span class="nc" id="L1383">			this.errorCode = error;</span>
+<span class="nc bnc" id="L1384" title="All 2 branches missed.">			this.isError = error &lt; 0;</span>
+<span class="nc" id="L1385">		}</span>
+	}
+
+	/**
+	 * This class represents structure for result which will be returned by this storage API when
+	 * invoking some of its methods which accepts only &lt;b&gt;single path&lt;/b&gt; as parameter.
+	 */
+	final class Result extends BaseResult {
+
+		/**
+		 * The path passed to the method for which was this result created.
+		 */
+		@NonNull
+		public final String path;
+
+		/**
+		 * Creates a new instance of Result like {@link BaseResult#BaseResult(int, String, int, int)}.
+		 *
+		 * @param path The single path for which is this result being created.
+		 */
+		Result(int action, String message, @NonNull String path, int flags, int error) {
+<span class="nc" id="L1406">			super(action, message, flags, error);</span>
+<span class="nc" id="L1407">			this.path = path;</span>
+<span class="nc" id="L1408">		}</span>
+	}
+
+	/**
+	 * This class represents structure for result which will be returned by this storage API when
+	 * invoking some of its methods which accepts set of &lt;b&gt;paths&lt;/b&gt; as parameter so when requesting
+	 * a bulk storage operation.
+	 */
+	final class Results extends BaseResult {
+
+		/**
+		 * The count determining how many operations were successfully performed for the paths passed
+		 * to the bulk method for which was this result created.
+		 */
+		public final int succeeded;
+
+		/**
+		 * List of single results where each of them was obtained by invoking storage API method which
+		 * accepts &lt;b&gt;single path&lt;/b&gt; as parameter for each of the passed paths which were passed to
+		 * the method for which was this result created.
+		 * &lt;p&gt;
+		 * This list of results will be always the same size as the size of provided paths.
+		 */
+		@NonNull
+		public final List&lt;Result&gt; results;
+
+		/**
+		 * Creates a new instance of Results like {@link BaseResult#BaseResult(int, String, int, int)}.
+		 *
+		 * @param succeeded Count of successfully performed operations.
+		 * @param results   List of results for each of the paths passed to the method for which is
+		 *                  this results object being created.
+		 */
+		Results(int action, @NonNull String message, int succeeded, @NonNull List&lt;Result&gt; results, int flags, int error) {
+<span class="nc" id="L1442">			super(action, message, flags, error);</span>
+<span class="nc" id="L1443">			this.succeeded = succeeded;</span>
+<span class="nc" id="L1444">			this.results = results;</span>
+<span class="nc" id="L1445">		}</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

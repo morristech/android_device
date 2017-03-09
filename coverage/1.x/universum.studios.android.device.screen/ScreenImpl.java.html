@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ScreenImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.screen</a> &gt; <span class="el_source">ScreenImpl.java</span></div><h1>ScreenImpl.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.screen;
+
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Configuration;
+import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings.SettingNotFoundException;
+import android.provider.Settings.System;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Px;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Window;
+import android.view.WindowManager;
+
+/**
+ * A {@link Screen} implementation.
+ *
+ * @author Martin Albedinsky
+ */
+final class ScreenImpl implements Screen {
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	// private static final String TAG = &quot;ScreenImpl&quot;;
+
+	/**
+	 * Interface ===================================================================================
+	 */
+
+	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
+	 * Lock used for synchronized operations.
+	 */
+<span class="nc" id="L66">	private static final Object LOCK = new Object();</span>
+
+	/**
+	 * ScreenImpl singleton instance.
+	 */
+	@SuppressLint(&quot;StaticFieldLeak&quot;)
+	private static ScreenImpl sInstance;
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Display metrics.
+	 */
+<span class="nc" id="L81">	private final DisplayMetrics mMetrics = new DisplayMetrics();</span>
+
+	/**
+	 * Application context.
+	 */
+	private final Context mContext;
+
+	/**
+	 * &quot;Default&quot; width of the current Android device's screen.
+	 */
+	private final int mWidth;
+
+	/**
+	 * &quot;Default&quot; height of the current Android device's screen.
+	 */
+	private final int mHeight;
+
+	/**
+	 * Window manager service.
+	 */
+	private final WindowManager mWindowManager;
+
+	/**
+	 * Default orientation of the current Android device's screen.
+	 */
+	private final int mDefaultOrientation;
+
+	/**
+	 * Type of the current Android device's screen.
+	 */
+	private final ScreenType mType;
+
+	/**
+	 * Density of the current Android device's screen.
+	 */
+	private final ScreenDensity mDensity;
+
+	/**
+	 * Raw density of the current Android device's screen.
+	 */
+	private final int mRawDensity;
+
+	/**
+	 * Actual orientation of the current Android device's screen.
+	 */
+<span class="nc" id="L126">	private int mCurrentOrientation = ORIENTATION_UNSPECIFIED;</span>
+
+	/**
+	 * Actual rotation of the current Android device's screen.
+	 */
+<span class="nc" id="L131">	private ScreenRotation mCurrentRotation = ScreenRotation.UNKNOWN;</span>
+
+	/**
+	 * Actual width of the current Android device's screen. Depends on the actual screen orientation.
+	 */
+	private int mCurrentWidth;
+
+	/**
+	 * Actual height of the current Android device's screen. Depends on the actual screen orientation.
+	 */
+	private int mCurrentHeight;
+
+	/**
+	 * Flag indicating whether the current Android device's screen orientation is currently locked or
+	 * not.
+	 */
+	private boolean mOrientationLocked;
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of ScreenImpl.
+	 *
+	 * @param applicationContext Application context used to access system services.
+	 */
+<span class="nc" id="L158">	private ScreenImpl(Context applicationContext) {</span>
+<span class="nc" id="L159">		this.mContext = applicationContext;</span>
+<span class="nc" id="L160">		this.mWindowManager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);</span>
+<span class="nc" id="L161">		this.refresh();</span>
+		// Resolve default orientation.
+<span class="nc bnc" id="L163" title="All 3 branches missed.">		switch (mCurrentRotation) {</span>
+			case ROTATION_0:
+			case ROTATION_180:
+<span class="nc bnc" id="L166" title="All 3 branches missed.">				switch (mCurrentOrientation) {</span>
+					case ORIENTATION_LANDSCAPE:
+					case ORIENTATION_REVERSE_LANDSCAPE:
+<span class="nc" id="L169">						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;</span>
+<span class="nc" id="L170">						break;</span>
+					case ORIENTATION_PORTRAIT:
+					case ORIENTATION_REVERSE_PORTRAIT:
+<span class="nc" id="L173">						this.mDefaultOrientation = ORIENTATION_PORTRAIT;</span>
+<span class="nc" id="L174">						break;</span>
+					default:
+<span class="nc" id="L176">						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;</span>
+<span class="nc" id="L177">						break;</span>
+				}
+				break;
+			case ROTATION_90:
+			case ROTATION_270:
+<span class="nc bnc" id="L182" title="All 3 branches missed.">				switch (mCurrentOrientation) {</span>
+					case ORIENTATION_LANDSCAPE:
+					case ORIENTATION_REVERSE_LANDSCAPE:
+<span class="nc" id="L185">						this.mDefaultOrientation = ORIENTATION_PORTRAIT;</span>
+<span class="nc" id="L186">						break;</span>
+					case ORIENTATION_PORTRAIT:
+					case ORIENTATION_REVERSE_PORTRAIT:
+<span class="nc" id="L189">						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;</span>
+<span class="nc" id="L190">						break;</span>
+					default:
+<span class="nc" id="L192">						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;</span>
+<span class="nc" id="L193">						break;</span>
+				}
+				break;
+			default:
+<span class="nc" id="L197">				this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;</span>
+				break;
+		}
+<span class="nc" id="L200">		this.mDensity = ScreenDensity.resolve(mRawDensity = mMetrics.densityDpi);</span>
+		// Resolve screen type.
+		float defaultWidthDP, defaultHeightDP;
+<span class="nc bnc" id="L203" title="All 3 branches missed.">		switch (mCurrentOrientation) {</span>
+			case ORIENTATION_LANDSCAPE:
+			case ORIENTATION_REVERSE_LANDSCAPE:
+<span class="nc" id="L206">				defaultWidthDP = pixelToDP(mMetrics.heightPixels);</span>
+<span class="nc" id="L207">				defaultHeightDP = pixelToDP(mMetrics.widthPixels);</span>
+<span class="nc" id="L208">				break;</span>
+			case ORIENTATION_PORTRAIT:
+			case ORIENTATION_REVERSE_PORTRAIT:
+<span class="nc" id="L211">				defaultWidthDP = pixelToDP(mMetrics.widthPixels);</span>
+<span class="nc" id="L212">				defaultHeightDP = pixelToDP(mMetrics.heightPixels);</span>
+<span class="nc" id="L213">				break;</span>
+			case ORIENTATION_UNSPECIFIED:
+			default:
+<span class="nc" id="L216">				defaultWidthDP = pixelToDP(mMetrics.widthPixels);</span>
+<span class="nc" id="L217">				defaultHeightDP = pixelToDP(mMetrics.heightPixels);</span>
+				break;
+		}
+<span class="nc" id="L220">		this.mType = ScreenType.resolve(defaultWidthDP, defaultHeightDP);</span>
+		// Resolve actual screen metrics.
+		final boolean reverse;
+<span class="nc bnc" id="L223" title="All 3 branches missed.">		switch (mDefaultOrientation) {</span>
+			case ORIENTATION_PORTRAIT:
+<span class="nc bnc" id="L225" title="All 4 branches missed.">				reverse = mCurrentOrientation != ORIENTATION_PORTRAIT &amp;&amp; mCurrentOrientation != ORIENTATION_REVERSE_PORTRAIT;</span>
+<span class="nc" id="L226">				break;</span>
+			case ORIENTATION_LANDSCAPE:
+<span class="nc bnc" id="L228" title="All 4 branches missed.">				reverse = mCurrentOrientation != ORIENTATION_LANDSCAPE &amp;&amp; mCurrentOrientation != ORIENTATION_REVERSE_LANDSCAPE;</span>
+<span class="nc" id="L229">				break;</span>
+			default:
+<span class="nc" id="L231">				reverse = false;</span>
+				break;
+		}
+		// Initialize display actual width and height.
+<span class="nc" id="L235">		this.mCurrentWidth = mMetrics.widthPixels;</span>
+<span class="nc" id="L236">		this.mCurrentHeight = mMetrics.heightPixels;</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">		this.mWidth = reverse ? mCurrentHeight : mCurrentWidth;</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">		this.mHeight = reverse ? mCurrentWidth : mCurrentHeight;</span>
+<span class="nc" id="L239">	}</span>
+
+	/**
+	 * Returns or creates a new singleton instance of ScreenImpl.
+	 *
+	 * @param context Context used by the screen implementation to access system services.
+	 * @return Screen implementation with actual screen data available.
+	 */
+	@NonNull
+	static ScreenImpl getsInstance(@NonNull Context context) {
+<span class="nc" id="L249">		synchronized (LOCK) {</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">			if (sInstance == null) sInstance = new ScreenImpl(context.getApplicationContext());</span>
+<span class="nc" id="L251">		}</span>
+<span class="nc" id="L252">		return sInstance;</span>
+	}
+
+	/**
+	 */
+	@Override
+	@SuppressWarnings(&quot;deprecation&quot;)
+	public boolean isOn() {
+<span class="nc" id="L260">		final PowerManager power = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);</span>
+<span class="nc bnc" id="L261" title="All 4 branches missed.">		return power != null &amp;&amp; power.isScreenOn();</span>
+	}
+
+	/**
+	 */
+	@Override
+	@TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
+	public boolean isInteractive() {
+<span class="nc" id="L269">		final PowerManager power = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);</span>
+<span class="nc bnc" id="L270" title="All 4 branches missed.">		return power != null &amp;&amp; power.isInteractive();</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean lockOrientation(@NonNull Activity activity) {
+<span class="nc" id="L277">		return requestOrientation(activity, ORIENTATION_CURRENT);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public void unlockOrientation(@NonNull Activity activity) {
+<span class="nc" id="L284">		requestOrientation(activity, ORIENTATION_USER);</span>
+<span class="nc" id="L285">	}</span>
+
+	/**
+	 */
+	@Override
+	@SuppressWarnings(&quot;WrongConstant&quot;)
+	public boolean requestOrientation(@NonNull Activity activity, @Orientation int orientation) {
+<span class="nc bnc" id="L292" title="All 3 branches missed.">		switch (orientation) {</span>
+			case ORIENTATION_CURRENT:
+<span class="nc" id="L294">				activity.setRequestedOrientation(getCurrentOrientation());</span>
+<span class="nc" id="L295">				break;</span>
+			case ORIENTATION_UNSPECIFIED:
+<span class="nc" id="L297">				break;</span>
+			default:
+<span class="nc" id="L299">				activity.setRequestedOrientation(orientation);</span>
+				break;
+		}
+<span class="nc bnc" id="L302" title="All 2 branches missed.">		return mOrientationLocked = (orientation != ORIENTATION_USER);</span>
+	}
+
+	/**
+	 */
+	@Override
+	@Orientation
+	@SuppressWarnings(&quot;ResourceType&quot;)
+	public int getRequestedOrientation(@NonNull Activity activity) {
+<span class="nc" id="L311">		return activity.getRequestedOrientation();</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public Display getDisplay() {
+<span class="nc" id="L319">		return mWindowManager.getDefaultDisplay();</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	@IntRange(from = 0)
+	public int getWidth() {
+<span class="nc" id="L328">		return mWidth;</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	@IntRange(from = 0)
+	public int getHeight() {
+<span class="nc" id="L337">		return mHeight;</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	@IntRange(from = 0)
+	public int getCurrentWidth() {
+<span class="nc" id="L346">		refresh();</span>
+<span class="nc" id="L347">		return mCurrentWidth;</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	@IntRange(from = 0)
+	public int getCurrentHeight() {
+<span class="nc" id="L356">		refresh();</span>
+<span class="nc" id="L357">		return mCurrentHeight;</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public DisplayMetrics getMetrics() {
+<span class="nc" id="L365">		refresh();</span>
+<span class="nc" id="L366">		return mMetrics;</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public ScreenDensity getDensity() {
+<span class="nc" id="L374">		return mDensity;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public int getRawDensity() {
+<span class="nc" id="L381">		return mRawDensity;</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public ScreenType getType() {
+<span class="nc" id="L389">		return mType;</span>
+	}
+
+	/**
+	 */
+	@Override
+	@Orientation
+	public int getCurrentOrientation() {
+<span class="nc" id="L397">		refresh();</span>
+<span class="nc" id="L398">		return mCurrentOrientation;</span>
+	}
+
+	/**
+	 */
+	@Override
+	@Orientation
+	public int getDefaultOrientation() {
+<span class="nc" id="L406">		return mDefaultOrientation;</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public ScreenRotation getCurrentRotation() {
+<span class="nc" id="L414">		refresh();</span>
+<span class="nc" id="L415">		return mCurrentRotation;</span>
+	}
+
+	/**
+	 */
+	@Override
+	@FloatRange(from = 0)
+	public float getDiagonalDistanceInInches() {
+<span class="nc" id="L423">		refresh();</span>
+		// Calculation in inches will depends on the exact pixel per inch in each axis (x and y) of the device display.
+<span class="nc" id="L425">		return (float) Math.sqrt(Math.pow((mWidth / mMetrics.xdpi), 2) + Math.pow((mHeight / mMetrics.ydpi), 2));</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	@IntRange(from = 0)
+	@SuppressWarnings(&quot;SuspiciousNameCombination&quot;)
+	public int getDiagonalDistanceInPixels() {
+<span class="nc" id="L435">		refresh();</span>
+<span class="nc" id="L436">		return Math.round((float) Math.sqrt(Math.pow(mWidth, 2) + Math.pow(mHeight, 2)));</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float getRefreshRate() {
+<span class="nc" id="L443">		return getDisplay().getRefreshRate();</span>
+	}
+
+	/**
+	 */
+	@Override
+	@SuppressWarnings(&quot;ResourceType&quot;)
+	public int getBrightness(@NonNull Activity activity) {
+<span class="nc" id="L451">		final Window window = activity.getWindow();</span>
+		// Get the brightness from the current application window settings.
+<span class="nc" id="L453">		return Math.round(window.getAttributes().screenBrightness * 100);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public void setBrightness(@NonNull Activity activity, @IntRange(from = 0, to = 100) int brightness) {
+<span class="nc bnc" id="L460" title="All 4 branches missed.">		if (brightness &lt; 0 || brightness &gt; 100) {</span>
+<span class="nc" id="L461">			throw new IllegalArgumentException(&quot;Brightness value(&quot; + brightness + &quot;) is out of the range [0, 100].&quot;);</span>
+		}
+		// Create new window parameters.
+<span class="nc" id="L464">		final Window window = activity.getWindow();</span>
+<span class="nc" id="L465">		final WindowManager.LayoutParams layoutParams = window.getAttributes();</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">		layoutParams.screenBrightness = ((brightness == 0) ? ++brightness : brightness) / 100f;</span>
+		// Set new brightness to the current application window.
+<span class="nc" id="L468">		window.setAttributes(layoutParams);</span>
+<span class="nc" id="L469">	}</span>
+
+	/**
+	 */
+	@Override
+	public int getSystemBrightness() {
+<span class="nc" id="L475">		float brightness = 0;</span>
+		try {
+<span class="nc" id="L477">			brightness = System.getInt(mContext.getContentResolver(), System.SCREEN_BRIGHTNESS);</span>
+<span class="nc" id="L478">		} catch (SettingNotFoundException e) {</span>
+<span class="nc" id="L479">			e.printStackTrace();</span>
+<span class="nc" id="L480">		}</span>
+<span class="nc" id="L481">		return Math.round(brightness / 255 * 100);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean isOrientationLocked() {
+<span class="nc" id="L488">		return mOrientationLocked;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float pixelToDP(@Px int pixel) {
+		// From the Android developers documentation:
+		// px = dp * (dpi / 160)
+		// So modified equation is:
+		// dp = px / (dpi / 160)
+<span class="nc" id="L499">		return pixel / (mDensity.value / 160);</span>
+	}
+
+	/**
+	 */
+	@Px
+	@Override
+	public int dpToPixel(float dp) {
+		// From the Android developers documentation:
+		// px = dp * (dpi / 160)
+<span class="nc" id="L509">		return Math.round(dp * (mDensity.value / 160));</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float getScreenDP() {
+		// From the Android developers documentation:
+		// The density-independent pixel is equivalent to one physical pixel on
+		// a 160 dpi screen, which is the baseline density assumed by the system
+		// for a &quot;medium&quot; density screen.
+		// px = dp * (dpi / 160)
+		// So modified equation is:
+		// dp = px / (dpi / 160)
+		// and finally to determine for 1 px:
+<span class="nc" id="L524">		return mDensity.value / 160;</span>
+	}
+
+	/**
+	 * Called to refresh the current data of this screen wrapper instance. This should be called whenever
+	 * the current data are requested.
+	 */
+	private void refresh() {
+<span class="nc" id="L532">		getDisplay().getMetrics(mMetrics);</span>
+		// Refresh when:
+		// 1) screen orientation change occurred
+<span class="nc bnc" id="L535" title="All 4 branches missed.">		if (mCurrentWidth != mMetrics.widthPixels || mCurrentHeight != mMetrics.heightPixels) {</span>
+<span class="nc" id="L536">			onRefresh();</span>
+		}
+<span class="nc" id="L538">	}</span>
+
+	/**
+	 * Invoked to refresh/update the current data. This is invoked only in case, that the current
+	 * Android device's screen orientation was changed.
+	 */
+	private void onRefresh() {
+		// Update orientation to the actual. This call also updates the screen rotation.
+<span class="nc" id="L546">		int orientation = ORIENTATION_UNSPECIFIED;</span>
+<span class="nc" id="L547">		this.mCurrentRotation = ScreenRotation.resolve(getDisplay().getRotation());</span>
+<span class="nc bnc" id="L548" title="All 3 branches missed.">		switch (mContext.getResources().getConfiguration().orientation) {</span>
+			case Configuration.ORIENTATION_LANDSCAPE:
+				// Check screen rotation.
+<span class="nc bnc" id="L551" title="All 3 branches missed.">				switch (mCurrentRotation) {</span>
+					case ROTATION_0:
+						// Tablet in landscape mode.
+					case ROTATION_90:
+						// Phone in landscape mode.
+<span class="nc" id="L556">						orientation = ORIENTATION_LANDSCAPE;</span>
+<span class="nc" id="L557">						break;</span>
+					case ROTATION_180:
+						// Tablet in reverse landscape mode.
+					case ROTATION_270:
+						// Phone in reverse landscape mode.
+<span class="nc" id="L562">						orientation = ORIENTATION_REVERSE_LANDSCAPE;</span>
+<span class="nc" id="L563">						break;</span>
+					default:
+						// Unknown current landscape rotation.
+<span class="nc" id="L566">						break;</span>
+				}
+				break;
+			case Configuration.ORIENTATION_PORTRAIT:
+				// Check screen rotation.
+<span class="nc bnc" id="L571" title="All 3 branches missed.">				switch (mCurrentRotation) {</span>
+					case ROTATION_0:
+						// Phone in portrait mode.
+					case ROTATION_270:
+						// Tablet in portrait mode.
+<span class="nc" id="L576">						orientation = ORIENTATION_PORTRAIT;</span>
+<span class="nc" id="L577">						break;</span>
+					case ROTATION_90:
+						// Tablet in reverse portrait mode.
+					case ROTATION_180:
+						// Phone in reverse portrait mode.
+<span class="nc" id="L582">						orientation = ORIENTATION_REVERSE_PORTRAIT;</span>
+<span class="nc" id="L583">						break;</span>
+					default:
+						// Unknown current portrait rotation.
+<span class="nc" id="L586">						break;</span>
+				}
+				break;
+			case Configuration.ORIENTATION_UNDEFINED:
+			default:
+				// Nothing to refresh.
+				break;
+		}
+<span class="nc" id="L594">		this.mCurrentOrientation = orientation;</span>
+		// Get screen metrics to handle actual ones.
+<span class="nc" id="L596">		this.mCurrentWidth = mMetrics.widthPixels;</span>
+<span class="nc" id="L597">		this.mCurrentHeight = mMetrics.heightPixels;</span>
+<span class="nc" id="L598">	}</span>
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StorageEditor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.storage</a> &gt; <span class="el_source">StorageEditor.java</span></div><h1>StorageEditor.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.storage;
+
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * The StorageEditor is a helper class used by {@link StorageUtils} to perform {@link File Files}
+ * related operations.
+ *
+ * @author Martin Albedinsky
+ */
+<span class="nc" id="L43">public class StorageEditor {</span>
+
+	/**
+	 * Interface ===================================================================================
+	 */
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	private static final String TAG = &quot;StorageEditor&quot;;
+
+	/**
+	 * Flags ---------------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Flag used to indicate that default options for storage operation should be used.
+	 */
+	public static final int DEFAULT = 0x00000000;
+
+	/**
+	 * Flag used to indicate that file/directory can be overwritten.
+	 */
+	public static final int OVERWRITE = 0x000000001;
+
+	/**
+	 * Flag used to indicate that copy of file/directory should be created with {@link #COPY_SUFFIX}.
+	 */
+	public static final int COPY = 0x000000001 &lt;&lt; 1;
+
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Small buffer type for {@link #createBuffer(int)} method.
+	 * &lt;p&gt;
+	 * Size of buffer: &lt;b&gt;512 bytes&lt;/b&gt;
+	 */
+	public static final int SMALL_BUFFER = 0x01;
+
+	/**
+	 * Medium buffer type for {@link #createBuffer(int)} method.
+	 * &lt;p&gt;
+	 * Size of buffer: &lt;b&gt;1024 bytes&lt;/b&gt;
+	 */
+	public static final int MEDIUM_BUFFER = 0x02;
+
+	/**
+	 * Large buffer type for {@link #createBuffer(int)} method.
+	 * &lt;p&gt;
+	 * Size of buffer: &lt;b&gt;2048 bytes&lt;/b&gt;
+	 */
+	public static final int LARGE_BUFFER = 0x04;
+
+	/**
+	 * X-Large buffer type for {@link #createBuffer(int)} method.
+	 * &lt;p&gt;
+	 * Size of buffer: &lt;b&gt;4096 bytes&lt;/b&gt;
+	 */
+	public static final int XLARGE_BUFFER = 0x08;
+
+	/**
+	 * XX-Large buffer type for {@link #createBuffer(int)} method.
+	 * &lt;p&gt;
+	 * Size of buffer: &lt;b&gt;8192 bytes&lt;/b&gt;
+	 */
+	public static final int XXLARGE_BUFFER = 0x10;
+
+	/**
+	 * Suffix for name of file/directory when creating a copy of it passing {@link #COPY} flag to some
+	 * of this editor's methods accepting &lt;b&gt;flags&lt;/b&gt; parameter.
+	 */
+	public static final String COPY_SUFFIX = &quot;-Copy&quot;;
+
+	/**
+	 * Base size for bytes buffer.
+	 */
+	private static final int BASE_BUFFER_SIZE = 512;
+
+	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
+	 * Lock object used for synchronized operations.
+	 */
+<span class="nc" id="L134">	private static final Object LOCK = new Object();</span>
+
+	/**
+	 * Matcher to match file name and extract its type.
+	 */
+<span class="nc" id="L139">	private final Matcher mFileNameMatcher = Pattern.compile(&quot;^(.*)\\.(.+)$&quot;).matcher(&quot;&quot;);</span>
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Creates a new &lt;b&gt;bytes&lt;/b&gt; buffer for the specified &lt;var&gt;bufferType&lt;/var&gt;.
+	 *
+	 * @param bufferType Type of buffer to create. One of {@link #SMALL_BUFFER}, {@link #MEDIUM_BUFFER},
+	 *                   {@link #LARGE_BUFFER}, {@link #XLARGE_BUFFER}, {@link #XXLARGE_BUFFER}.
+	 * @return New bytes buffer with size of the requested type or size of &lt;b&gt;1024&lt;/b&gt; if there is no
+	 * such a buffer type.
+	 */
+	@NonNull
+	public static byte[] createBuffer(int bufferType) {
+<span class="nc bnc" id="L163" title="All 2 branches missed.">		switch (bufferType) {</span>
+			case SMALL_BUFFER:
+			case MEDIUM_BUFFER:
+			case LARGE_BUFFER:
+			case XLARGE_BUFFER:
+			case XXLARGE_BUFFER:
+<span class="nc" id="L169">				return new byte[bufferType * BASE_BUFFER_SIZE];</span>
+			default:
+<span class="nc" id="L171">				return new byte[1024];</span>
+		}
+	}
+
+	/**
+	 * Same as {@link #deleteDirectory(File, FileFilter, FilenameFilter)}
+	 * with {@code null} filters.
+	 */
+	public boolean deleteDirectory(@NonNull File directory) {
+<span class="nc" id="L180">		return deleteDirectory(directory, null, null);</span>
+	}
+
+	/**
+	 * Deletes the given directory and its content (all files + subdirectories) on the file system.
+	 *
+	 * @param directory  The desired directory to delete.
+	 * @param filter     The filter used to delete only desired files form the requested directory.
+	 *                   Pass {@code null} to delete all files.
+	 * @param nameFilter The filter used to delete only files with desired names form the requested
+	 *                   directory. Pass {@code null} to delete all files.
+	 * @return {@code True} if directory was successfully deleted, {@code false} otherwise.
+	 */
+	public boolean deleteDirectory(@NonNull File directory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) {
+<span class="nc" id="L194">		synchronized (LOCK) {</span>
+<span class="nc bnc" id="L195" title="All 4 branches missed.">			return directory.isDirectory() &amp;&amp; this.deleteDirectoryContentInner(directory, filter, nameFilter);</span>
+<span class="nc" id="L196">		}</span>
+	}
+
+	/**
+	 * Deletes the given directory and its content on the file system.
+	 *
+	 * @param directory  The desired directory to delete.
+	 * @param filter     The filter used to delete only desired files form the requested directory.
+	 * @param nameFilter The filter used to delete only files with desired names form the requested
+	 *                   directory.
+	 * @return {@code True} if content and the given directory was successfully deleted,
+	 * {@code false} if some error occurs during delete process.
+	 */
+	private boolean deleteDirectoryContentInner(File directory, FileFilter filter, FilenameFilter nameFilter) {
+<span class="nc" id="L210">		final File[] files = directory.listFiles();</span>
+		boolean isDir;
+<span class="nc" id="L212">		boolean failed = false;</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">		if (files.length &gt; 0) {</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">			for (final File file : files) {</span>
+				// Apply filters.
+<span class="nc bnc" id="L216" title="All 8 branches missed.">				if ((filter != null &amp;&amp; !filter.accept(file)) || (nameFilter != null &amp;&amp; !nameFilter.accept(file, file.getName()))) {</span>
+<span class="nc" id="L217">					continue;</span>
+				}
+				// File passed through filters, resolve how to delete it.
+<span class="nc" id="L220">				isDir = file.isDirectory();</span>
+<span class="nc bnc" id="L221" title="All 4 branches missed.">				if (isDir &amp;&amp; !deleteDirectoryContentInner(file, filter, nameFilter)) {</span>
+<span class="nc" id="L222">					logError(&quot;Failed to delete directory('&quot; + file.getName() + &quot;').&quot;);</span>
+<span class="nc" id="L223">					failed = true;</span>
+<span class="nc bnc" id="L224" title="All 4 branches missed.">				} else if (!isDir &amp;&amp; !file.delete()) {</span>
+<span class="nc" id="L225">					logError(&quot;Failed to delete file('&quot; + file.getName() + &quot;').&quot;);</span>
+<span class="nc" id="L226">					failed = true;</span>
+				}
+			}
+		}
+<span class="nc bnc" id="L230" title="All 2 branches missed.">		if (directory.listFiles().length == 0) {</span>
+			// Apply filters.
+<span class="nc bnc" id="L232" title="All 12 branches missed.">			if ((filter == null &amp;&amp; nameFilter == null) || (filter != null &amp;&amp; filter.accept(directory)) || (nameFilter != null &amp;&amp; nameFilter.accept(directory, directory.getName()))) {</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">				if (!directory.delete()) {</span>
+<span class="nc" id="L234">					failed = true;</span>
+				}
+			}
+		}
+<span class="nc bnc" id="L238" title="All 2 branches missed.">		return !failed;</span>
+	}
+
+	/**
+	 * Same as {@link #copyFileContent(int, File, File)} with {@link #COPY} flag and
+	 * {@code null} &lt;var&gt;toFile&lt;/var&gt; parameter, so there will be created new copy of the given
+	 * &lt;var&gt;file&lt;/var&gt; at the same path with {@link #COPY_SUFFIX}.
+	 */
+	public boolean copyFileContent(@NonNull File file) throws IOException {
+<span class="nc" id="L247">		return copyFileContent(COPY, file, null);</span>
+	}
+
+	/**
+	 * Copies a content from the given &lt;var&gt;fromFile&lt;/var&gt; into the given &lt;var&gt;toFile&lt;/var&gt;.
+	 *
+	 * @param flags    The flags used manage move process. See {@link #OVERWRITE}, {@link #COPY}.
+	 * @param fromFile The desired file of which content to copy.
+	 * @param toFile   The desired file to which should be content of the requested file copied.
+	 * @return {@code True} if file was successfully copied, {@code false} if some error
+	 * occurs during copy process or the given flags were not properly specified.
+	 * @throws FileNotFoundException    If the given &lt;var&gt;fromFile&lt;/var&gt; doesn't exists or is not a file.
+	 * @throws IllegalArgumentException If the given &lt;var&gt;toFile&lt;/var&gt; is not a file but a directory.
+	 * @throws IOException              If some IO error occurs during copy process of the requested file.
+	 */
+	public boolean copyFileContent(int flags, @NonNull File fromFile, @Nullable File toFile) throws IOException {
+<span class="nc bnc" id="L263" title="All 2 branches missed.">		if (!fromFile.isFile()) {</span>
+<span class="nc" id="L264">			throw new FileNotFoundException(</span>
+<span class="nc" id="L265">					&quot;Cannot copy content of file(&quot; + fromFile.getPath() + &quot;). Such a file doesn't exist or it is a directory.&quot;</span>
+			);
+		}
+<span class="nc bnc" id="L268" title="All 4 branches missed.">		if (toFile != null &amp;&amp; toFile.isDirectory()) {</span>
+<span class="nc" id="L269">			throw new IllegalArgumentException(</span>
+<span class="nc" id="L270">					&quot;Cannot copy content to file(&quot; + toFile.getPath() + &quot;). Destination already exists and it is a directory not a file.&quot;</span>
+			);
+		}
+<span class="nc" id="L273">		return this.copyFileContentInner(flags, fromFile, toFile);</span>
+	}
+
+	/**
+	 * Copies the given file and its content on the file system.
+	 *
+	 * @param flags    The flags used manage copy process.
+	 * @param fromFile The desired file of which content to copy.
+	 * @param toFile   The desired file to which should be content of the requested file copied.
+	 * @return {@code True} if content of the requested file was successfully copied,
+	 * {@code false} if some error occurs during copy process or the given flags were not properly
+	 * specified.
+	 */
+	private boolean copyFileContentInner(int flags, File fromFile, File toFile) throws IOException {
+<span class="nc" id="L287">		synchronized (LOCK) {</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">			String toFilePath = toFile == null ? &quot;&quot; : toFile.getPath();</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">			if (TextUtils.isEmpty(toFilePath)) {</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">				if ((flags &amp; COPY) == 0) {</span>
+<span class="nc" id="L291">					logError(&quot;Failed to copy content of file('&quot; + fromFile.getPath() + &quot;') without StorageEditor.COPY flag. Such a file already exists.&quot;);</span>
+<span class="nc" id="L292">					return false;</span>
+				}
+				// Append -Copy suffix to file path.
+<span class="nc" id="L295">				toFilePath = appendPath(fromFile, COPY_SUFFIX).getPath();</span>
+<span class="nc bnc" id="L296" title="All 4 branches missed.">			} else if (toFile != null &amp;&amp; toFile.exists()) {</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">				final boolean copy = (flags &amp; COPY) != 0;</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">				final boolean overwrite = (flags &amp; OVERWRITE) != 0;</span>
+<span class="nc bnc" id="L299" title="All 4 branches missed.">				if (!copy &amp;&amp; !overwrite) {</span>
+<span class="nc" id="L300">					logError(&quot;Failed to copy content to file('&quot; + toFilePath + &quot;') without StorageEditor.COPY or StorageEditor.OVERWRITE flag. Such a file already exists.&quot;);</span>
+<span class="nc" id="L301">					return false;</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">				} else if (copy) {</span>
+					// Append -Copy suffix to file path.
+<span class="nc" id="L304">					toFilePath = appendPath(toFile, COPY_SUFFIX).getPath();</span>
+				}
+			}
+<span class="nc bnc" id="L307" title="All 2 branches missed.">			if ((toFile = createAndGetFile(toFilePath)) == null) {</span>
+<span class="nc" id="L308">				return false;</span>
+			}
+<span class="nc" id="L310">			final FileInputStream input = new FileInputStream(fromFile);</span>
+<span class="nc" id="L311">			final FileOutputStream output = new FileOutputStream(toFile);</span>
+<span class="nc" id="L312">			copyFileStreams(input, output);</span>
+<span class="nc" id="L313">			input.close();</span>
+<span class="nc" id="L314">			output.close();</span>
+<span class="nc" id="L315">			return true;</span>
+<span class="nc" id="L316">		}</span>
+	}
+
+	/**
+	 * Creates and returns a new empty file at the specified &lt;var&gt;path&lt;/var&gt;.
+	 *
+	 * @param path The desired path at which should be the requested file created.
+	 * @return {@code True} if file was successfully created or already exists, {@code false}
+	 * if some error occurs or there is already a directory at the specified path.
+	 */
+	private static File createAndGetFile(String path) {
+<span class="nc" id="L327">		final File file = new File(path);</span>
+<span class="nc" id="L328">		synchronized (LOCK) {</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">			if (file.isFile()) {</span>
+<span class="nc" id="L330">				return file;</span>
+			}
+<span class="nc bnc" id="L332" title="All 2 branches missed.">			if (!file.exists()) {</span>
+				// First check if all parent directories exist.
+<span class="nc" id="L334">				final Uri fileUri = Uri.parse(path);</span>
+<span class="nc" id="L335">				final File parentDirs = new File(fileUri.getPath().replace(fileUri.getLastPathSegment(), &quot;&quot;));</span>
+<span class="nc bnc" id="L336" title="All 6 branches missed.">				if ((!parentDirs.exists() || !parentDirs.isDirectory()) &amp;&amp; !parentDirs.mkdirs()) {</span>
+<span class="nc" id="L337">					logError(&quot;Failed to create parent directories for file('&quot; + path + &quot;').&quot;);</span>
+<span class="nc" id="L338">					return null;</span>
+				}
+				try {
+<span class="nc bnc" id="L341" title="All 2 branches missed.">					return file.createNewFile() ? file : null;</span>
+<span class="nc" id="L342">				} catch (IOException e) {</span>
+<span class="nc" id="L343">					e.printStackTrace();</span>
+				}
+			}
+<span class="nc" id="L346">			return null;</span>
+<span class="nc" id="L347">		}</span>
+	}
+
+	/**
+	 * Same as {@link #copyDirectoryContent(int, File, File)} with {@link #COPY} flag
+	 * and {@code null} &lt;var&gt;toDirectory&lt;/var&gt; parameter, so there will be created new copy of
+	 * the given &lt;var&gt;directory&lt;/var&gt; at the same path with {@link #COPY_SUFFIX}.
+	 */
+	public boolean copyDirectoryContent(@NonNull File directory) throws IOException {
+<span class="nc" id="L356">		return copyDirectoryContent(COPY, directory, null);</span>
+	}
+
+	/**
+	 * Same as {@link #copyDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
+	 * with {@code null} filters.
+	 */
+	public boolean copyDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory) throws IOException {
+<span class="nc" id="L364">		return copyDirectoryContent(flags, fromDirectory, toDirectory, null, null);</span>
+	}
+
+	/**
+	 * Copies a content from the given &lt;var&gt;fromDirectory&lt;/var&gt; into the given &lt;var&gt;toDirectory&lt;/var&gt;.
+	 *
+	 * @param flags         The flags used manage copy process. See {@link #OVERWRITE}, {@link #COPY}.
+	 * @param fromDirectory The desired directory of which content to copy.
+	 * @param toDirectory   The desired directory to which should be content of the requested directory
+	 *                      copied.
+	 * @param filter        The filter used to copy only desired files form the requested directory.
+	 *                      Pass {@code null} to copy all files.
+	 * @param nameFilter    The filter used to copy only files with desired names form the requested
+	 *                      directory. Pass {@code null} to copy all files.
+	 * @return {@code True} if directory was successfully copied, {@code false} if some error
+	 * occurs during copy process or the given flags were not properly specified.
+	 * @throws FileNotFoundException    If the given &lt;var&gt;fromDirectory&lt;/var&gt; doesn't exists or is not a directory.
+	 * @throws IllegalArgumentException If the given &lt;var&gt;toDirectory&lt;/var&gt; is not a directory but a file.
+	 * @throws IOException              If some IO error occurs during copy process of the requested file.
+	 */
+	public boolean copyDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) throws IOException {
+<span class="nc bnc" id="L385" title="All 2 branches missed.">		if (!fromDirectory.isDirectory()) {</span>
+<span class="nc" id="L386">			throw new FileNotFoundException(</span>
+<span class="nc" id="L387">					&quot;Cannot copy content of directory(&quot; + fromDirectory.getPath() + &quot;). Such a directory doesn't exist or it is a file.&quot;</span>
+			);
+		}
+<span class="nc bnc" id="L390" title="All 4 branches missed.">		if (toDirectory != null &amp;&amp; toDirectory.isFile()) {</span>
+<span class="nc" id="L391">			throw new IllegalArgumentException(</span>
+<span class="nc" id="L392">					&quot;Cannot copy content to directory(&quot; + toDirectory.getPath() + &quot;). Destination already exists and it is a file not a directory.&quot;</span>
+			);
+		}
+<span class="nc" id="L395">		return this.copyDirectoryContentInner(flags, fromDirectory, toDirectory, filter, nameFilter);</span>
+	}
+
+	/**
+	 * Copies the given directory and its content on the file system.
+	 *
+	 * @param flags         The flags used manage copy process.
+	 * @param fromDirectory The desired directory of which content to copy.
+	 * @param toDirectory   The desired directory to which should be content of the requested directory
+	 *                      copied.
+	 * @param filter        The filter used to copy only desired files form the requested directory.
+	 * @param nameFilter    The filter used to copy only files with desired names form the requested
+	 *                      directory.
+	 * @return {@code True} if content of the requested directory was successfully copied,
+	 * {@code false} if some error occurs during copy process or the given flags were not properly
+	 * specified.
+	 */
+	private boolean copyDirectoryContentInner(int flags, File fromDirectory, File toDirectory, FileFilter filter, FilenameFilter nameFilter) throws IOException {
+<span class="nc" id="L413">		final File[] files = fromDirectory.listFiles();</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">		String toDirectoryPath = toDirectory == null ? &quot;&quot; : toDirectory.getPath();</span>
+<span class="nc" id="L415">		boolean failed = false;</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">		if (files.length &gt; 0) {</span>
+			File tempFile;
+<span class="nc" id="L418">			synchronized (LOCK) {</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">				for (final File file : files) {</span>
+					// Apply filters.
+<span class="nc bnc" id="L421" title="All 8 branches missed.">					if ((filter != null &amp;&amp; !filter.accept(file)) || (nameFilter != null &amp;&amp; !nameFilter.accept(file, file.getName()))) {</span>
+<span class="nc" id="L422">						continue;</span>
+					}
+					// File passed through filters, resolve how to copy it.
+<span class="nc" id="L425">					tempFile = new File(appendPathWithFilename(toDirectoryPath, file.getName()));</span>
+<span class="nc bnc" id="L426" title="All 2 branches missed.">					if (file.isDirectory()) {</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">						if (copyDirectoryContentInner(flags, file, tempFile, filter, nameFilter)) {</span>
+<span class="nc" id="L428">							continue;</span>
+						}
+<span class="nc" id="L430">						logError(&quot;Failed to copy content of directory('&quot; + file.getPath() + &quot;').&quot;);</span>
+<span class="nc" id="L431">						failed = true;</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">					} else if (file.isFile()) {</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">						if (copyFileContentInner(flags, file, tempFile)) {</span>
+<span class="nc" id="L434">							continue;</span>
+						}
+<span class="nc" id="L436">						logError(&quot;Failed to copy content of file('&quot; + file.getPath() + &quot;').&quot;);</span>
+<span class="nc" id="L437">						failed = true;</span>
+					}
+				}
+<span class="nc" id="L440">			}</span>
+		} else {
+<span class="nc" id="L442">			synchronized (LOCK) {</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">				if (TextUtils.isEmpty(toDirectoryPath)) {</span>
+<span class="nc bnc" id="L444" title="All 2 branches missed.">					if ((flags &amp; COPY) == 0) {</span>
+<span class="nc" id="L445">						logError(&quot;Failed to copy content of directory('&quot; + fromDirectory.getPath() + &quot;') without StorageEditor.COPY flag. Such a directory already exists.&quot;);</span>
+<span class="nc" id="L446">						failed = true;</span>
+					} else {
+						// Append -Copy suffix to directory path.
+<span class="nc" id="L449">						toDirectoryPath = appendPath(fromDirectory, COPY_SUFFIX).getPath();</span>
+					}
+<span class="nc bnc" id="L451" title="All 4 branches missed.">				} else if (toDirectory != null &amp;&amp; toDirectory.exists()) {</span>
+<span class="nc bnc" id="L452" title="All 2 branches missed.">					if ((flags &amp; COPY) == 0) {</span>
+<span class="nc" id="L453">						logError(&quot;Failed to copy content to directory('&quot; + toDirectoryPath + &quot;') without StorageEditor.COPY flag. Such a directory already exists.&quot;);</span>
+<span class="nc" id="L454">						failed = true;</span>
+					} else {
+						// Append -Copy suffix to directory path.
+<span class="nc" id="L457">						toDirectoryPath = appendPath(toDirectory, COPY_SUFFIX).getPath();</span>
+					}
+				}
+
+<span class="nc bnc" id="L461" title="All 2 branches missed.">				if (!failed) {</span>
+<span class="nc" id="L462">					final File toDir = new File(toDirectoryPath);</span>
+					// Apply filters.
+<span class="nc bnc" id="L464" title="All 8 branches missed.">					if ((filter != null &amp;&amp; !filter.accept(toDir)) || (nameFilter != null &amp;&amp; !nameFilter.accept(toDir, toDir.getName()))) {</span>
+<span class="nc" id="L465">						return true;</span>
+					}
+					// Directory passed through filters.
+<span class="nc bnc" id="L468" title="All 4 branches missed.">					if (!toDir.exists() &amp;&amp; !createDirectory(toDirectoryPath)) {</span>
+<span class="nc" id="L469">						logError(&quot;Failed to create directory('&quot; + toDirectoryPath + &quot;').&quot;);</span>
+<span class="nc" id="L470">						failed = true;</span>
+					}
+				}
+<span class="nc" id="L473">			}</span>
+		}
+<span class="nc bnc" id="L475" title="All 2 branches missed.">		return !failed;</span>
+	}
+
+	/**
+	 * Appends the given &lt;var&gt;path&lt;/var&gt; with the given &lt;var&gt;filename&lt;/var&gt;.
+	 *
+	 * @param path     The path which to append.
+	 * @param filename The name of file which to add at the end of the given path.
+	 * @return Appended path or &lt;var&gt;filename&lt;/var&gt; if the given path is empty.
+	 */
+	private String appendPathWithFilename(String path, String filename) {
+<span class="nc bnc" id="L486" title="All 2 branches missed.">		return TextUtils.isEmpty(path) ? &quot;&quot; : path + File.separator + filename;</span>
+	}
+
+	/**
+	 * Appends a path of the given &lt;var&gt;file&lt;/var&gt; with the given &lt;var&gt;suffix&lt;/var&gt;. If the given file
+	 * represents a file, the given suffix will be appended to last path segment of the given file's
+	 * path preserving its type at the end.
+	 *
+	 * @param file   The file of which path to append.
+	 * @param suffix The suffix which to add at the end of the given file's path.
+	 * @return New file with appended path.
+	 */
+	private File appendPath(File file, String suffix) {
+<span class="nc" id="L499">		String filePath = file.getPath();</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">		if (TextUtils.isEmpty(filePath)) {</span>
+<span class="nc" id="L501">			return file;</span>
+		}
+<span class="nc bnc" id="L503" title="All 2 branches missed.">		if (file.isDirectory()) {</span>
+<span class="nc" id="L504">			return new File(filePath + suffix);</span>
+		}
+<span class="nc" id="L506">		final String lastPathSegment = Uri.parse(filePath).getLastPathSegment();</span>
+<span class="nc bnc" id="L507" title="All 2 branches missed.">		if (mFileNameMatcher.reset(lastPathSegment).matches()) {</span>
+<span class="nc" id="L508">			final String fileType = mFileNameMatcher.group(2);</span>
+			// Remove the type suffix from path.
+<span class="nc" id="L510">			filePath = filePath.substring(0, filePath.length() - fileType.length() - 1);</span>
+<span class="nc" id="L511">			return new File(filePath + suffix + &quot;.&quot; + fileType);</span>
+		}
+<span class="nc" id="L513">		return file;</span>
+	}
+
+	/**
+	 * Creates a new empty directory at the specified &lt;var&gt;path&lt;/var&gt;.
+	 *
+	 * @param path The desired path at which should be the requested directory created.
+	 * @return {@code True} if directory was successfully created or already exists, {@code false}
+	 * if some error occurs or there is already a file at the specified path.
+	 */
+	private static boolean createDirectory(String path) {
+<span class="nc" id="L524">		final File file = new File(path);</span>
+<span class="nc" id="L525">		synchronized (LOCK) {</span>
+<span class="nc bnc" id="L526" title="All 4 branches missed.">			return file.isDirectory() || file.mkdirs();</span>
+<span class="nc" id="L527">		}</span>
+	}
+
+	/**
+	 * Moves a content from the given &lt;var&gt;fromFile&lt;/var&gt; into the given &lt;var&gt;toFile&lt;/var&gt;. When content
+	 * is successfully moved, the file, from which was content moved, is deleted.
+	 * &lt;p&gt;
+	 * This implementation actually moves content between the given files and than deletes the old one.
+	 *
+	 * @param flags    The flags used manage move process. See {@link #OVERWRITE}, {@link #COPY}.
+	 * @param fromFile The desired file of which content to move.
+	 * @param toFile   The desired file to which should be content of the requested file moved.
+	 * @return {@code True} if file was successfully moved and old one deleted, {@code false}
+	 * if some error occurs during move process or the given flags were not properly specified.
+	 * @throws FileNotFoundException    If the given &lt;var&gt;fromFile&lt;/var&gt; doesn't exists or is not a file.
+	 * @throws IllegalArgumentException If the given &lt;var&gt;toFile&lt;/var&gt; is not a file but a directory.
+	 * @throws IOException              If some IO error occurs during copy process of the requested file.
+	 */
+	public boolean moveFileContent(int flags, @NonNull File fromFile, @Nullable File toFile) throws IOException {
+<span class="nc bnc" id="L546" title="All 2 branches missed.">		if (!fromFile.isFile()) {</span>
+<span class="nc" id="L547">			throw new FileNotFoundException(</span>
+<span class="nc" id="L548">					&quot;Cannot move content of file(&quot; + fromFile.getPath() + &quot;). Such a file doesn't exist or it is a directory.&quot;</span>
+			);
+		}
+<span class="nc bnc" id="L551" title="All 4 branches missed.">		if (toFile != null &amp;&amp; toFile.isDirectory()) {</span>
+<span class="nc" id="L552">			throw new IllegalArgumentException(</span>
+<span class="nc" id="L553">					&quot;Cannot move content to file(&quot; + toFile.getPath() + &quot;). Destination already exists and it is a directory not a file.&quot;</span>
+			);
+		}
+<span class="nc" id="L556">		return this.moveFileContentInner(flags, fromFile, toFile);</span>
+	}
+
+	/**
+	 * Moves the given file and its content on the file system.
+	 *
+	 * @param flags    The flags used manage move process.
+	 * @param fromFile The desired file of which content to move.
+	 * @param toFile   The desired file to which should be content of the requested file moved.
+	 * @return {@code True} if content of the requested file was successfully moved and old file
+	 * was deleted, {@code false} if some error occurs during move process or the given flags
+	 * were not properly specified.
+	 */
+	private boolean moveFileContentInner(int flags, File fromFile, File toFile) throws IOException {
+<span class="nc bnc" id="L570" title="All 4 branches missed.">		return this.copyFileContentInner(flags, fromFile, toFile) &amp;&amp; fromFile.delete();</span>
+	}
+
+	/**
+	 * Same as {@link #moveDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
+	 * with {@code null} filters.
+	 */
+	public boolean moveDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory) throws IOException {
+<span class="nc" id="L578">		return moveDirectoryContent(flags, fromDirectory, toDirectory, null, null);</span>
+	}
+
+	/**
+	 * Moves a content (files + subdirectories) from the given &lt;var&gt;fromDirectory&lt;/var&gt; into the given
+	 * &lt;var&gt;toDirectory&lt;/var&gt;. When content is successfully moved, the directory, from which was content
+	 * moved, is deleted.
+	 * &lt;p&gt;
+	 * This implementation actually moves content between the given directories and than deletes the
+	 * old one.
+	 *
+	 * @param flags         The flags used manage move process. See {@link #OVERWRITE}, {@link #COPY}.
+	 * @param fromDirectory The desired directory of which content to move.
+	 * @param toDirectory   The desired directory to which should be content of the requested directory
+	 *                      moved.
+	 * @param filter        The filter used to move only desired files form the requested directory.
+	 *                      Pass {@code null} to move all files.
+	 * @param nameFilter    The filter used to move only files with desired names form the requested
+	 *                      directory. Pass {@code null} to move all files.
+	 * @return {@code True} if directory was successfully moved and old one deleted, {@code false}
+	 * if some error occurs during move process or the given flags were not properly specified.
+	 * @throws FileNotFoundException         If the given &lt;var&gt;fromDirectory&lt;/var&gt; doesn't exists or is not a directory.
+	 * @throws IllegalArgumentException      If the given &lt;var&gt;toDirectory&lt;/var&gt; is not a directory but a file.
+	 * @throws UnsupportedOperationException
+	 * @throws IOException                   If some IO error occurs during copy process of the requested file.
+	 */
+	public boolean moveDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) throws IOException {
+<span class="nc bnc" id="L605" title="All 2 branches missed.">		if (!fromDirectory.isDirectory()) {</span>
+<span class="nc" id="L606">			throw new FileNotFoundException(</span>
+<span class="nc" id="L607">					&quot;Cannot move content of directory(&quot; + fromDirectory.getPath() + &quot;). Such a directory doesn't exist or it is a file.&quot;</span>
+			);
+		}
+<span class="nc bnc" id="L610" title="All 2 branches missed.">		if (toDirectory != null) {</span>
+<span class="nc bnc" id="L611" title="All 2 branches missed.">			if (toDirectory.isFile()) {</span>
+<span class="nc" id="L612">				throw new IllegalArgumentException(</span>
+<span class="nc" id="L613">						&quot;Cannot move content to directory(&quot; + toDirectory.getPath() + &quot;). Destination already exists and it is a file not a directory.&quot;</span>
+				);
+			}
+			// Check if there is request to move directory to itself, that's not supported.
+<span class="nc" id="L617">			final File parent = toDirectory.getParentFile();</span>
+<span class="nc" id="L618">			final String directoryPath = fromDirectory.getPath();</span>
+<span class="nc bnc" id="L619" title="All 4 branches missed.">			if (parent != null &amp;&amp; directoryPath.equals(parent.getPath())) {</span>
+<span class="nc" id="L620">				throw new UnsupportedOperationException(&quot;Cannot move directory('&quot; + directoryPath + &quot;') to itself.&quot;);</span>
+			}
+		}
+<span class="nc" id="L623">		return this.moveDirectoryContentInner(flags, fromDirectory, toDirectory, filter, nameFilter);</span>
+	}
+
+	/**
+	 * Moves the given directory and its content on the file system.
+	 *
+	 * @param flags         The flags used manage move process.
+	 * @param fromDirectory The desired directory of which content to move.
+	 * @param toDirectory   The desired directory to which should be content of the requested directory
+	 *                      moved.
+	 * @param filter        The filter used to move only desired files form the requested directory.
+	 * @param nameFilter    The filter used to move only files with desired names form the requested
+	 *                      directory.
+	 * @return {@code True} if content of the requested directory was successfully moved and the
+	 * old directory was deleted, {@code false} if some error occurs during move process or the
+	 * given flags were not properly specified.
+	 */
+	private boolean moveDirectoryContentInner(int flags, File fromDirectory, File toDirectory, FileFilter filter, FilenameFilter nameFilter) throws IOException {
+<span class="nc bnc" id="L641" title="All 4 branches missed.">		return this.copyDirectoryContentInner(flags, fromDirectory, toDirectory, filter, nameFilter) &amp;&amp; this.deleteDirectory(fromDirectory, filter, nameFilter);</span>
+	}
+
+	/**
+	 * Same as {@link #copyFileStreams(FileInputStream, FileOutputStream, int)}
+	 * with {@link #MEDIUM_BUFFER} type.
+	 */
+	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream) throws IOException {
+<span class="nc" id="L649">		return copyFileStreams(inputStream, outputStream, MEDIUM_BUFFER);</span>
+	}
+
+	/**
+	 * Same as {@link #copyFileStreams(FileInputStream, FileOutputStream, byte[])}
+	 * with buffer obtained from {@link #createBuffer(int)} for the desired &lt;var&gt;bufferType&lt;/var&gt;.
+	 */
+	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream, int bufferType) throws IOException {
+<span class="nc" id="L657">		return copyFileStreams(inputStream, outputStream, createBuffer(bufferType));</span>
+	}
+
+	/**
+	 * Copies a content of the given &lt;var&gt;inputStream&lt;/var&gt; into the given &lt;var&gt;outputStream&lt;/var&gt;
+	 * using the given &lt;var&gt;buffer&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that if the IOException occurs, the given streams will be not closed by this implementation,
+	 * so it is your duty to close them in &lt;b&gt;finally&lt;/b&gt; block of your &lt;b&gt;try catch&lt;/b&gt; statement.
+	 *
+	 * @param inputStream  The input stream of which content to copy.
+	 * @param outputStream The output stream where should be content copied.
+	 * @param buffer       Buffer used for copy process. Larger buffer will make copy process faster,
+	 *                     but also more memory intensive.
+	 * @return Always {@code true} if no IOException is thrown.
+	 * @throws IOException If some input/output error occurs during copy process.
+	 */
+	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream, byte[] buffer) throws IOException {
+		int bytes;
+<span class="nc bnc" id="L676" title="All 2 branches missed.">		while ((bytes = inputStream.read(buffer, 0, buffer.length)) &gt; 0) {</span>
+<span class="nc" id="L677">			outputStream.write(buffer, 0, bytes);</span>
+		}
+<span class="nc" id="L679">		inputStream.close();</span>
+<span class="nc" id="L680">		outputStream.close();</span>
+<span class="nc" id="L681">		return true;</span>
+	}
+
+	/**
+	 * Logs the given &lt;var&gt;errorMessage&lt;/var&gt; with {@link Log#e(String, String)} with
+	 * this class's TAG.
+	 *
+	 * @param errorMessage The desired error message to log.
+	 */
+	private static void logError(String errorMessage) {
+<span class="nc" id="L691">		Log.e(TAG, errorMessage);</span>
+<span class="nc" id="L692">	}</span>
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

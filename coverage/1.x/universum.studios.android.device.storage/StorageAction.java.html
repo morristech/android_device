@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StorageAction.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.device.storage</a> &gt; <span class="el_source">StorageAction.java</span></div><h1>StorageAction.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.device.storage;
+
+import android.text.TextUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * StorageAction represents base implementation for all file/directory operations requested by {@link StorageImpl}.
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link StorageAction.Create} implementation for &lt;b&gt;create&lt;/b&gt; operations&lt;/li&gt;
+ * &lt;li&gt;{@link StorageAction.Delete} implementation for &lt;b&gt;delete&lt;/b&gt; operations&lt;/li&gt;
+ * &lt;li&gt;{@link StorageAction.Copy} implementation for &lt;b&gt;copy&lt;/b&gt; operations&lt;/li&gt;
+ * &lt;li&gt;{@link StorageAction.Move} implementation for &lt;b&gt;move&lt;/b&gt; operations&lt;/li&gt;
+ * &lt;/ul&gt;
+ * Above mentioned implementations use {@link StorageUtils} to perform all requested operations and
+ * also handles all thrown exceptions and sets the related error codes to implementation of
+ * {@link Storage.BaseResult} when returning result for the preformed action.
+ *
+ * @author Martin Albedinsky
+ */
+abstract class StorageAction {
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	// private static final String TAG = &quot;StorageAction&quot;;
+
+	/**
+	 * Interface ===================================================================================
+	 */
+
+	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Storage implementation to access some storage info.
+	 */
+	private final StorageImpl mStorage;
+
+	/**
+	 * Unique identifier of this storage action.
+	 */
+	private final int mAction;
+
+	/**
+	 * Action verb.
+	 */
+	private final String mActionVerb, mActionVerbPast;
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of StorageAction with the given parameters.
+	 *
+	 * @param storage        An instance of StorageImpl to access some storage info.
+	 * @param action         Unique identifier for this action.
+	 * @param actionVerb     Verb representing this action.
+	 * @param actionVerbPast Past form of the verb representing this action.
+	 */
+<span class="nc" id="L95">	private StorageAction(StorageImpl storage, int action, String actionVerb, String actionVerbPast) {</span>
+<span class="nc" id="L96">		this.mStorage = storage;</span>
+<span class="nc" id="L97">		this.mAction = action;</span>
+<span class="nc" id="L98">		this.mActionVerb = actionVerb;</span>
+<span class="nc" id="L99">		this.mActionVerbPast = actionVerbPast;</span>
+<span class="nc" id="L100">	}</span>
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Performs storage operation represented by this action for file at the given &lt;var&gt;fromPath&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * See {@link Storage} and its file related operations for additional parameters descriptions
+	 * which are passed to this action.
+	 *
+	 * @return Result data of the performed action.
+	 */
+	Storage.Result performFileAction(int storage, int flags, String toPath, String fromPath) {
+<span class="nc" id="L115">		int errorCode = Storage.ERROR_API;</span>
+<span class="nc" id="L116">		String exMessage = &quot;&quot;;</span>
+<span class="nc" id="L117">		boolean success = false;</span>
+		try {
+<span class="nc" id="L119">			success = onPerformFileAction(flags, mStorage.appendBasePath(storage, toPath), mStorage.appendBasePath(storage, fromPath));</span>
+<span class="nc" id="L120">		} catch (FileNotFoundException e) {</span>
+<span class="nc" id="L121">			errorCode = Storage.ERROR_FILE_NOT_FOUND;</span>
+<span class="nc" id="L122">			exMessage = e.getMessage();</span>
+<span class="nc" id="L123">		} catch (IOException e) {</span>
+<span class="nc" id="L124">			errorCode = Storage.ERROR_IO;</span>
+<span class="nc" id="L125">			exMessage = e.getMessage();</span>
+<span class="nc" id="L126">		} catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L127">			errorCode = Storage.ERROR_FILE_SAME_AS_DIRECTORY;</span>
+<span class="nc" id="L128">			exMessage = e.getMessage();</span>
+<span class="nc" id="L129">		}</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">		return createResult(</span>
+				mAction,
+				success ?
+<span class="nc" id="L133">						buildStorageMessage(&quot;Successfully &quot; + mActionVerbPast + &quot; file('&quot; + fromPath + &quot;')&quot;, storage, null) :</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">						buildStorageMessage(&quot;Failed to &quot; + mActionVerb + &quot; file('&quot; + fromPath + &quot;')&quot;, storage, exMessage),</span>
+				fromPath,
+				flags,
+				success ? Storage.NO_ERROR : errorCode
+		);
+	}
+
+	/**
+	 * Called from {@link #performFileAction(int, int, String, String)} with same data to perform by
+	 * this action represented storage file operation.
+	 *
+	 * @return {@code True} if this action succeeded, {@code false} otherwise.
+	 */
+	abstract boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException;
+
+	/**
+	 * Bulk method for {@link #performFileAction(int, int, String, String)} method.
+	 *
+	 * @return Results data of the performed action.
+	 */
+	Storage.Results performFilesAction(int storage, int flags, String toPath, String... fromPaths) {
+<span class="nc bnc" id="L155" title="All 2 branches missed.">		if (fromPaths.length &gt; 0) {</span>
+<span class="nc" id="L156">			final List&lt;Storage.Result&gt; results = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L157">			int passed = 0;</span>
+			Storage.Result result;
+<span class="nc bnc" id="L159" title="All 2 branches missed.">			for (final String fromPath : fromPaths) {</span>
+<span class="nc" id="L160">				result = performFileAction(storage, flags, toPath, fromPath);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">				if (!result.isError) {</span>
+<span class="nc" id="L162">					passed++;</span>
+				}
+<span class="nc" id="L164">				results.add(result);</span>
+			}
+<span class="nc" id="L166">			return this.processResults(results, passed, &quot;files&quot;, storage, Storage.ERROR_API);</span>
+		}
+<span class="nc" id="L168">		return createResults(mAction, 0, &quot;No files to &quot; + mActionVerb + &quot;.&quot;, null, Storage.NO_FLAGS, Storage.ERROR_EMPTY_REQUEST);</span>
+	}
+
+	/**
+	 * Performs storage operation represented by this action for directory at the given &lt;var&gt;fromPath&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * See {@link Storage} and its directory related operations for additional parameters descriptions
+	 * which are passed to this action.
+	 *
+	 * @return Result data of the performed action.
+	 */
+	Storage.Result performDirectoryAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) {
+<span class="nc" id="L180">		int errorCode = Storage.ERROR_API;</span>
+<span class="nc" id="L181">		String exMessage = &quot;&quot;;</span>
+<span class="nc" id="L182">		boolean success = false;</span>
+		try {
+<span class="nc" id="L184">			success = onPerformDirectoryAction(</span>
+					flags,
+					filter,
+					nameFilter,
+<span class="nc" id="L188">					mStorage.appendBasePath(storage, toPath),</span>
+<span class="nc" id="L189">					mStorage.appendBasePath(storage, fromPath)</span>
+			);
+<span class="nc" id="L191">		} catch (FileNotFoundException e) {</span>
+<span class="nc" id="L192">			errorCode = Storage.ERROR_FILE_NOT_FOUND;</span>
+<span class="nc" id="L193">			exMessage = e.getMessage();</span>
+<span class="nc" id="L194">		} catch (IOException e) {</span>
+<span class="nc" id="L195">			errorCode = Storage.ERROR_IO;</span>
+<span class="nc" id="L196">			exMessage = e.getMessage();</span>
+<span class="nc" id="L197">		} catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L198">			errorCode = Storage.ERROR_FILE_SAME_AS_DIRECTORY;</span>
+<span class="nc" id="L199">			exMessage = e.getMessage();</span>
+<span class="nc" id="L200">		} catch (UnsupportedOperationException e) {</span>
+<span class="nc" id="L201">			errorCode = Storage.ERROR_UNSUPPORTED_OPERATION;</span>
+<span class="nc" id="L202">			exMessage = e.getMessage();</span>
+<span class="nc" id="L203">		}</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">		return createResult(</span>
+				mAction,
+				success ?
+<span class="nc" id="L207">						buildStorageMessage(&quot;Successfully &quot; + mActionVerbPast + &quot; directory('&quot; + fromPath + &quot;')&quot;, storage, null) :</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">						buildStorageMessage(&quot;Failed to &quot; + mActionVerb + &quot; directory('&quot; + fromPath + &quot;')&quot;, storage, exMessage),</span>
+				fromPath,
+				flags,
+				success ? Storage.NO_ERROR : errorCode
+		);
+	}
+
+	/**
+	 * Called from {@link #performDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)}
+	 * with same data to perform by this action represented storage directory operation.
+	 *
+	 * @return {@code True} if this action succeeded, {@code false} otherwise.
+	 */
+	abstract boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException;
+
+	/**
+	 * Bulk method for {@link #performDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)}
+	 * method.
+	 *
+	 * @return Results data of the performed action.
+	 */
+	Storage.Results performDirectoriesAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String... fromPaths) {
+<span class="nc bnc" id="L230" title="All 2 branches missed.">		if (fromPaths.length &gt; 0) {</span>
+<span class="nc" id="L231">			final List&lt;Storage.Result&gt; results = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L232">			int passed = 0;</span>
+			Storage.Result result;
+<span class="nc bnc" id="L234" title="All 2 branches missed.">			for (final String fromPath : fromPaths) {</span>
+<span class="nc" id="L235">				result = performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">				if (!result.isError) {</span>
+<span class="nc" id="L237">					passed++;</span>
+				}
+<span class="nc" id="L239">				results.add(result);</span>
+			}
+<span class="nc" id="L241">			return this.processResults(results, passed, &quot;directories&quot;, storage, Storage.ERROR_API);</span>
+		}
+<span class="nc" id="L243">		return createResults(mAction, 0, &quot;No directories to &quot; + mActionVerb + &quot;.&quot;, null, flags, Storage.ERROR_EMPTY_REQUEST);</span>
+	}
+
+	/**
+	 * Bulk method for {@link #performFileOrDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)}
+	 * method.
+	 *
+	 * @return Results object for this action.
+	 */
+	Storage.Results performFilesOrDirectoriesAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String... fromPaths) {
+<span class="nc bnc" id="L253" title="All 2 branches missed.">		if (fromPaths.length &gt; 0) {</span>
+<span class="nc" id="L254">			final List&lt;Storage.Result&gt; results = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L255">			int passed = 0;</span>
+			Storage.Result result;
+<span class="nc bnc" id="L257" title="All 2 branches missed.">			for (final String fromPath : fromPaths) {</span>
+<span class="nc" id="L258">				result = performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">				if (!result.isError) {</span>
+<span class="nc" id="L260">					passed++;</span>
+				}
+<span class="nc" id="L262">				results.add(result);</span>
+			}
+<span class="nc" id="L264">			return this.processResults(results, passed, &quot;files/directories&quot;, storage, Storage.ERROR_API);</span>
+		}
+<span class="nc" id="L266">		return StorageAction.createResults(mAction, 0, &quot;No files/directories to delete.&quot;, null, flags, Storage.ERROR_EMPTY_REQUEST);</span>
+	}
+
+	/**
+	 * Performs storage operation represented by this action for file or directory at the given
+	 * &lt;var&gt;fromPath&lt;/var&gt;. This will call {@link #performFileAction(int, int, String, String)} or
+	 * {@link #performDirectoryAction(int, int, FileFilter, FilenameFilter, String, String)} depends
+	 * on whether the given &lt;var&gt;fromPath&lt;/var&gt; points to a file or to a directory.
+	 * &lt;p&gt;
+	 * See {@link Storage} and its file or directory related operations for additional parameters
+	 * descriptions which are passed to this action.
+	 *
+	 * @return Result data of the performed action.
+	 */
+	Storage.Result performFileOrDirectoryAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) {
+<span class="nc" id="L281">		final File file = new File(mStorage.appendBasePath(storage, fromPath));</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">		if (file.exists()) {</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">			return file.isFile() ? performFileAction(storage, flags, toPath, fromPath) : performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);</span>
+		}
+<span class="nc" id="L285">		return createResult(mAction, &quot;No file/directory to &quot; + mActionVerb + &quot;.&quot;, fromPath, flags, Storage.ERROR_EMPTY_REQUEST);</span>
+	}
+
+	/**
+	 * Builds a storage message used to bundle into {@link Storage.BaseResult} implementation as result
+	 * message for this action.
+	 *
+	 * @param baseMessage      Base for the requested message. This should identify storage action.
+	 * @param storage          An identifier of storage of which name will be added into message to identify
+	 *                         on which storage was this action performed.
+	 * @param exceptionMessage The message provided by thrown exception if this storage message is
+	 *                         requested as error message.
+	 * @return Storage message.
+	 */
+	private static String buildStorageMessage(String baseMessage, int storage, String exceptionMessage) {
+<span class="nc" id="L300">		final String storageName = StorageImpl.getStorageName(storage);</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">		final String message = TextUtils.isEmpty(storageName) ? baseMessage + &quot; at device storage.&quot; : baseMessage + &quot; on&quot; + storageName + &quot; storage.&quot;;</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">		return TextUtils.isEmpty(exceptionMessage) ? message : message + &quot;\n&quot; + exceptionMessage;</span>
+	}
+
+	/**
+	 * Called to process the given data into Results object.
+	 *
+	 * @param results   List of results to be bundled into Results instance.
+	 * @param passed    The count of results which passes this action.
+	 * @param fileType  Type of file (file/directory) for which will be the passed data processed.
+	 * @param storage   An identifier of storage where was this action performed.
+	 * @param errorCode Error code which will be passed to the instance of Results if this method
+	 *                  process all given data as error.
+	 * @return New instance of Results object with bundled passed data.
+	 */
+	private Storage.Results processResults(List&lt;Storage.Result&gt; results, int passed, String fileType, int storage, int errorCode) {
+<span class="nc" id="L317">		final int size = results.size();</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">		if (passed != results.size()) {</span>
+<span class="nc" id="L319">			return createResults(</span>
+					mAction,
+					passed,
+<span class="nc" id="L322">					buildStorageMessage(&quot;Failed to &quot; + mActionVerb + &quot; &quot; + Integer.toString(size - passed) + &quot; &quot; + fileType, storage, null),</span>
+					results,
+					-1,
+					errorCode
+			);
+		}
+<span class="nc" id="L328">		return createResults(</span>
+				mAction,
+				size,
+<span class="nc" id="L331">				buildStorageMessage(&quot;Successfully &quot; + mActionVerbPast + &quot; &quot; + Integer.toString(passed) + &quot; &quot; + fileType, storage, null),</span>
+				results,
+				-1,
+				0
+		);
+	}
+
+	/**
+	 * See {@link Storage.Result#Result(int, String, String, int, int)} for additional info.
+	 */
+	static Storage.Result createResult(int action, String message, String path, int flags, int error) {
+<span class="nc" id="L342">		return new Storage.Result(action, message, path, flags, error);</span>
+	}
+
+	/**
+	 * See {@link Storage.Results#Results(int, String, int, List, int, int)} for additional info.
+	 */
+	private static Storage.Results createResults(int action, int size, String message, List&lt;Storage.Result&gt; results, int flags, int error) {
+<span class="nc" id="L349">		return new Storage.Results(action, message, size, results, flags, error);</span>
+	}
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * StorageAction implementation for file &lt;b&gt;create&lt;/b&gt; operation on the file system.
+	 */
+	static final class Create extends StorageAction {
+
+		/**
+		 * Create a new instance of Create action with all necessary data initialized.
+		 */
+		Create(StorageImpl storage) {
+<span class="nc" id="L365">			super(storage, Storage.ACTION_CREATE, &quot;create&quot;, &quot;created&quot;);</span>
+<span class="nc" id="L366">		}</span>
+
+		/**
+		 */
+		@Override
+		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L372">			return StorageUtils.createFile(fromPath);</span>
+		}
+
+		/**
+		 */
+		@Override
+		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L379">			return StorageUtils.createDirectory(fromPath);</span>
+		}
+	}
+
+	/**
+	 * StorageAction implementation for file &lt;b&gt;delete&lt;/b&gt; operation on the file system.
+	 */
+	static final class Delete extends StorageAction {
+
+		/**
+		 * Create a new instance of Delete action with all necessary data initialized.
+		 */
+		Delete(StorageImpl storage) {
+<span class="nc" id="L392">			super(storage, Storage.ACTION_DELETE, &quot;delete&quot;, &quot;deleted&quot;);</span>
+<span class="nc" id="L393">		}</span>
+
+		/**
+		 */
+		@Override
+		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L399">			return StorageUtils.deleteFile(fromPath);</span>
+		}
+
+		/**
+		 */
+		@Override
+		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L406">			return StorageUtils.deleteDirectory(filter, nameFilter, fromPath);</span>
+		}
+	}
+
+	/**
+	 * StorageAction implementation for file &lt;b&gt;copy&lt;/b&gt; operation on the file system.
+	 */
+	static final class Copy extends StorageAction {
+
+		/**
+		 * Create a new instance of Copy action with all necessary data initialized.
+		 */
+		Copy(StorageImpl storage) {
+<span class="nc" id="L419">			super(storage, Storage.ACTION_COPY, &quot;copy&quot;, &quot;copied&quot;);</span>
+<span class="nc" id="L420">		}</span>
+
+		/**
+		 */
+		@Override
+		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L426">			return StorageUtils.copyFile(flags, toPath, fromPath);</span>
+		}
+
+		/**
+		 */
+		@Override
+		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L433">			return StorageUtils.copyDirectory(flags, filter, nameFilter, toPath, fromPath);</span>
+		}
+	}
+
+	/**
+	 * StorageAction implementation for file &lt;b&gt;move&lt;/b&gt; operation on the file system.
+	 */
+	static final class Move extends StorageAction {
+
+		/**
+		 * Create a new instance of Move action with all necessary data initialized.
+		 */
+		Move(StorageImpl storage) {
+<span class="nc" id="L446">			super(storage, Storage.ACTION_MOVE, &quot;move&quot;, &quot;moved&quot;);</span>
+<span class="nc" id="L447">		}</span>
+
+		/**
+		 */
+		@Override
+		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L453">			return StorageUtils.moveFile(flags, toPath, fromPath);</span>
+		}
+
+		/**
+		 */
+		@Override
+		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+<span class="nc" id="L460">			return StorageUtils.moveDirectory(flags, filter, nameFilter, toPath, fromPath);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
