@@ -5,6 +5,10 @@ Device
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_device&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&utm_medium=referral&utm_content=universum-studios/android_device&utm_campaign=Badge_Coverage)
 
+Simple access to battery, connection, screen and storage information for the Android platform.
+
+For more information please visit the **[Wiki](https://github.com/universum-studios/android_device/wiki)**.
+
 ## Download ##
 [![Bintray Badge](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
 
@@ -13,6 +17,10 @@ Download the latest **[release](https://github.com/universum-studios/android_dev
 ### Gradle ###
 
     compile "universum.studios.android:device:${DESIRED_VERSION}@aar"
+
+## Modules ##
+
+This library may be also used via **separate modules**. For more information please see **[Modules](https://github.com/universum-studios/android_device/blob/master/MODULES.md)**.
 
 ## Compatibility ##
 
