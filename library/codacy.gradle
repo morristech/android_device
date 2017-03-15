@@ -48,6 +48,6 @@ task uploadCoverageToCodacy(type: JavaExec, dependsOn: 'createDebugCoverageRepor
             "-r",
             "${buildDir}/reports/coverage/debug/report.xml",
             "--projectToken",
-            token
+            token == null ? "NO_TOKEN" : token
     ]
 }
