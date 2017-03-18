@@ -19,5 +19,6 @@
  * =================================================================================================
  */
 -->
-<resources>
-</resources>
+<manifest package="universum.studios.android.test">
+	<application/>
+</manifest>
