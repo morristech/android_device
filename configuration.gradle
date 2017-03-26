@@ -11,7 +11,7 @@ def testConfig = [
 ]
 
 def libraryConfig = [
-        version: '1.0.0'
+        version: '1.0.1'
 ]
 
 def mavenConfig = [
@@ -30,9 +30,9 @@ def mavenConfig = [
 def bintrayConfig = [
         publish                  : false,
         packageName              : mavenConfig.groupId + ':' + mavenConfig.artifactId,
-        packageLabels            : ['android', 'fragment', 'management', 'transition'],
+        packageLabels            : ['android', 'battery', 'connection', 'screen', 'storage'],
         packageVersionName       : mavenConfig.version,
-        packageVersionDescription: 'First version release.',
+        packageVersionDescription: 'Release patch.',
         packageVersionTag        : mavenConfig.version
 ]
 
@@ -42,11 +42,16 @@ def codacyConfig = [
         projectName: 'android_device'
 ]
 
+def ciConfig = [
+        travis: Boolean.parseBoolean(System.getenv('TRAVIS'))
+]
+
 ext.config = [
         "build"  : buildConfig,
         "test"   : testConfig,
         "library": libraryConfig,
         "maven"  : mavenConfig,
         "bintray": bintrayConfig,
-        "codacy" : codacyConfig
+        "codacy" : codacyConfig,
+        "ci"     : ciConfig
 ]

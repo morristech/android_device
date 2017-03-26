@@ -44,7 +44,7 @@ android {
     sourceSets {
         release.java.srcDirs = [
                 '../library-core/src/main/java',
-                '../library-battery-core/src/main/java',
+                '../library-battery/src/main/java',
                 '../library-connection-core/src/main/java',
                 '../library-connection-util/src/main/java',
                 '../library-screen-core/src/main/java',
@@ -54,6 +54,18 @@ android {
                 '../library-util/src/main/java'
         ]
         debug.java.srcDirs = release.java.srcDirs
+        androidTest.java.srcDirs = [
+                '../library/src/androidTest/java',
+                '../library-core/src/androidTest/java',
+                '../library-battery/src/androidTest/java',
+                '../library-connection-core/src/androidTest/java',
+                '../library-connection-util/src/androidTest/java',
+                '../library-screen-core/src/androidTest/java',
+                '../library-screen-util/src/androidTest/java',
+                '../library-storage-core/src/androidTest/java',
+                '../library-storage-util/src/androidTest/java',
+                '../library-util/src/androidTest/java'
+        ]
     }
 
     lintOptions {
