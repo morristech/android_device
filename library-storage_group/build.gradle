@@ -43,8 +43,8 @@ android {
 
     sourceSets {
         release.java.srcDirs = [
-                '../library-storage-core/src/main/java',
-                '../library-storage-util/src/main/java'
+                "${rootProject.rootDir}/library-storage-core/src/main/java",
+                "${rootProject.rootDir}/library-storage-util/src/main/java"
         ]
         debug.java.srcDirs = release.java.srcDirs
     }
@@ -79,5 +79,4 @@ dependencies {
     debugCompile project(':library-core')
 }
 
-// Apply DEPLOY script.
-apply from: '../deploy/deploy.gradle'
+apply from: "${rootProject.rootDir}/deploy/deploy.gradle"

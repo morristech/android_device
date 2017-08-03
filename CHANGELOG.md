@@ -8,3 +8,5 @@ Change-Log
 
 ### Release 1.0.0 ###
 > 25.12.2016
+
+- First production release.
