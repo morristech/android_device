@@ -1,9 +1,9 @@
 Device
 ===============
 
-[![Build Status](https://travis-ci.org/universum-studios/android_device.svg?branch=master)](https://travis-ci.org/universum-studios/android_device)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_device&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&utm_medium=referral&utm_content=universum-studios/android_device&utm_campaign=Badge_Coverage)
+[![CircleCI](https://circleci.com/gh/universum-studios/android_device.svg?style=svg)](https://circleci.com/gh/universum-studios/android_device)
+[![Codecov](https://codecov.io/gh/universum-studios/android_device/branch/master/graph/badge.svg)](https://codecov.io/gh/universum-studios/android_device)
+[![Codacy](https://api.codacy.com/project/badge/Grade/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_device&amp;utm_campaign=Badge_Grade)
 
 Simple access to battery, connection, screen and storage information for the Android platform.
 

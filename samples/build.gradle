@@ -76,5 +76,5 @@ dependencies {
     compile deps.androidSupport.recyclerView
     compile deps.other.butterknife
     annotationProcessor deps.other.butterknifeProcessor
-    compile deps.universumStudios.samples
+    compile deps.universumStudios.supportSamples
 }

@@ -5,7 +5,8 @@ def versions = [
         androidSupportTestEspresso: '3.0.0',
         butterknife               : '8.5.1',
         junit                     : '4.12',
-        mockito                   : '2.7.20'
+        mockito                   : '2.7.20',
+        robolectric               : '3.3.2'
 ]
 
 ext.versions = versions
@@ -20,19 +21,24 @@ def androidSupport = [
 ]
 
 def test = [
-        androidSupportAnnotations: androidSupport.annotations,
-        androidRunner            : "com.android.support.test:runner:${versions.androidSupportTest}",
-        androidRules             : "com.android.support.test:rules:${versions.androidSupportTest}",
-        androidEspressoCore      : "com.android.support.test.espresso:espresso-core:${versions.androidSupportTestEspresso}",
-        androidEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${versions.androidSupportTestEspresso}",
-        androidEspressoContrib   : "com.android.support.test.espresso:espresso-contrib:${versions.androidSupportTestEspresso}",
-        junit                    : "junit:junit:${versions.junit}",
-        mockitoCore              : "org.mockito:mockito-core:${versions.mockito}",
-        mockitoAndroid           : "org.mockito:mockito-android:${versions.mockito}"
+        junit                      : "junit:junit:${versions.junit}",
+        mockitoCore                : "org.mockito:mockito-core:${versions.mockito}",
+        mockitoAndroid             : "org.mockito:mockito-android:${versions.mockito}",
+        robolectric                : "org.robolectric:robolectric:${versions.robolectric}",
+        robolectricMultidex        : "org.robolectric:shadows-multidex:${versions.robolectric}",
+        robolectricShadowsSupportV4: "org.robolectric:shadows-support-v4:${versions.robolectric}",
+        androidRunner              : "com.android.support.test:runner:${versions.androidSupportTest}",
+        androidRules               : "com.android.support.test:rules:${versions.androidSupportTest}",
+        androidEspressoCore        : "com.android.support.test.espresso:espresso-core:${versions.androidSupportTestEspresso}",
+        androidEspressoIntents     : "com.android.support.test.espresso:espresso-intents:${versions.androidSupportTestEspresso}",
+        androidEspressoContrib     : "com.android.support.test.espresso:espresso-contrib:${versions.androidSupportTestEspresso}",
+        androidSupportAnnotations  : androidSupport.annotations,
+        androidSupportV4           : androidSupport.v4
 ]
 
 def universumStudios = [
-        samples: 'universum.studios.android:samples:0.1.3@aar'
+        supportSamples  : 'universum.studios.android.support:support-samples:0.1.3@aar',
+        supportFragments: 'universum.studios.android.support:support-fragments:1.2.0@aar'
 ]
 
 def other = [
