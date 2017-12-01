@@ -10,13 +10,13 @@ Simple access to battery, connection, screen and storage information for the And
 For more information please visit the **[Wiki](https://github.com/universum-studios/android_device/wiki)**.
 
 ## Download ##
-[![Bintray Badge](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
+[![Bintray](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
 
 Download the latest **[release](https://github.com/universum-studios/android_device/releases "Latest Releases page")** or **add as dependency** in your project via:
 
 ### Gradle ###
 
-    compile "universum.studios.android:device:${DESIRED_VERSION}@aar"
+    implementation "universum.studios.android:device:${DESIRED_VERSION}@aar"
 
 ## Modules ##
 

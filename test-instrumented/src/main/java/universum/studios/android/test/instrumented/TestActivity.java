@@ -25,12 +25,12 @@ import android.support.test.rule.ActivityTestRule;
 import android.widget.FrameLayout;
 
 /**
- * Simple activity that may be used in <b>Android Instrumented Tests</b> in order to set up
+ * Simple activity that may be used in <b>Android instrumented tests</b> in order to set up
  * {@link ActivityTestRule}.
  *
  * @author Martin Albedinsky
  */
-public final class TestActivity extends Activity {
+public class TestActivity extends Activity {
 
 	/**
 	 * Log TAG.

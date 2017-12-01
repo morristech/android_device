@@ -5,11 +5,11 @@ This module contains utilities that may be used to obtain additional information
 device's **connection**.
 
 ## Download ##
-[![Bintray Badge](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
+[![Bintray](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
 
 ### Gradle ###
 
-    compile "universum.studios.android:device-connection-util:${DESIRED_VERSION}@aar"
+    implementation "universum.studios.android:device-connection-util:${DESIRED_VERSION}@aar"
 
 ## Components ##
 
