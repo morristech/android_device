@@ -18,11 +18,13 @@
  */
 package universum.studios.android.device.connection;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 
 /**
  * Connection interface specifies API through which an actual information about the Android device's
@@ -103,7 +105,7 @@ import android.support.annotation.Nullable;
  */
 public interface Connection {
 
-	/**
+	/*
 	 * Provider ====================================================================================
 	 */
 
@@ -134,12 +136,12 @@ public interface Connection {
 		 */
 		@NonNull
 		@Override
-		public Connection getConnection(@NonNull Context context) {
+		public Connection getConnection(@NonNull final Context context) {
 			return ConnectionImpl.getsInstance(context);
 		}
 	};
 
-	/**
+	/*
 	 * Listeners ===================================================================================
 	 */
 
@@ -178,11 +180,11 @@ public interface Connection {
 		void onConnectionLost(@NonNull Context context, @NonNull ConnectionType type);
 	}
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Enums =======================================================================================
 	 */
 
@@ -355,7 +357,7 @@ public interface Connection {
 		 * @param origName Original name of this connectivity type.
 		 * @param prefsKey The key under which may be this connectivity type saved into shared preferences.
 		 */
-		ConnectionType(int id, String origName, String prefsKey) {
+		ConnectionType(final int id, final String origName, final String prefsKey) {
 			this.systemConstant = id;
 			this.preferencesKey = prefsKey;
 			this.originalName = origName;
@@ -371,7 +373,7 @@ public interface Connection {
 		 * is no connection type with the requested constant.
 		 */
 		@NonNull
-		public static ConnectionType resolve(int systemConstant) {
+		public static ConnectionType resolve(final int systemConstant) {
 			for (ConnectionType type : ConnectionType.values()) {
 				if (type.systemConstant == systemConstant) return type;
 			}
@@ -379,7 +381,7 @@ public interface Connection {
 		}
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -394,6 +396,7 @@ public interface Connection {
 	 * @see #isConnected()
 	 * @see #getConnectionType()
 	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	boolean isConnectedOrConnecting();
 
 	/**
@@ -405,6 +408,7 @@ public interface Connection {
 	 * @see #isConnectedOrConnecting()
 	 * @see #getConnectionType()
 	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	boolean isConnected();
 
 	/**
@@ -417,6 +421,7 @@ public interface Connection {
 	 * @return {@code True} if connection is established or is in the process of being established,
 	 * {@code false} otherwise.
 	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	boolean isConnectedOrConnecting(@NonNull ConnectionType connectionType);
 
 	/**
@@ -428,6 +433,7 @@ public interface Connection {
 	 * @return {@code True} if connection is established, {@code false} otherwise.
 	 * @see #isConnectedOrConnecting(Connection.ConnectionType)
 	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	boolean isConnected(@NonNull ConnectionType connectionType);
 
 	/**
@@ -439,6 +445,7 @@ public interface Connection {
 	 * @return {@code True} if the requested connection can be established, {@code false}
 	 * if establishing of the requested connection is not possible due to current network conditions.
 	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	boolean isAvailable(@NonNull ConnectionType connectionType);
 
 	/**
@@ -448,6 +455,7 @@ public interface Connection {
 	 * if there is no connection currently available.
 	 */
 	@NonNull
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	ConnectionType getConnectionType();
 
 	/**
@@ -458,6 +466,7 @@ public interface Connection {
 	 * @see #getConnectionType()
 	 */
 	@Nullable
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	NetworkInfo getConnectionInfo(@NonNull ConnectionType connectionType);
 
 	/**

@@ -43,7 +43,7 @@ import android.view.WindowManager;
  */
 final class ScreenImpl implements Screen {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -52,11 +52,11 @@ final class ScreenImpl implements Screen {
 	 */
 	// private static final String TAG = "ScreenImpl";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -71,7 +71,7 @@ final class ScreenImpl implements Screen {
 	@SuppressLint("StaticFieldLeak")
 	private static ScreenImpl sInstance;
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -146,7 +146,7 @@ final class ScreenImpl implements Screen {
 	 */
 	private boolean mOrientationLocked;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -155,7 +155,7 @@ final class ScreenImpl implements Screen {
 	 *
 	 * @param applicationContext Application context used to access system services.
 	 */
-	private ScreenImpl(Context applicationContext) {
+	private ScreenImpl(final Context applicationContext) {
 		this.mContext = applicationContext;
 		this.mWindowManager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);
 		this.refresh();
@@ -245,7 +245,7 @@ final class ScreenImpl implements Screen {
 	 * @return Screen implementation with actual screen data available.
 	 */
 	@NonNull
-	static ScreenImpl getsInstance(@NonNull Context context) {
+	static ScreenImpl getsInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (sInstance == null) sInstance = new ScreenImpl(context.getApplicationContext());
 		}
@@ -273,14 +273,14 @@ final class ScreenImpl implements Screen {
 	/**
 	 */
 	@Override
-	public boolean lockOrientation(@NonNull Activity activity) {
+	public boolean lockOrientation(@NonNull final Activity activity) {
 		return requestOrientation(activity, ORIENTATION_CURRENT);
 	}
 
 	/**
 	 */
 	@Override
-	public void unlockOrientation(@NonNull Activity activity) {
+	public void unlockOrientation(@NonNull final Activity activity) {
 		requestOrientation(activity, ORIENTATION_USER);
 	}
 
@@ -288,7 +288,7 @@ final class ScreenImpl implements Screen {
 	 */
 	@Override
 	@SuppressWarnings("WrongConstant")
-	public boolean requestOrientation(@NonNull Activity activity, @Orientation int orientation) {
+	public boolean requestOrientation(@NonNull final Activity activity, @Orientation final int orientation) {
 		switch (orientation) {
 			case ORIENTATION_CURRENT:
 				activity.setRequestedOrientation(getCurrentOrientation());
@@ -307,7 +307,7 @@ final class ScreenImpl implements Screen {
 	@Override
 	@Orientation
 	@SuppressWarnings("ResourceType")
-	public int getRequestedOrientation(@NonNull Activity activity) {
+	public int getRequestedOrientation(@NonNull final Activity activity) {
 		return activity.getRequestedOrientation();
 	}
 
@@ -447,7 +447,7 @@ final class ScreenImpl implements Screen {
 	 */
 	@Override
 	@SuppressWarnings("ResourceType")
-	public int getBrightness(@NonNull Activity activity) {
+	public int getBrightness(@NonNull final Activity activity) {
 		final Window window = activity.getWindow();
 		// Get the brightness from the current application window settings.
 		return Math.round(window.getAttributes().screenBrightness * 100);
@@ -456,14 +456,14 @@ final class ScreenImpl implements Screen {
 	/**
 	 */
 	@Override
-	public void setBrightness(@NonNull Activity activity, @IntRange(from = 0, to = 100) int brightness) {
+	public void setBrightness(@NonNull final Activity activity, @IntRange(from = 0, to = 100) final int brightness) {
 		if (brightness < 0 || brightness > 100) {
 			throw new IllegalArgumentException("Brightness value(" + brightness + ") is out of the range [0, 100].");
 		}
 		// Create new window parameters.
 		final Window window = activity.getWindow();
 		final WindowManager.LayoutParams layoutParams = window.getAttributes();
-		layoutParams.screenBrightness = ((brightness == 0) ? ++brightness : brightness) / 100f;
+		layoutParams.screenBrightness = Math.max(1, brightness) / 100f;
 		// Set new brightness to the current application window.
 		window.setAttributes(layoutParams);
 	}
@@ -491,7 +491,7 @@ final class ScreenImpl implements Screen {
 	/**
 	 */
 	@Override
-	public float pixelToDP(@Px int pixel) {
+	public float pixelToDP(@Px final int pixel) {
 		// From the Android developers documentation:
 		// px = dp * (dpi / 160)
 		// So modified equation is:
@@ -503,7 +503,7 @@ final class ScreenImpl implements Screen {
 	 */
 	@Px
 	@Override
-	public int dpToPixel(float dp) {
+	public int dpToPixel(final float dp) {
 		// From the Android developers documentation:
 		// px = dp * (dpi / 160)
 		return Math.round(dp * (mDensity.value / 160));
@@ -597,7 +597,7 @@ final class ScreenImpl implements Screen {
 		this.mCurrentHeight = mMetrics.heightPixels;
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

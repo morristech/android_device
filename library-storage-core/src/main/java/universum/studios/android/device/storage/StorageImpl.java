@@ -37,8 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import universum.studios.android.device.DeviceConfig;
-
 /**
  * A {@link Storage} implementation.
  *
@@ -46,7 +44,7 @@ import universum.studios.android.device.DeviceConfig;
  */
 final class StorageImpl implements Storage {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -54,6 +52,11 @@ final class StorageImpl implements Storage {
 	 * Log TAG.
 	 */
 	private static final String TAG = "StorageImpl";
+
+	/**
+	 * Boolean flag indicating whether to print debug output or not.
+	 */
+	private static final boolean DEBUG = false;
 
 	/**
 	 * Relative path to the directory on the external storage where a directory named by the package
@@ -64,11 +67,11 @@ final class StorageImpl implements Storage {
 	 */
 	private static final String EXTERNAL_PACKAGE_STORAGE_PARENTS_PATH = "Android" + File.separator + "data";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -83,7 +86,7 @@ final class StorageImpl implements Storage {
 	@SuppressLint("StaticFieldLeak")
 	private static StorageImpl sInstance;
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -130,7 +133,7 @@ final class StorageImpl implements Storage {
 	 */
 	private File mExternalPackage;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -139,13 +142,13 @@ final class StorageImpl implements Storage {
 	 *
 	 * @param applicationContext Application context used to access system services.
 	 */
-	private StorageImpl(Context applicationContext) {
+	private StorageImpl(final Context applicationContext) {
 		this.mContext = applicationContext;
 		this.mPackageName = applicationContext.getPackageName();
 		this.checkExternalAvailability();
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -156,7 +159,7 @@ final class StorageImpl implements Storage {
 	 * @return Storage implementation with actual storage data available.
 	 */
 	@NonNull
-	static StorageImpl getInstance(@NonNull Context context) {
+	static StorageImpl getInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (sInstance == null) sInstance = new StorageImpl(context.getApplicationContext());
 		}
@@ -167,7 +170,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result createFile(@NonNull String path) {
+	public Result createFile(@NonNull final String path) {
 		return createFile(BASE, path);
 	}
 
@@ -175,7 +178,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result createFile(@StorageDir int storage, @NonNull String path) {
+	public Result createFile(@StorageDir final int storage, @NonNull final String path) {
 		if (StorageUtils.directoryExists(appendBasePath(storage, path))) {
 			return StorageAction.createResult(
 					ACTION_CREATE,
@@ -192,7 +195,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results createFiles(@NonNull String... paths) {
+	public Results createFiles(@NonNull final String... paths) {
 		return createFiles(BASE, paths);
 	}
 
@@ -200,7 +203,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results createFiles(@StorageDir int storage, @NonNull String... paths) {
+	public Results createFiles(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_CREATE.performFilesAction(storage, NO_FLAGS, "", paths);
 	}
 
@@ -208,7 +211,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result createDirectory(@NonNull String path) {
+	public Result createDirectory(@NonNull final String path) {
 		return createDirectory(BASE, path);
 	}
 
@@ -216,7 +219,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result createDirectory(@StorageDir int storage, @NonNull String path) {
+	public Result createDirectory(@StorageDir final int storage, @NonNull final String path) {
 		if (StorageUtils.directoryExists(appendBasePath(storage, path))) {
 			return StorageAction.createResult(
 					ACTION_CREATE,
@@ -233,7 +236,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results createDirectories(@NonNull String... paths) {
+	public Results createDirectories(@NonNull final String... paths) {
 		return createDirectories(BASE, paths);
 	}
 
@@ -241,7 +244,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results createDirectories(@StorageDir int storage, @NonNull String... paths) {
+	public Results createDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_CREATE.performDirectoriesAction(storage, NO_FLAGS, null, null, "", paths);
 	}
 
@@ -249,7 +252,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteFile(@NonNull String path) {
+	public Result deleteFile(@NonNull final String path) {
 		return deleteFile(BASE, path);
 	}
 
@@ -257,7 +260,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteFile(@StorageDir int storage, @NonNull String path) {
+	public Result deleteFile(@StorageDir final int storage, @NonNull final String path) {
 		return SA_DELETE.performFileAction(storage, NO_FLAGS, "", path);
 	}
 
@@ -265,7 +268,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteFiles(@NonNull String... paths) {
+	public Results deleteFiles(@NonNull final String... paths) {
 		return deleteFiles(BASE, paths);
 	}
 
@@ -273,7 +276,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteFiles(@StorageDir int storage, @NonNull String... paths) {
+	public Results deleteFiles(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_DELETE.performFilesAction(storage, NO_FLAGS, "", paths);
 	}
 
@@ -281,7 +284,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteDirectory(@NonNull String path) {
+	public Result deleteDirectory(@NonNull final String path) {
 		return deleteDirectory(BASE, path);
 	}
 
@@ -289,7 +292,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteDirectory(@StorageDir int storage, @NonNull String path) {
+	public Result deleteDirectory(@StorageDir final int storage, @NonNull final String path) {
 		return deleteDirectory(storage, null, null, path);
 	}
 
@@ -297,7 +300,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
+	public Result deleteDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		return SA_DELETE.performDirectoryAction(storage, NO_FLAGS, filter, nameFilter, "", path);
 	}
 
@@ -305,7 +308,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteDirectories(@NonNull String... paths) {
+	public Results deleteDirectories(@NonNull final String... paths) {
 		return deleteDirectories(BASE, paths);
 	}
 
@@ -313,7 +316,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteDirectories(@StorageDir int storage, @NonNull String... paths) {
+	public Results deleteDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return deleteDirectories(storage, null, null, paths);
 	}
 
@@ -321,7 +324,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteDirectories(@StorageDir int storage, FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
+	public Results deleteDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
 		return SA_DELETE.performDirectoriesAction(storage, NO_FLAGS, filter, nameFilter, "", paths);
 	}
 
@@ -329,7 +332,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteFileOrDirectory(@NonNull String path) {
+	public Result deleteFileOrDirectory(@NonNull final String path) {
 		return deleteFileOrDirectory(BASE, path);
 	}
 
@@ -337,7 +340,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteFileOrDirectory(@StorageDir int storage, @NonNull String path) {
+	public Result deleteFileOrDirectory(@StorageDir final int storage, @NonNull final String path) {
 		return deleteFileOrDirectory(storage, null, null, path);
 	}
 
@@ -345,7 +348,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result deleteFileOrDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
+	public Result deleteFileOrDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		return SA_DELETE.performFileOrDirectoryAction(storage, NO_FLAGS, filter, nameFilter, "", path);
 	}
 
@@ -353,7 +356,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteFilesOrDirectories(@NonNull String... paths) {
+	public Results deleteFilesOrDirectories(@NonNull final String... paths) {
 		return deleteFilesOrDirectories(BASE, paths);
 	}
 
@@ -361,7 +364,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteFilesOrDirectories(@StorageDir int storage, @NonNull String... paths) {
+	public Results deleteFilesOrDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return deleteFilesOrDirectories(storage, null, null, paths);
 	}
 
@@ -369,7 +372,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results deleteFilesOrDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
+	public Results deleteFilesOrDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
 		return SA_DELETE.performFilesOrDirectoriesAction(storage, NO_FLAGS, filter, nameFilter, "", paths);
 	}
 
@@ -377,7 +380,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyFile(int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyFile(final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFile(BASE, flags, toPath, fromPath);
 	}
 
@@ -385,7 +388,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_COPY.performFileAction(storage, flags, toPath, fromPath);
 	}
 
@@ -393,7 +396,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFiles(BASE, flags, toPath, fromPaths);
 	}
 
@@ -401,7 +404,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_DELETE.performFilesAction(storage, flags, toPath, fromPaths);
 	}
 
@@ -409,7 +412,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyDirectory(BASE, flags, toPath, fromPath);
 	}
 
@@ -417,7 +420,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
@@ -425,7 +428,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_DELETE.performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
@@ -433,7 +436,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyDirectories(BASE, flags, toPath, fromPaths);
 	}
 
@@ -441,7 +444,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
@@ -449,7 +452,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_DELETE.performDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
@@ -457,7 +460,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFileOrDirectory(BASE, flags, toPath, fromPath);
 	}
 
@@ -465,7 +468,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFileOrDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
@@ -473,7 +476,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) {
+	public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_COPY.performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
@@ -481,7 +484,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFilesOrDirectories(BASE, flags, toPath, fromPaths);
 	}
 
@@ -489,7 +492,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFilesOrDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
@@ -497,7 +500,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_COPY.performFilesOrDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
@@ -505,7 +508,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveFile(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFile(BASE, flags, toPath, fromPath);
 	}
 
@@ -513,7 +516,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performFileAction(storage, flags, toPath, fromPath);
 	}
 
@@ -521,7 +524,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFiles(BASE, flags, toPath, fromPaths);
 	}
 
@@ -529,13 +532,13 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performFilesAction(storage, flags, toPath, fromPaths);
 	}
 
 	@NonNull
 	@Override
-	public Result moveDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveDirectory(BASE, flags, toPath, fromPath);
 	}
 
@@ -543,7 +546,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
@@ -551,7 +554,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
@@ -559,7 +562,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveDirectories(BASE, flags, toPath, fromPaths);
 	}
 
@@ -567,7 +570,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
@@ -575,13 +578,13 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
 	@NonNull
 	@Override
-	public Result moveFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFileOrDirectory(BASE, flags, toPath, fromPath);
 	}
 
@@ -589,7 +592,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFileOrDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
@@ -597,7 +600,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) {
+	public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
@@ -605,7 +608,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFilesOrDirectories(BASE, flags, toPath, fromPaths);
 	}
 
@@ -613,7 +616,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFilesOrDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
@@ -621,21 +624,21 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) {
+	public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performFilesOrDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean changeFilePermissions(@NonNull String path, @FilePermissions int permissions, boolean ownerOnly) {
+	public boolean changeFilePermissions(@NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
 		return changeFilePermissions(BASE, path, permissions, ownerOnly);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean changeFilePermissions(@StorageDir int storage, @NonNull String path, @FilePermissions int permissions, boolean ownerOnly) {
+	public boolean changeFilePermissions(@StorageDir final int storage, @NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
 		final File file = this.newFile(storage, path);
 		if (file.isFile() && permissions > 0) {
 			if (file.setExecutable((permissions & PERMISSION_EXECUTE) != 0, ownerOnly) &&
@@ -651,7 +654,7 @@ final class StorageImpl implements Storage {
 	/**
 	 */
 	@Override
-	public boolean hasFreeSpace(@StorageDir int storage, long bytes) {
+	public boolean hasFreeSpace(@StorageDir final int storage, final long bytes) {
 		final File storageFile = getStorage(storage);
 		return storageFile != null && storageFile.getFreeSpace() >= bytes;
 	}
@@ -659,7 +662,7 @@ final class StorageImpl implements Storage {
 	/**
 	 */
 	@Override
-	public long getFreeSpace(@StorageDir int storage) {
+	public long getFreeSpace(@StorageDir final int storage) {
 		final File storageFile = getStorage(storage);
 		return storageFile == null ? 0 : storageFile.getFreeSpace();
 	}
@@ -719,7 +722,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public String getStoragePath(@StorageDir int storage) {
+	public String getStoragePath(@StorageDir final int storage) {
 		if (storage == BASE) {
 			return "";
 		}
@@ -731,7 +734,7 @@ final class StorageImpl implements Storage {
 	 */
 	@Nullable
 	@Override
-	public File getStorage(@StorageDir int storage) {
+	public File getStorage(@StorageDir final int storage) {
 		switch (storage) {
 			case INTERNAL:
 				return mContext.getFilesDir();
@@ -801,7 +804,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public File getFile(@StorageDir int storage, @NonNull String path) {
+	public File getFile(@StorageDir final int storage, @NonNull final String path) {
 		return this.newFile(storage, path);
 	}
 
@@ -809,7 +812,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public List<File> getDirectoryContent(@NonNull String path) {
+	public List<File> getDirectoryContent(@NonNull final String path) {
 		return getDirectoryContent(BASE, path);
 	}
 
@@ -817,7 +820,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public List<File> getDirectoryContent(@StorageDir int storage, @NonNull String path) {
+	public List<File> getDirectoryContent(@StorageDir final int storage, @NonNull final String path) {
 		return getDirectoryContent(storage, null, null, path);
 	}
 
@@ -826,7 +829,7 @@ final class StorageImpl implements Storage {
 	@NonNull
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<File> getDirectoryContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
+	public List<File> getDirectoryContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		final File dir = this.newFile(storage, path);
 		if (dir.isDirectory()) {
 			if (filter == null) {
@@ -865,7 +868,7 @@ final class StorageImpl implements Storage {
 	 * @param path    Relative path to be appended to the path of resolved <var>storage</var> type.
 	 * @return An instance of file the the requested path.
 	 */
-	private File newFile(int storage, String path) {
+	private File newFile(final int storage, final String path) {
 		return new File(buildPath(storage, path));
 	}
 
@@ -876,7 +879,7 @@ final class StorageImpl implements Storage {
 	 * @param path    Relative path to be appended to the path of resolved <var>storage</var> type.
 	 * @return Full path.
 	 */
-	private String buildPath(int storage, String path) {
+	private String buildPath(final int storage, final String path) {
 		return getStoragePath(storage) + File.separator + path;
 	}
 
@@ -887,7 +890,7 @@ final class StorageImpl implements Storage {
 	 * @return {@code True} if the given array is {@code null} or if it doesn't have any
 	 * items within it, {@code false} otherwise.
 	 */
-	private boolean isArrayEmpty(Object[] array) {
+	private boolean isArrayEmpty(final Object[] array) {
 		return array == null || array.length == 0;
 	}
 
@@ -895,7 +898,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public List<File> getDirectoriesContent(@NonNull String... paths) {
+	public List<File> getDirectoriesContent(@NonNull final String... paths) {
 		return getDirectoriesContent(BASE, paths);
 	}
 
@@ -903,7 +906,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public List<File> getDirectoriesContent(@StorageDir int storage, @NonNull String... paths) {
+	public List<File> getDirectoriesContent(@StorageDir final int storage, @NonNull final String... paths) {
 		return getDirectoriesContent(storage, null, null, paths);
 	}
 
@@ -911,7 +914,7 @@ final class StorageImpl implements Storage {
 	 */
 	@NonNull
 	@Override
-	public List<File> getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
+	public List<File> getDirectoriesContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
 		final List<File> files = new ArrayList<>();
 		if (paths.length > 0) {
 			for (final String path : paths) {
@@ -928,7 +931,7 @@ final class StorageImpl implements Storage {
 	 * @param storage An identifier of the desired storage of which name is requested.
 	 * @return Storage name or {@code ""} if unknown type or {@link #BASE} was requested.
 	 */
-	static String getStorageName(int storage) {
+	static String getStorageName(final int storage) {
 		switch (storage) {
 			case INTERNAL:
 				return "INTERNAL";
@@ -955,7 +958,7 @@ final class StorageImpl implements Storage {
 	 * @return Appended base path of the specified storage with the given path or just the given
 	 * <var>path</var> if the path of the specified storage is empty.
 	 */
-	String appendBasePath(int storage, String path) {
+	String appendBasePath(final int storage, final String path) {
 		final String basePath = getStoragePath(storage);
 		return TextUtils.isEmpty(basePath) ? path : basePath + File.separator + path;
 	}
@@ -966,12 +969,12 @@ final class StorageImpl implements Storage {
 	 * @param message Message to log.
 	 * @param error   {@code True} to log message as error, {@code false}otherwise.
 	 */
-	private void logMessage(String message, boolean error) {
+	private void logMessage(final String message, final boolean error) {
 		if (error) Log.e(TAG, message);
-		else if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, message);
+		else if (DEBUG) Log.d(TAG, message);
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

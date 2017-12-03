@@ -134,7 +134,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public interface Battery {
 
-	/**
+	/*
 	 * Provider ====================================================================================
 	 */
 
@@ -164,12 +164,12 @@ public interface Battery {
 		 */
 		@NonNull
 		@Override
-		public Battery getBattery(@NonNull Context context) {
+		public Battery getBattery(@NonNull final Context context) {
 			return BatteryImpl.getInstance(context);
 		}
 	};
 
-	/**
+	/*
 	 * Listeners ===================================================================================
 	 */
 
@@ -262,7 +262,7 @@ public interface Battery {
 		void onHealthLow(@NonNull Context context, @NonNull Battery battery);
 	}
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -414,7 +414,7 @@ public interface Battery {
 	@interface Health {
 	}
 
-	/**
+	/*
 	 * Enums =======================================================================================
 	 */
 
@@ -510,7 +510,7 @@ public interface Battery {
 		 * @param tagName  Tag of this technology provided by {@link BatteryManager}.
 		 * @param origName Original name of this technology.
 		 */
-		BatteryTechnology(String tagName, String origName) {
+		BatteryTechnology(final String tagName, final String origName) {
 			this.tagName = tagName;
 			this.originalName = origName;
 		}
@@ -524,7 +524,7 @@ public interface Battery {
 		 * if there is no battery technology with the requested tag.
 		 */
 		@NonNull
-		public static BatteryTechnology resolve(@NonNull String tagName) {
+		public static BatteryTechnology resolve(@NonNull final String tagName) {
 			for (final BatteryTechnology tech : BatteryTechnology.values()) {
 				if (tech.tagName.equalsIgnoreCase(tagName)) {
 					return tech;
@@ -534,7 +534,7 @@ public interface Battery {
 		}
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -765,7 +765,7 @@ public interface Battery {
 	 */
 	void unregisterBatteryReceiver(@NonNull Context context, @Receiver int receiverFlag);
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 

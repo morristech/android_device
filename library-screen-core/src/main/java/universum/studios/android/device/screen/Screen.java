@@ -75,7 +75,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public interface Screen {
 
-	/**
+	/*
 	 * Provider ====================================================================================
 	 */
 
@@ -105,12 +105,12 @@ public interface Screen {
 		 */
 		@NonNull
 		@Override
-		public Screen getScreen(@NonNull Context context) {
+		public Screen getScreen(@NonNull final Context context) {
 			return ScreenImpl.getsInstance(context);
 		}
 	};
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -189,7 +189,7 @@ public interface Screen {
 	@interface Orientation {
 	}
 
-	/**
+	/*
 	 * Enums =======================================================================================
 	 */
 
@@ -364,7 +364,7 @@ public interface Screen {
 		 * @param nativeWidthDp  Native width specific for this screen type.
 		 * @param nativeHeightDp Native height specific for this screen type.
 		 */
-		ScreenType(float nativeWidthDp, float nativeHeightDp) {
+		ScreenType(final float nativeWidthDp, final float nativeHeightDp) {
 			this.nativeWidthDp = nativeWidthDp;
 			this.nativeHeightDp = nativeHeightDp;
 		}
@@ -379,7 +379,7 @@ public interface Screen {
 		 * type with the given dimensions specified.
 		 */
 		@NonNull
-		public static ScreenType resolve(float widthDp, float heightDp) {
+		public static ScreenType resolve(final float widthDp, final float heightDp) {
 			for (ScreenType type : REVERSED_VALUES) {
 				if (widthDp >= type.nativeWidthDp && heightDp >= type.nativeHeightDp) return type;
 			}
@@ -455,7 +455,7 @@ public interface Screen {
 		 * @param degreesValue The value of degrees specific for this screen rotation.
 		 * @param flag         Id of rotation as flag provided by {@link Surface}.
 		 */
-		ScreenRotation(int degreesValue, int flag) {
+		ScreenRotation(final int degreesValue, final int flag) {
 			this.degrees = degreesValue;
 			this.systemConstant = flag;
 		}
@@ -470,7 +470,7 @@ public interface Screen {
 		 * no screen rotation with the requested constant.
 		 */
 		@NonNull
-		public static ScreenRotation resolve(int systemConstant) {
+		public static ScreenRotation resolve(final int systemConstant) {
 			for (ScreenRotation rotation : values()) {
 				if (rotation.systemConstant == systemConstant) return rotation;
 			}
@@ -478,7 +478,7 @@ public interface Screen {
 		}
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
