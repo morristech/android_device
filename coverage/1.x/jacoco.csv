@@ -1,0 +1,43 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+library,universum.studios.android.device.connection,ConnectionImpl,365,0,46,0,70,0,39,0,16,0
+library,universum.studios.android.device.connection,ConnectionStateReceiver,14,0,0,0,4,0,3,0,3,0
+library,universum.studios.android.device.connection,Connection.new Connection.Provider() {...},6,0,0,0,2,0,2,0,2,0
+library,universum.studios.android.device.connection,Connection.ConnectionType,194,0,4,0,20,0,7,0,5,0
+library,universum.studios.android.device.connection,Connection,5,0,0,0,1,0,1,0,1,0
+library,universum.studios.android.device.connection,ConnectionImpl.ActualConnection,59,0,10,0,14,0,8,0,3,0
+library,universum.studios.android.device.connection,ConnectionUtils,65,0,14,0,12,0,14,0,7,0
+library,universum.studios.android.device.battery,Battery,5,0,0,0,1,0,1,0,1,0
+library,universum.studios.android.device.battery,BatteryImpl.BatteryInfo,243,0,14,0,53,0,17,0,10,0
+library,universum.studios.android.device.battery,Battery.BatteryBroadcastReceiver,14,0,0,0,2,0,2,0,2,0
+library,universum.studios.android.device.battery,BatteryHealthReceiver,27,0,0,0,8,0,3,0,3,0
+library,universum.studios.android.device.battery,Battery.BatteryTechnology,145,0,4,0,17,0,7,0,5,0
+library,universum.studios.android.device.battery,BatteryPluggedStateReceiver,27,0,0,0,8,0,3,0,3,0
+library,universum.studios.android.device.battery,Battery.new Battery.Provider() {...},6,0,0,0,2,0,2,0,2,0
+library,universum.studios.android.device.battery,BatteryStatusReceiver,20,0,0,0,5,0,3,0,3,0
+library,universum.studios.android.device.battery,BatteryImpl,873,0,103,0,176,0,84,0,32,0
+library,universum.studios.android.device.screen,Screen.new Screen.Provider() {...},6,0,0,0,2,0,2,0,2,0
+library,universum.studios.android.device.screen,Screen,5,0,0,0,1,0,1,0,1,0
+library,universum.studios.android.device.screen,Screen.ScreenRotation,108,0,4,0,13,0,7,0,5,0
+library,universum.studios.android.device.screen,ScreenImpl.new Object() {...},33,0,0,0,1,0,1,0,1,0
+library,universum.studios.android.device.screen,ScreenUtils,88,0,26,0,16,0,18,0,5,0
+library,universum.studios.android.device.screen,Screen.ScreenDensity,142,0,6,0,15,0,8,0,5,0
+library,universum.studios.android.device.screen,ScreenImpl,532,0,59,0,128,0,67,0,33,0
+library,universum.studios.android.device.screen,Screen.ScreenType,137,0,6,0,14,0,8,0,5,0
+library,universum.studios.android.device.storage,StorageImpl,1048,0,96,0,174,0,136,0,83,0
+library,universum.studios.android.device.storage,Storage.Unit,225,0,0,0,20,0,6,0,6,0
+library,universum.studios.android.device.storage,Storage.BaseResult,22,0,2,0,7,0,2,0,1,0
+library,universum.studios.android.device.storage,StorageUtils,595,0,74,0,97,0,69,0,32,0
+library,universum.studios.android.device.storage,StorageAction.Move,20,0,0,0,4,0,3,0,3,0
+library,universum.studios.android.device.storage,StorageAction,580,0,36,0,90,0,29,0,11,0
+library,universum.studios.android.device.storage,Storage.Results,13,0,0,0,4,0,1,0,1,0
+library,universum.studios.android.device.storage,StorageAction.Copy,20,0,0,0,4,0,3,0,3,0
+library,universum.studios.android.device.storage,Storage.Result,10,0,0,0,3,0,1,0,1,0
+library,universum.studios.android.device.storage,StorageAction.Create,14,0,0,0,4,0,3,0,3,0
+library,universum.studios.android.device.storage,StorageEditor,1027,0,176,0,171,0,114,0,26,0
+library,universum.studios.android.device.storage,Storage.new Storage.Provider() {...},6,0,0,0,2,0,2,0,2,0
+library,universum.studios.android.device.storage,StorageAction.Delete,16,0,0,0,4,0,3,0,3,0
+library,universum.studios.android.device.storage,Storage,5,0,0,0,1,0,1,0,1,0
+library,universum.studios.android.device,DeviceUtils,46,0,10,0,16,0,7,0,2,0
+library,universum.studios.android.device,DeviceConfig,8,0,0,0,4,0,2,0,2,0
+library,universum.studios.android.device,Device,87,0,26,0,56,0,27,0,2,0
+library,universum.studios.android.device,DeviceUtils.new Object() {...},44,0,0,0,2,0,1,0,1,0
