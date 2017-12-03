@@ -37,8 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import universum.studios.android.device.DeviceConfig;
-
 /**
  * A {@link Storage} implementation.
  *
@@ -54,6 +52,11 @@ final class StorageImpl implements Storage {
 	 * Log TAG.
 	 */
 	private static final String TAG = "StorageImpl";
+
+	/**
+	 * Boolean flag indicating whether to print debug output or not.
+	 */
+	private static final boolean DEBUG = false;
 
 	/**
 	 * Relative path to the directory on the external storage where a directory named by the package
@@ -968,7 +971,7 @@ final class StorageImpl implements Storage {
 	 */
 	private void logMessage(final String message, final boolean error) {
 		if (error) Log.e(TAG, message);
-		else if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, message);
+		else if (DEBUG) Log.d(TAG, message);
 	}
 
 	/*
