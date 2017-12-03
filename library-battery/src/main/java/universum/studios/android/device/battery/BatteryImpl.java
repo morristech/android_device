@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import universum.studios.android.device.DeviceConfig;
-
 /**
  * A {@link Battery} implementation.
  *
@@ -47,6 +45,11 @@ final class BatteryImpl implements Battery {
 	 * Log TAG.
 	 */
 	private static final String TAG = "BatteryImpl";
+
+	/**
+	 * Boolean flag indicating whether to print debug output or not.
+	 */
+	static final boolean DEBUG = false;
 
 	/*
 	 * Interface ===================================================================================
@@ -259,10 +262,8 @@ final class BatteryImpl implements Battery {
 	 * @return {@code True} if data are initialized, {@code false} otherwise.
 	 */
 	private boolean checkDataInitialization(final String batteryInfo) {
-		if (!mDataInitialized && !isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS)) {
-			if (DeviceConfig.DEBUG_LOG_ENABLED) {
-				Log.d(TAG, "Cannot determine " + batteryInfo + " of the battery. The BatteryStatusReceiver is not registered.");
-			}
+		if (!mDataInitialized && !isBatteryReceiverRegistered(RECEIVER_BATTERY_STATUS) && DEBUG) {
+			Log.d(TAG, "Cannot determine " + batteryInfo + " of the battery. The BatteryStatusReceiver is not registered.");
 		}
 		return mDataInitialized;
 	}
@@ -737,7 +738,7 @@ final class BatteryImpl implements Battery {
 		 * Logs the current data of this info to log-cat console.
 		 */
 		void logCurrentData() {
-			if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, toString());
+			if (DEBUG) Log.d(TAG, toString());
 		}
 
 		/**

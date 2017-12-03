@@ -21,10 +21,14 @@ package universum.studios.android.device;
 import android.util.Log;
 
 /**
+ * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <p>
  * Configuration options for the Device library.
  *
  * @author Martin Albedinsky
+ * @deprecated Not used anymore.
  */
+@Deprecated
 public final class DeviceConfig {
 
 	/**
