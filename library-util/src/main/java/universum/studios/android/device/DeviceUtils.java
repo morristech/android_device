@@ -33,11 +33,11 @@ import universum.studios.android.device.screen.Screen;
 @SuppressWarnings("unused")
 public final class DeviceUtils {
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -122,25 +122,26 @@ public final class DeviceUtils {
 	 */
 	private static final float MINIMUM_TABLET_DIAGONAL_DISTANCE = 6.5f;
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
 	 */
 	private DeviceUtils() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -161,7 +162,7 @@ public final class DeviceUtils {
 	 * otherwise.
 	 */
 	@SuppressLint("SwitchIntDef")
-	public static boolean isTablet(@NonNull Context context) {
+	public static boolean isTablet(@NonNull final Context context) {
 		final Screen screen = Screen.PROVIDER.getScreen(context);
 		int percentageMatch = 0;
 		// Check the default screen orientation.
@@ -203,7 +204,7 @@ public final class DeviceUtils {
 		return percentageMatch >= MINIMUM_TABLET_PERCENTAGE_MATCH;
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

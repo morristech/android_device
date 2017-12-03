@@ -18,12 +18,14 @@
  */
 package universum.studios.android.device.connection;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 
 /**
  * A {@link BroadcastReceiver} used by {@link Connection} implementation to receive actual information
@@ -47,7 +49,8 @@ public class ConnectionStateReceiver extends BroadcastReceiver {
 	/**
 	 */
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
 		ConnectionImpl.getsInstance(context).handleBroadcast(context, intent);
 	}
 }

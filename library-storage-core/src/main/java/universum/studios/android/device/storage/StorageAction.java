@@ -44,7 +44,7 @@ import java.util.List;
  */
 abstract class StorageAction {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -53,15 +53,15 @@ abstract class StorageAction {
 	 */
 	// private static final String TAG = "StorageAction";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -80,7 +80,7 @@ abstract class StorageAction {
 	 */
 	private final String mActionVerb, mActionVerbPast;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -99,7 +99,7 @@ abstract class StorageAction {
 		this.mActionVerbPast = actionVerbPast;
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -349,7 +349,7 @@ abstract class StorageAction {
 		return new Storage.Results(action, message, size, results, flags, error);
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 

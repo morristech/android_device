@@ -47,7 +47,7 @@ public class BatteryHealthReceiver extends Battery.BatteryBroadcastReceiver {
 	/**
 	 */
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
 		intent.putExtra(EXTRA_RECEIVER_CLASS, getClass());
 		BatteryImpl.getInstance(context).handleBroadcast(context, intent);
 	}

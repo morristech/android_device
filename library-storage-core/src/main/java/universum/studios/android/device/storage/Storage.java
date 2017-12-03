@@ -97,7 +97,7 @@ import java.util.List;
  */
 public interface Storage {
 
-	/**
+	/*
 	 * Provider ====================================================================================
 	 */
 
@@ -127,12 +127,12 @@ public interface Storage {
 		 */
 		@NonNull
 		@Override
-		public Storage getStorage(@NonNull Context context) {
+		public Storage getStorage(@NonNull final Context context) {
 			return StorageImpl.getInstance(context);
 		}
 	};
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -426,7 +426,7 @@ public interface Storage {
 	 */
 	int KILO = 128;
 
-	/**
+	/*
 	 * Enums =======================================================================================
 	 */
 
@@ -567,7 +567,7 @@ public interface Storage {
 		 * @param fullName The name for this storage unit.
 		 * @param bits     Amount of bits represented by this unit.
 		 */
-		Unit(String fullName, long bits) {
+		Unit(final String fullName, final long bits) {
 			this.fullName = fullName;
 			this.bits = bits;
 			this.bytes = bits / 8.0f;
@@ -583,7 +583,7 @@ public interface Storage {
 		 * @return Formatted representative value of this storage unit for the given amount of bits.
 		 * @see #formatBytes(long)
 		 */
-		public float formatBits(long bits) {
+		public float formatBits(final long bits) {
 			return bits / (float) this.bits;
 		}
 
@@ -597,12 +597,12 @@ public interface Storage {
 		 * @return Formatted representative value of this storage unit for the given amount of bytes.
 		 * @see #formatBits(long)
 		 */
-		public float formatBytes(long bytes) {
+		public float formatBytes(final long bytes) {
 			return bytes / this.bytes;
 		}
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -1325,7 +1325,7 @@ public interface Storage {
 	@NonNull
 	List<File> getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 
@@ -1376,7 +1376,7 @@ public interface Storage {
 		 * @param flags   Flags passed to the method which is represented by the given <var>action</var>.
 		 * @param error   Error code if this result represents error.
 		 */
-		BaseResult(int action, @NonNull String message, int flags, int error) {
+		BaseResult(final int action, @NonNull final String message, final int flags, final int error) {
 			this.action = action;
 			this.message = message;
 			this.flags = flags;
@@ -1402,7 +1402,7 @@ public interface Storage {
 		 *
 		 * @param path The single path for which is this result being created.
 		 */
-		Result(int action, String message, @NonNull String path, int flags, int error) {
+		Result(final int action, final String message, @NonNull final String path, final int flags, final int error) {
 			super(action, message, flags, error);
 			this.path = path;
 		}
@@ -1438,7 +1438,7 @@ public interface Storage {
 		 * @param results   List of results for each of the paths passed to the method for which is
 		 *                  this results object being created.
 		 */
-		Results(int action, @NonNull String message, int succeeded, @NonNull List<Result> results, int flags, int error) {
+		Results(final int action, @NonNull final String message, final int succeeded, @NonNull final List<Result> results, final int flags, final int error) {
 			super(action, message, flags, error);
 			this.succeeded = succeeded;
 			this.results = results;

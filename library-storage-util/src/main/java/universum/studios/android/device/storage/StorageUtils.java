@@ -42,11 +42,11 @@ import java.io.IOException;
  */
 public final class StorageUtils {
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -55,7 +55,7 @@ public final class StorageUtils {
 	 */
 	private static final String TAG = "StorageUtils";
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -70,17 +70,18 @@ public final class StorageUtils {
 	 */
 	private static final StorageEditor EDITOR = new StorageEditor();
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
 	 */
 	private StorageUtils() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -91,7 +92,7 @@ public final class StorageUtils {
 	 * @return {@code True} if the given path points to file which at this time exists,
 	 * {@code false} if there is no file at the given path or it is a directory.
 	 */
-	public static boolean fileExists(@NonNull String path) {
+	public static boolean fileExists(@NonNull final String path) {
 		return new File(path).isFile();
 	}
 
@@ -102,7 +103,7 @@ public final class StorageUtils {
 	 * @return {@code True} if the given path points to directory which at this time exists,
 	 * {@code false} if there is no directory at the given path or it is a file.
 	 */
-	public static boolean directoryExists(@NonNull String path) {
+	public static boolean directoryExists(@NonNull final String path) {
 		return new File(path).isDirectory();
 	}
 
@@ -115,7 +116,7 @@ public final class StorageUtils {
 	 * doesn't contains any files/subdirectories, {@code false} if it doesn't exists or if it is
 	 * a file.
 	 */
-	public static boolean isDirectoryEmpty(@NonNull String path) {
+	public static boolean isDirectoryEmpty(@NonNull final String path) {
 		final File file = new File(path);
 		return file.isDirectory() && file.list().length == 0;
 	}
@@ -130,7 +131,7 @@ public final class StorageUtils {
 	 * {@code false} if at the specified path already exists a directory with the same path
 	 * or some IO error occurs.
 	 */
-	public static boolean createFile(@NonNull String path) {
+	public static boolean createFile(@NonNull final String path) {
 		final File file = new File(path);
 		synchronized (LOCK) {
 			if (!file.exists()) {
@@ -155,7 +156,7 @@ public final class StorageUtils {
 	/**
 	 * Same as {@link #createFiles(String, String...)} with empty <var>basePath</var>.
 	 */
-	public static int createFiles(@NonNull String... paths) {
+	public static int createFiles(@NonNull final String... paths) {
 		return createFiles("", paths);
 	}
 
@@ -170,7 +171,7 @@ public final class StorageUtils {
 	 * @param paths    Paths of the desired files to be created.
 	 * @return Count of the successfully created files.
 	 */
-	public static int createFiles(@Nullable String basePath, @NonNull String... paths) {
+	public static int createFiles(@Nullable final String basePath, @NonNull final String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
 			for (final String path : paths) {
@@ -191,7 +192,7 @@ public final class StorageUtils {
 	 * {@code false} if at the specified path already exists a file with the same path or some
 	 * IO error occurs.
 	 */
-	public static boolean createDirectory(@NonNull String path) {
+	public static boolean createDirectory(@NonNull final String path) {
 		final File file = new File(path);
 		synchronized (LOCK) {
 			return file.isDirectory() || file.mkdirs();
@@ -201,7 +202,7 @@ public final class StorageUtils {
 	/**
 	 * Same as {@link #createDirectories(String, String...)} with empty <var>basePath</var>.
 	 */
-	public static int createDirectories(@NonNull String... paths) {
+	public static int createDirectories(@NonNull final String... paths) {
 		return createDirectories("", paths);
 	}
 
@@ -216,7 +217,7 @@ public final class StorageUtils {
 	 * @param paths    Paths of the desired directories to be created.
 	 * @return Count of the successfully created directories.
 	 */
-	public static int createDirectories(@Nullable String basePath, @NonNull String... paths) {
+	public static int createDirectories(@Nullable final String basePath, @NonNull final String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
 			for (final String path : paths) {
@@ -234,7 +235,7 @@ public final class StorageUtils {
 	 * @return {@code True} if the requested file was successfully deleted, {@code false}
 	 * if it is actually a directory or it doesn't exists.
 	 */
-	public static boolean deleteFile(@NonNull String path) {
+	public static boolean deleteFile(@NonNull final String path) {
 		final File file = new File(path);
 		synchronized (LOCK) {
 			return file.isFile() && file.delete();
@@ -244,7 +245,7 @@ public final class StorageUtils {
 	/**
 	 * Same as {@link #deleteFiles(String, String...)} with empty <var>basePath</var>.
 	 */
-	public static int deleteFiles(@NonNull String... paths) {
+	public static int deleteFiles(@NonNull final String... paths) {
 		return deleteFiles("", paths);
 	}
 
@@ -259,7 +260,7 @@ public final class StorageUtils {
 	 * @param paths    Paths to the desired files to be deleted.
 	 * @return Count of the successfully deleted files.
 	 */
-	public static int deleteFiles(@Nullable String basePath, @NonNull String... paths) {
+	public static int deleteFiles(@Nullable final String basePath, @NonNull final String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
 			for (final String path : paths) {
@@ -273,7 +274,7 @@ public final class StorageUtils {
 	/**
 	 * Same as {@link #deleteDirectory(FileFilter, FilenameFilter, String)} with {@code null} filters.
 	 */
-	public static boolean deleteDirectory(@NonNull String path) {
+	public static boolean deleteDirectory(@NonNull final String path) {
 		return deleteDirectory(null, null, path);
 	}
 
@@ -283,14 +284,14 @@ public final class StorageUtils {
 	 *
 	 * @param path The path to be used to create <var>directory</var> parameter for editor.
 	 */
-	public static boolean deleteDirectory(@Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path) {
+	public static boolean deleteDirectory(@Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		return EDITOR.deleteDirectory(new File(path), filter, nameFilter);
 	}
 
 	/**
 	 * Same as {@link #deleteDirectories(String, String...)} with empty <var>basePath</var>.
 	 */
-	public static int deleteDirectories(@NonNull String... paths) {
+	public static int deleteDirectories(@NonNull final String... paths) {
 		return deleteDirectories("", paths);
 	}
 
@@ -298,7 +299,7 @@ public final class StorageUtils {
 	 * Same as {@link #deleteDirectories(FileFilter, FilenameFilter, String, String...)}
 	 * with {@code null} filters.
 	 */
-	public static int deleteDirectories(@Nullable String basePath, @NonNull String... paths) {
+	public static int deleteDirectories(@Nullable final String basePath, @NonNull final String... paths) {
 		return deleteDirectories(null, null, basePath, paths);
 	}
 
@@ -313,7 +314,7 @@ public final class StorageUtils {
 	 * @param paths    Paths to the desired directories to be deleted.
 	 * @return Count of the successfully deleted directories.
 	 */
-	public static int deleteDirectories(@Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String basePath, @NonNull String... paths) {
+	public static int deleteDirectories(@Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String basePath, @NonNull final String... paths) {
 		if (paths.length > 0) {
 			int count = 0;
 			for (final String path : paths) {
@@ -334,7 +335,7 @@ public final class StorageUtils {
 	 * @param toPath   The path to be used to create <var>fromFile</var> parameter for editor.
 	 * @param fromPath The path to be used to create <var>toFile</var> parameter for editor.
 	 */
-	public static boolean copyFile(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean copyFile(final int flags, @Nullable final String toPath, @NonNull final String fromPath) throws IOException {
 		return EDITOR.copyFileContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)));
 	}
 
@@ -347,7 +348,7 @@ public final class StorageUtils {
 	 * @param fromPaths Paths to the desired files to be copied.
 	 * @return Count of the successfully copied files.
 	 */
-	public static int copyFiles(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int copyFiles(final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
 			for (final String fromPath : fromPaths) {
@@ -362,7 +363,7 @@ public final class StorageUtils {
 	 * Same as {@link #copyDirectory(int, FileFilter, FilenameFilter, String, String)}
 	 * with {@code null} filters.
 	 */
-	public static boolean copyDirectory(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean copyDirectory(final int flags, @Nullable final String toPath, @NonNull final String fromPath) throws IOException {
 		return copyDirectory(flags, null, null, toPath, fromPath);
 	}
 
@@ -376,7 +377,7 @@ public final class StorageUtils {
 	 * @param toPath   The path to be used to create <var>fromDirectory</var> parameter for editor.
 	 * @param fromPath The path to be used to create <var>toDirectory</var> parameter for editor.
 	 */
-	public static boolean copyDirectory(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean copyDirectory(final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) throws IOException {
 		return EDITOR.copyDirectoryContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)), filter, nameFilter);
 	}
 
@@ -384,7 +385,7 @@ public final class StorageUtils {
 	 * Same as {@link #copyDirectories(int, FileFilter, FilenameFilter, String, String...)}
 	 * with {@code null} filters.
 	 */
-	public static int copyDirectories(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int copyDirectories(final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		return copyDirectories(flags, null, null, toPath, fromPaths);
 	}
 
@@ -397,7 +398,7 @@ public final class StorageUtils {
 	 * @param fromPaths Paths to the desired directories to be copied.
 	 * @return Count of the successfully copied directories.
 	 */
-	public static int copyDirectories(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int copyDirectories(final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
 			for (final String fromPath : fromPaths) {
@@ -418,7 +419,7 @@ public final class StorageUtils {
 	 * @param toPath   The path to be used to create <var>fromFile</var> parameter for editor.
 	 * @param fromPath The path to be used to create <var>toFile</var> parameter for editor.
 	 */
-	public static boolean moveFile(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean moveFile(final int flags, @Nullable final String toPath, @NonNull final String fromPath) throws IOException {
 		return EDITOR.moveFileContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)));
 	}
 
@@ -431,7 +432,7 @@ public final class StorageUtils {
 	 * @param fromPaths Paths to the desired files to be moved.
 	 * @return Count of the successfully moved files.
 	 */
-	public static int moveFiles(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int moveFiles(final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
 			for (final String fromPath : fromPaths) {
@@ -446,7 +447,7 @@ public final class StorageUtils {
 	 * Same as {@link #moveDirectory(int, FileFilter, FilenameFilter, String, String)}
 	 * with {@code null} filters.
 	 */
-	public static boolean moveDirectory(int flags, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean moveDirectory(final int flags, @Nullable final String toPath, @NonNull final String fromPath) throws IOException {
 		return moveDirectory(flags, null, null, toPath, fromPath);
 	}
 
@@ -460,7 +461,7 @@ public final class StorageUtils {
 	 * @param toPath   The path to be used to create <var>fromDirectory</var> parameter for editor.
 	 * @param fromPath The path to be used to create <var>toDirectory</var> parameter for editor.
 	 */
-	public static boolean moveDirectory(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath) throws IOException {
+	public static boolean moveDirectory(final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull String fromPath) throws IOException {
 		return EDITOR.moveDirectoryContent(flags, new File(fromPath), new File(appendDestinationPathWithFileName(toPath, fromPath)), filter, nameFilter);
 	}
 
@@ -468,7 +469,7 @@ public final class StorageUtils {
 	 * Same as {@link #moveDirectories(int, FileFilter, FilenameFilter, String, String...)}
 	 * with {@code null} filters.
 	 */
-	public static int moveDirectories(int flags, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int moveDirectories(final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		return moveDirectories(flags, null, null, toPath, fromPaths);
 	}
 
@@ -481,7 +482,7 @@ public final class StorageUtils {
 	 * @param fromPaths Paths to the desired directories to be moved.
 	 * @return Count of the successfully moved directories.
 	 */
-	public static int moveDirectories(int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths) throws IOException {
+	public static int moveDirectories(final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) throws IOException {
 		if (fromPaths.length > 0) {
 			int count = 0;
 			for (final String fromPath : fromPaths) {
@@ -501,7 +502,7 @@ public final class StorageUtils {
 	 * @return Appended path with extracted file name or just same destination path if the given
 	 * <var>filePath</var> doesn't contain last segment.
 	 */
-	private static String appendDestinationPathWithFileName(String destinationPath, String filePath) {
+	private static String appendDestinationPathWithFileName(final String destinationPath, final String filePath) {
 		if (TextUtils.isEmpty(destinationPath)) {
 			return "";
 		}

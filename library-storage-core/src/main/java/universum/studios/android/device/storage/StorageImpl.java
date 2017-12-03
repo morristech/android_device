@@ -46,7 +46,7 @@ import universum.studios.android.device.DeviceConfig;
  */
 final class StorageImpl implements Storage {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -64,11 +64,11 @@ final class StorageImpl implements Storage {
 	 */
 	private static final String EXTERNAL_PACKAGE_STORAGE_PARENTS_PATH = "Android" + File.separator + "data";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -83,7 +83,7 @@ final class StorageImpl implements Storage {
 	@SuppressLint("StaticFieldLeak")
 	private static StorageImpl sInstance;
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -130,7 +130,7 @@ final class StorageImpl implements Storage {
 	 */
 	private File mExternalPackage;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -145,7 +145,7 @@ final class StorageImpl implements Storage {
 		this.checkExternalAvailability();
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -971,7 +971,7 @@ final class StorageImpl implements Storage {
 		else if (DeviceConfig.DEBUG_LOG_ENABLED) Log.d(TAG, message);
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }
