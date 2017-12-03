@@ -44,7 +44,7 @@ import java.util.List;
  */
 abstract class StorageAction {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -53,15 +53,15 @@ abstract class StorageAction {
 	 */
 	// private static final String TAG = "StorageAction";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -80,7 +80,7 @@ abstract class StorageAction {
 	 */
 	private final String mActionVerb, mActionVerbPast;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -92,14 +92,14 @@ abstract class StorageAction {
 	 * @param actionVerb     Verb representing this action.
 	 * @param actionVerbPast Past form of the verb representing this action.
 	 */
-	private StorageAction(StorageImpl storage, int action, String actionVerb, String actionVerbPast) {
+	private StorageAction(final StorageImpl storage, final int action, final String actionVerb, final String actionVerbPast) {
 		this.mStorage = storage;
 		this.mAction = action;
 		this.mActionVerb = actionVerb;
 		this.mActionVerbPast = actionVerbPast;
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -111,7 +111,7 @@ abstract class StorageAction {
 	 *
 	 * @return Result data of the performed action.
 	 */
-	Storage.Result performFileAction(int storage, int flags, String toPath, String fromPath) {
+	Storage.Result performFileAction(final int storage, final int flags, final String toPath, final String fromPath) {
 		int errorCode = Storage.ERROR_API;
 		String exMessage = "";
 		boolean success = false;
@@ -151,7 +151,7 @@ abstract class StorageAction {
 	 *
 	 * @return Results data of the performed action.
 	 */
-	Storage.Results performFilesAction(int storage, int flags, String toPath, String... fromPaths) {
+	Storage.Results performFilesAction(final int storage, final int flags, final String toPath, final String... fromPaths) {
 		if (fromPaths.length > 0) {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
@@ -176,7 +176,7 @@ abstract class StorageAction {
 	 *
 	 * @return Result data of the performed action.
 	 */
-	Storage.Result performDirectoryAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) {
+	Storage.Result performDirectoryAction(final int storage, final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) {
 		int errorCode = Storage.ERROR_API;
 		String exMessage = "";
 		boolean success = false;
@@ -226,7 +226,7 @@ abstract class StorageAction {
 	 *
 	 * @return Results data of the performed action.
 	 */
-	Storage.Results performDirectoriesAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String... fromPaths) {
+	Storage.Results performDirectoriesAction(final int storage, final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String... fromPaths) {
 		if (fromPaths.length > 0) {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
@@ -249,7 +249,7 @@ abstract class StorageAction {
 	 *
 	 * @return Results object for this action.
 	 */
-	Storage.Results performFilesOrDirectoriesAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String... fromPaths) {
+	Storage.Results performFilesOrDirectoriesAction(final int storage, final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String... fromPaths) {
 		if (fromPaths.length > 0) {
 			final List<Storage.Result> results = new ArrayList<>();
 			int passed = 0;
@@ -277,7 +277,7 @@ abstract class StorageAction {
 	 *
 	 * @return Result data of the performed action.
 	 */
-	Storage.Result performFileOrDirectoryAction(int storage, int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) {
+	Storage.Result performFileOrDirectoryAction(final int storage, final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) {
 		final File file = new File(mStorage.appendBasePath(storage, fromPath));
 		if (file.exists()) {
 			return file.isFile() ? performFileAction(storage, flags, toPath, fromPath) : performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
@@ -296,7 +296,7 @@ abstract class StorageAction {
 	 *                         requested as error message.
 	 * @return Storage message.
 	 */
-	private static String buildStorageMessage(String baseMessage, int storage, String exceptionMessage) {
+	private static String buildStorageMessage(final String baseMessage, final int storage, final String exceptionMessage) {
 		final String storageName = StorageImpl.getStorageName(storage);
 		final String message = TextUtils.isEmpty(storageName) ? baseMessage + " at device storage." : baseMessage + " on" + storageName + " storage.";
 		return TextUtils.isEmpty(exceptionMessage) ? message : message + "\n" + exceptionMessage;
@@ -313,7 +313,7 @@ abstract class StorageAction {
 	 *                  process all given data as error.
 	 * @return New instance of Results object with bundled passed data.
 	 */
-	private Storage.Results processResults(List<Storage.Result> results, int passed, String fileType, int storage, int errorCode) {
+	private Storage.Results processResults(final List<Storage.Result> results, final int passed, final String fileType, final int storage, final int errorCode) {
 		final int size = results.size();
 		if (passed != results.size()) {
 			return createResults(
@@ -338,18 +338,18 @@ abstract class StorageAction {
 	/**
 	 * See {@link Storage.Result#Result(int, String, String, int, int)} for additional info.
 	 */
-	static Storage.Result createResult(int action, String message, String path, int flags, int error) {
+	static Storage.Result createResult(final int action, final String message, final String path, final int flags, final int error) {
 		return new Storage.Result(action, message, path, flags, error);
 	}
 
 	/**
 	 * See {@link Storage.Results#Results(int, String, int, List, int, int)} for additional info.
 	 */
-	private static Storage.Results createResults(int action, int size, String message, List<Storage.Result> results, int flags, int error) {
+	private static Storage.Results createResults(final int action, final int size, final String message, final List<Storage.Result> results, final int flags, final int error) {
 		return new Storage.Results(action, message, size, results, flags, error);
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 
@@ -368,14 +368,14 @@ abstract class StorageAction {
 		/**
 		 */
 		@Override
-		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.createFile(fromPath);
 		}
 
 		/**
 		 */
 		@Override
-		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.createDirectory(fromPath);
 		}
 	}
@@ -395,14 +395,14 @@ abstract class StorageAction {
 		/**
 		 */
 		@Override
-		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.deleteFile(fromPath);
 		}
 
 		/**
 		 */
 		@Override
-		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.deleteDirectory(filter, nameFilter, fromPath);
 		}
 	}
@@ -422,14 +422,14 @@ abstract class StorageAction {
 		/**
 		 */
 		@Override
-		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.copyFile(flags, toPath, fromPath);
 		}
 
 		/**
 		 */
 		@Override
-		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.copyDirectory(flags, filter, nameFilter, toPath, fromPath);
 		}
 	}
@@ -449,14 +449,14 @@ abstract class StorageAction {
 		/**
 		 */
 		@Override
-		boolean onPerformFileAction(int flags, String toPath, String fromPath) throws IOException {
+		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.moveFile(flags, toPath, fromPath);
 		}
 
 		/**
 		 */
 		@Override
-		boolean onPerformDirectoryAction(int flags, FileFilter filter, FilenameFilter nameFilter, String toPath, String fromPath) throws IOException {
+		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.moveDirectory(flags, filter, nameFilter, toPath, fromPath);
 		}
 	}

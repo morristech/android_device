@@ -1,7 +1,7 @@
 // Defines configuration used across the library project.
 def libraryConfig = [
         name   : 'device',
-        version: '1.0.1'
+        version: '1.0.2'
 ]
 
 def buildConfig = [

@@ -18,12 +18,14 @@
  */
 package universum.studios.android.device.connection;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 final class ConnectionImpl implements Connection {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -45,11 +47,11 @@ final class ConnectionImpl implements Connection {
 	 */
 	// private static final String TAG = "ConnectionImpl";
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -63,7 +65,7 @@ final class ConnectionImpl implements Connection {
 	 */
 	private static ConnectionImpl sInstance;
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -92,7 +94,7 @@ final class ConnectionImpl implements Connection {
 	 */
 	private final List<OnConnectionListener> mListeners = new ArrayList<>(2);
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -101,11 +103,11 @@ final class ConnectionImpl implements Connection {
 	 *
 	 * @param applicationContext Application context used to access system services.
 	 */
-	private ConnectionImpl(Context applicationContext) {
+	private ConnectionImpl(final Context applicationContext) {
 		this.mConnectivityManager = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -116,7 +118,7 @@ final class ConnectionImpl implements Connection {
 	 * @return Connection implementation with actual connection data available.
 	 */
 	@NonNull
-	static ConnectionImpl getsInstance(@NonNull Context context) {
+	static ConnectionImpl getsInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (sInstance == null) sInstance = new ConnectionImpl(context.getApplicationContext());
 		}
@@ -126,6 +128,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	public boolean isConnectedOrConnecting() {
 		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
 		return info != null && info.isConnectedOrConnecting();
@@ -134,6 +137,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	public boolean isConnected() {
 		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
 		return info != null && info.isConnected();
@@ -143,7 +147,8 @@ final class ConnectionImpl implements Connection {
 	 */
 	@Override
 	@SuppressWarnings("deprecation")
-	public boolean isConnectedOrConnecting(@NonNull ConnectionType connectionType) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public boolean isConnectedOrConnecting(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isConnectedOrConnecting();
@@ -153,7 +158,8 @@ final class ConnectionImpl implements Connection {
 	 */
 	@Override
 	@SuppressWarnings("deprecation")
-	public boolean isConnected(@NonNull ConnectionType connectionType) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public boolean isConnected(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isConnected();
@@ -163,7 +169,8 @@ final class ConnectionImpl implements Connection {
 	 */
 	@Override
 	@SuppressWarnings("deprecation")
-	public boolean isAvailable(@NonNull ConnectionType connectionType) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public boolean isAvailable(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isAvailable();
@@ -173,6 +180,7 @@ final class ConnectionImpl implements Connection {
 	 */
 	@NonNull
 	@Override
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 	public ConnectionType getConnectionType() {
 		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
 		return info == null || !info.isConnected() ?
@@ -185,7 +193,8 @@ final class ConnectionImpl implements Connection {
 	@Nullable
 	@Override
 	@SuppressWarnings("deprecation")
-	public NetworkInfo getConnectionInfo(@NonNull ConnectionType type) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public NetworkInfo getConnectionInfo(@NonNull final ConnectionType type) {
 		// todo: Implement not deprecated approach ...
 		return mConnectivityManager.getNetworkInfo(type.systemConstant);
 	}
@@ -193,7 +202,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
-	public void registerOnConnectionListener(@NonNull OnConnectionListener listener) {
+	public void registerOnConnectionListener(@NonNull final OnConnectionListener listener) {
 		synchronized (mListeners) {
 			if (!mListeners.contains(listener)) mListeners.add(listener);
 		}
@@ -202,7 +211,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
-	public void unregisterOnConnectionListener(@NonNull OnConnectionListener listener) {
+	public void unregisterOnConnectionListener(@NonNull final OnConnectionListener listener) {
 		synchronized (mListeners) {
 			mListeners.remove(listener);
 		}
@@ -211,7 +220,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
-	public void registerConnectionReceiver(@NonNull Context context) {
+	public void registerConnectionReceiver(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (!mReceiverRegistered.get()) {
 				this.mReceiverRegistered.set(true);
@@ -233,7 +242,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 */
 	@Override
-	public void unregisterConnectionReceiver(@NonNull Context context) {
+	public void unregisterConnectionReceiver(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (mReceiverRegistered.get()) {
 				context.unregisterReceiver(mReceiver);
@@ -249,7 +258,8 @@ final class ConnectionImpl implements Connection {
 	 * @param context Application context.
 	 * @param intent  The intent containing the broadcasted data.
 	 */
-	void handleBroadcast(@NonNull Context context, @NonNull Intent intent) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	void handleBroadcast(@NonNull final Context context, @NonNull final Intent intent) {
 		if (isConnected()) {
 			final ConnectionType type = getConnectionType();
 			final ActualConnection connection = new ActualConnection(type, true);
@@ -277,7 +287,7 @@ final class ConnectionImpl implements Connection {
 		}
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 
@@ -302,7 +312,7 @@ final class ConnectionImpl implements Connection {
 		 * @param type      Type  current connection type.
 		 * @param connected {@code True} if connection is established, {@code false} otherwise.
 		 */
-		ActualConnection(ConnectionType type, boolean connected) {
+		ActualConnection(final ConnectionType type, final boolean connected) {
 			this.type = type;
 			this.connected = connected;
 		}
@@ -319,7 +329,7 @@ final class ConnectionImpl implements Connection {
 		/**
 		 */
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(@Nullable final Object other) {
 			if (other == this) return true;
 			if (!(other instanceof ActualConnection)) return false;
 			final ActualConnection connection = (ActualConnection) other;

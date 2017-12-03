@@ -34,7 +34,8 @@ public final class ScreenUtils {
 	/**
 	 */
 	private ScreenUtils() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -47,7 +48,7 @@ public final class ScreenUtils {
 	 * @return {@code True} if hiding was successful, {@code false} if a window of the given
 	 * activity does not have focused view at this time.
 	 */
-	public static boolean hideSoftKeyboard(@NonNull Activity activity) {
+	public static boolean hideSoftKeyboard(@NonNull final Activity activity) {
 		final View focusedView = activity.getWindow().getCurrentFocus();
 		return focusedView != null && hideSoftKeyboard(focusedView);
 	}
@@ -59,12 +60,12 @@ public final class ScreenUtils {
 	 * @return {@code True} if hiding was successful, {@code false} if the view does not
 	 * have focus at this time.
 	 */
-	public static boolean hideSoftKeyboard(@NonNull View focusedView) {
+	public static boolean hideSoftKeyboard(@NonNull final View focusedView) {
 		if (focusedView.getContext() == null || !focusedView.hasFocus()) {
 			return false;
 		}
-		final InputMethodManager imm = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		return imm.hideSoftInputFromWindow(focusedView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+		final InputMethodManager manager = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		return manager != null && manager.hideSoftInputFromWindow(focusedView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 	}
 
 	/**
@@ -76,7 +77,7 @@ public final class ScreenUtils {
 	 * @param activity Current activity context to obtain the current focused view.
 	 * @return {@code True} if showing was successful, {@code false} otherwise.
 	 */
-	public static boolean showSoftKeyboard(@NonNull Activity activity) {
+	public static boolean showSoftKeyboard(@NonNull final Activity activity) {
 		final View view = activity.getWindow().getCurrentFocus();
 		return view != null && showSoftKeyboard(view);
 	}
@@ -88,13 +89,13 @@ public final class ScreenUtils {
 	 *                    focus for that view will be requested by {@link View#requestFocus()}.
 	 * @return {@code True} if showing was successful, {@code false} otherwise.
 	 */
-	public static boolean showSoftKeyboard(@NonNull View focusedView) {
+	public static boolean showSoftKeyboard(@NonNull final View focusedView) {
 		if (focusedView.getContext() == null) {
 			return false;
 		}
 		if (focusedView.hasFocus() || focusedView.requestFocus()) {
-			final InputMethodManager imm = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-			return imm.showSoftInput(focusedView, InputMethodManager.RESULT_UNCHANGED_SHOWN);
+			final InputMethodManager manager = (InputMethodManager) focusedView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+			return manager != null && manager.showSoftInput(focusedView, InputMethodManager.RESULT_UNCHANGED_SHOWN);
 		}
 		return false;
 	}

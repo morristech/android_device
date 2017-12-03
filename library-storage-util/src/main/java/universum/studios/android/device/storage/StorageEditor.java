@@ -42,11 +42,11 @@ import java.util.regex.Pattern;
  */
 public class StorageEditor {
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -124,7 +124,7 @@ public class StorageEditor {
 	 */
 	private static final int BASE_BUFFER_SIZE = 512;
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
@@ -138,15 +138,15 @@ public class StorageEditor {
 	 */
 	private final Matcher mFileNameMatcher = Pattern.compile("^(.*)\\.(.+)$").matcher("");
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -159,7 +159,7 @@ public class StorageEditor {
 	 * such a buffer type.
 	 */
 	@NonNull
-	public static byte[] createBuffer(int bufferType) {
+	public static byte[] createBuffer(final int bufferType) {
 		switch (bufferType) {
 			case SMALL_BUFFER:
 			case MEDIUM_BUFFER:
@@ -176,7 +176,7 @@ public class StorageEditor {
 	 * Same as {@link #deleteDirectory(File, FileFilter, FilenameFilter)}
 	 * with {@code null} filters.
 	 */
-	public boolean deleteDirectory(@NonNull File directory) {
+	public boolean deleteDirectory(@NonNull final File directory) {
 		return deleteDirectory(directory, null, null);
 	}
 
@@ -190,7 +190,7 @@ public class StorageEditor {
 	 *                   directory. Pass {@code null} to delete all files.
 	 * @return {@code True} if directory was successfully deleted, {@code false} otherwise.
 	 */
-	public boolean deleteDirectory(@NonNull File directory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) {
+	public boolean deleteDirectory(@NonNull final File directory, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter) {
 		synchronized (LOCK) {
 			return directory.isDirectory() && this.deleteDirectoryContentInner(directory, filter, nameFilter);
 		}
@@ -206,7 +206,7 @@ public class StorageEditor {
 	 * @return {@code True} if content and the given directory was successfully deleted,
 	 * {@code false} if some error occurs during delete process.
 	 */
-	private boolean deleteDirectoryContentInner(File directory, FileFilter filter, FilenameFilter nameFilter) {
+	private boolean deleteDirectoryContentInner(final File directory, final FileFilter filter, final FilenameFilter nameFilter) {
 		final File[] files = directory.listFiles();
 		boolean isDir;
 		boolean failed = false;
@@ -243,7 +243,7 @@ public class StorageEditor {
 	 * {@code null} <var>toFile</var> parameter, so there will be created new copy of the given
 	 * <var>file</var> at the same path with {@link #COPY_SUFFIX}.
 	 */
-	public boolean copyFileContent(@NonNull File file) throws IOException {
+	public boolean copyFileContent(@NonNull final File file) throws IOException {
 		return copyFileContent(COPY, file, null);
 	}
 
@@ -259,7 +259,7 @@ public class StorageEditor {
 	 * @throws IllegalArgumentException If the given <var>toFile</var> is not a file but a directory.
 	 * @throws IOException              If some IO error occurs during copy process of the requested file.
 	 */
-	public boolean copyFileContent(int flags, @NonNull File fromFile, @Nullable File toFile) throws IOException {
+	public boolean copyFileContent(final int flags, @NonNull final File fromFile, @Nullable final File toFile) throws IOException {
 		if (!fromFile.isFile()) {
 			throw new FileNotFoundException(
 					"Cannot copy content of file(" + fromFile.getPath() + "). Such a file doesn't exist or it is a directory."
@@ -283,7 +283,7 @@ public class StorageEditor {
 	 * {@code false} if some error occurs during copy process or the given flags were not properly
 	 * specified.
 	 */
-	private boolean copyFileContentInner(int flags, File fromFile, File toFile) throws IOException {
+	private boolean copyFileContentInner(final int flags, final File fromFile, File toFile) throws IOException {
 		synchronized (LOCK) {
 			String toFilePath = toFile == null ? "" : toFile.getPath();
 			if (TextUtils.isEmpty(toFilePath)) {
@@ -323,7 +323,7 @@ public class StorageEditor {
 	 * @return {@code True} if file was successfully created or already exists, {@code false}
 	 * if some error occurs or there is already a directory at the specified path.
 	 */
-	private static File createAndGetFile(String path) {
+	private static File createAndGetFile(final String path) {
 		final File file = new File(path);
 		synchronized (LOCK) {
 			if (file.isFile()) {
@@ -352,7 +352,7 @@ public class StorageEditor {
 	 * and {@code null} <var>toDirectory</var> parameter, so there will be created new copy of
 	 * the given <var>directory</var> at the same path with {@link #COPY_SUFFIX}.
 	 */
-	public boolean copyDirectoryContent(@NonNull File directory) throws IOException {
+	public boolean copyDirectoryContent(@NonNull final File directory) throws IOException {
 		return copyDirectoryContent(COPY, directory, null);
 	}
 
@@ -360,7 +360,7 @@ public class StorageEditor {
 	 * Same as {@link #copyDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
 	 * with {@code null} filters.
 	 */
-	public boolean copyDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory) throws IOException {
+	public boolean copyDirectoryContent(final int flags, @NonNull final File fromDirectory, @Nullable final File toDirectory) throws IOException {
 		return copyDirectoryContent(flags, fromDirectory, toDirectory, null, null);
 	}
 
@@ -381,7 +381,7 @@ public class StorageEditor {
 	 * @throws IllegalArgumentException If the given <var>toDirectory</var> is not a directory but a file.
 	 * @throws IOException              If some IO error occurs during copy process of the requested file.
 	 */
-	public boolean copyDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) throws IOException {
+	public boolean copyDirectoryContent(final int flags, @NonNull final File fromDirectory, @Nullable final File toDirectory, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter) throws IOException {
 		if (!fromDirectory.isDirectory()) {
 			throw new FileNotFoundException(
 					"Cannot copy content of directory(" + fromDirectory.getPath() + "). Such a directory doesn't exist or it is a file."
@@ -409,7 +409,7 @@ public class StorageEditor {
 	 * {@code false} if some error occurs during copy process or the given flags were not properly
 	 * specified.
 	 */
-	private boolean copyDirectoryContentInner(int flags, File fromDirectory, File toDirectory, FileFilter filter, FilenameFilter nameFilter) throws IOException {
+	private boolean copyDirectoryContentInner(final int flags, final File fromDirectory, final File toDirectory, final FileFilter filter, final FilenameFilter nameFilter) throws IOException {
 		final File[] files = fromDirectory.listFiles();
 		String toDirectoryPath = toDirectory == null ? "" : toDirectory.getPath();
 		boolean failed = false;
@@ -482,7 +482,7 @@ public class StorageEditor {
 	 * @param filename The name of file which to add at the end of the given path.
 	 * @return Appended path or <var>filename</var> if the given path is empty.
 	 */
-	private String appendPathWithFilename(String path, String filename) {
+	private String appendPathWithFilename(final String path, final String filename) {
 		return TextUtils.isEmpty(path) ? "" : path + File.separator + filename;
 	}
 
@@ -495,7 +495,7 @@ public class StorageEditor {
 	 * @param suffix The suffix which to add at the end of the given file's path.
 	 * @return New file with appended path.
 	 */
-	private File appendPath(File file, String suffix) {
+	private File appendPath(final File file, final String suffix) {
 		String filePath = file.getPath();
 		if (TextUtils.isEmpty(filePath)) {
 			return file;
@@ -520,7 +520,7 @@ public class StorageEditor {
 	 * @return {@code True} if directory was successfully created or already exists, {@code false}
 	 * if some error occurs or there is already a file at the specified path.
 	 */
-	private static boolean createDirectory(String path) {
+	private static boolean createDirectory(final String path) {
 		final File file = new File(path);
 		synchronized (LOCK) {
 			return file.isDirectory() || file.mkdirs();
@@ -542,7 +542,7 @@ public class StorageEditor {
 	 * @throws IllegalArgumentException If the given <var>toFile</var> is not a file but a directory.
 	 * @throws IOException              If some IO error occurs during copy process of the requested file.
 	 */
-	public boolean moveFileContent(int flags, @NonNull File fromFile, @Nullable File toFile) throws IOException {
+	public boolean moveFileContent(final int flags, @NonNull final File fromFile, @Nullable final File toFile) throws IOException {
 		if (!fromFile.isFile()) {
 			throw new FileNotFoundException(
 					"Cannot move content of file(" + fromFile.getPath() + "). Such a file doesn't exist or it is a directory."
@@ -566,7 +566,7 @@ public class StorageEditor {
 	 * was deleted, {@code false} if some error occurs during move process or the given flags
 	 * were not properly specified.
 	 */
-	private boolean moveFileContentInner(int flags, File fromFile, File toFile) throws IOException {
+	private boolean moveFileContentInner(final int flags, final File fromFile, final File toFile) throws IOException {
 		return this.copyFileContentInner(flags, fromFile, toFile) && fromFile.delete();
 	}
 
@@ -574,7 +574,7 @@ public class StorageEditor {
 	 * Same as {@link #moveDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
 	 * with {@code null} filters.
 	 */
-	public boolean moveDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory) throws IOException {
+	public boolean moveDirectoryContent(final int flags, @NonNull final File fromDirectory, @Nullable final File toDirectory) throws IOException {
 		return moveDirectoryContent(flags, fromDirectory, toDirectory, null, null);
 	}
 
@@ -598,10 +598,10 @@ public class StorageEditor {
 	 * if some error occurs during move process or the given flags were not properly specified.
 	 * @throws FileNotFoundException         If the given <var>fromDirectory</var> doesn't exists or is not a directory.
 	 * @throws IllegalArgumentException      If the given <var>toDirectory</var> is not a directory but a file.
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException If <var>fromDirectory</var> is the same as <var>toDirectory</var>.
 	 * @throws IOException                   If some IO error occurs during copy process of the requested file.
 	 */
-	public boolean moveDirectoryContent(int flags, @NonNull File fromDirectory, @Nullable File toDirectory, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter) throws IOException {
+	public boolean moveDirectoryContent(final int flags, @NonNull final File fromDirectory, @Nullable final File toDirectory, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter) throws IOException {
 		if (!fromDirectory.isDirectory()) {
 			throw new FileNotFoundException(
 					"Cannot move content of directory(" + fromDirectory.getPath() + "). Such a directory doesn't exist or it is a file."
@@ -637,7 +637,7 @@ public class StorageEditor {
 	 * old directory was deleted, {@code false} if some error occurs during move process or the
 	 * given flags were not properly specified.
 	 */
-	private boolean moveDirectoryContentInner(int flags, File fromDirectory, File toDirectory, FileFilter filter, FilenameFilter nameFilter) throws IOException {
+	private boolean moveDirectoryContentInner(final int flags, final File fromDirectory, final File toDirectory, final FileFilter filter, final FilenameFilter nameFilter) throws IOException {
 		return this.copyDirectoryContentInner(flags, fromDirectory, toDirectory, filter, nameFilter) && this.deleteDirectory(fromDirectory, filter, nameFilter);
 	}
 
@@ -645,7 +645,7 @@ public class StorageEditor {
 	 * Same as {@link #copyFileStreams(FileInputStream, FileOutputStream, int)}
 	 * with {@link #MEDIUM_BUFFER} type.
 	 */
-	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream) throws IOException {
+	public boolean copyFileStreams(@NonNull final FileInputStream inputStream, @NonNull final FileOutputStream outputStream) throws IOException {
 		return copyFileStreams(inputStream, outputStream, MEDIUM_BUFFER);
 	}
 
@@ -653,7 +653,7 @@ public class StorageEditor {
 	 * Same as {@link #copyFileStreams(FileInputStream, FileOutputStream, byte[])}
 	 * with buffer obtained from {@link #createBuffer(int)} for the desired <var>bufferType</var>.
 	 */
-	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream, int bufferType) throws IOException {
+	public boolean copyFileStreams(@NonNull final FileInputStream inputStream, @NonNull final FileOutputStream outputStream, final int bufferType) throws IOException {
 		return copyFileStreams(inputStream, outputStream, createBuffer(bufferType));
 	}
 
@@ -671,7 +671,7 @@ public class StorageEditor {
 	 * @return Always {@code true} if no IOException is thrown.
 	 * @throws IOException If some input/output error occurs during copy process.
 	 */
-	public boolean copyFileStreams(@NonNull FileInputStream inputStream, @NonNull FileOutputStream outputStream, byte[] buffer) throws IOException {
+	public boolean copyFileStreams(@NonNull final FileInputStream inputStream, @NonNull final FileOutputStream outputStream, final byte[] buffer) throws IOException {
 		int bytes;
 		while ((bytes = inputStream.read(buffer, 0, buffer.length)) > 0) {
 			outputStream.write(buffer, 0, bytes);
@@ -687,11 +687,11 @@ public class StorageEditor {
 	 *
 	 * @param errorMessage The desired error message to log.
 	 */
-	private static void logError(String errorMessage) {
+	private static void logError(final String errorMessage) {
 		Log.e(TAG, errorMessage);
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

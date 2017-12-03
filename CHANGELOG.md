@@ -3,6 +3,11 @@ Change-Log
 
 ## Version 1.x ##
 
+### 1.0.2 ###
+> upcoming 
+
+- Small updates.
+
 ### [1.0.1](https://github.com/universum-studios/android_device/releases/tag/v1.0.1)###
 > 26.03.2017
 

@@ -18,11 +18,13 @@
  */
 package universum.studios.android.device.connection;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 
 /**
  * Connection utility class specifying API allowing to check whether the Android device has some network
@@ -42,7 +44,8 @@ public final class ConnectionUtils {
 	 * {@code false} otherwise.
 	 * @see #isConnectionEstablished(Context, int)
 	 */
-	public static boolean isConnectionEstablished(@NonNull Context context) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public static boolean isConnectionEstablished(@NonNull final Context context) {
 		final NetworkInfo info = obtainEstablishedConnectionInfo(context);
 		return info != null && info.isConnected();
 	}
@@ -61,7 +64,8 @@ public final class ConnectionUtils {
 	 * @see #isConnectionAvailable(Context, int)
 	 */
 	@SuppressWarnings("deprecation")
-	public static boolean isConnectionEstablished(@NonNull Context context, int connectionType) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public static boolean isConnectionEstablished(@NonNull final Context context, final int connectionType) {
 		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = accessManager(context).getNetworkInfo(connectionType);
 		return info != null && info.isConnected();
@@ -79,7 +83,8 @@ public final class ConnectionUtils {
 	 * @see #isConnectionEstablished(Context, int)
 	 */
 	@SuppressWarnings("deprecation")
-	public static boolean isConnectionAvailable(@NonNull Context context, int connectionType) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public static boolean isConnectionAvailable(@NonNull final Context context, final int connectionType) {
 		// todo: Implement not deprecated approach ...
 		final NetworkInfo info = accessManager(context).getNetworkInfo(connectionType);
 		return info != null && info.isAvailable();
@@ -96,7 +101,8 @@ public final class ConnectionUtils {
 	 * @see #obtainEstablishedConnectionInfo(Context)
 	 * @see #isConnectionEstablished(Context)
 	 */
-	public static int obtainEstablishedConnectionType(@NonNull Context context) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public static int obtainEstablishedConnectionType(@NonNull final Context context) {
 		final NetworkInfo info = obtainEstablishedConnectionInfo(context);
 		return info == null ? -1 : info.getType();
 	}
@@ -111,7 +117,8 @@ public final class ConnectionUtils {
 	 * @see #isConnectionEstablished(Context)
 	 */
 	@Nullable
-	public static NetworkInfo obtainEstablishedConnectionInfo(@NonNull Context context) {
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	public static NetworkInfo obtainEstablishedConnectionInfo(@NonNull final Context context) {
 		return accessManager(context).getActiveNetworkInfo();
 	}
 
@@ -121,13 +128,14 @@ public final class ConnectionUtils {
 	 * @param context Context from which ConnectivityManager should be accessed.
 	 * @return An instance of ConnectivityManager.
 	 */
-	private static ConnectivityManager accessManager(Context context) {
+	private static ConnectivityManager accessManager(final Context context) {
 		return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 
 	/**
 	 */
 	private ConnectionUtils() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 }
