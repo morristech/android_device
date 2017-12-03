@@ -3,8 +3,8 @@ Change-Log
 
 ## Version 1.x ##
 
-### 1.0.2 ###
-> upcoming 
+### [1.0.2](https://github.com/universum-studios/android_device/releases/tag/v1.0.2)###
+> 03.12.2017 
 
 - Small updates.
 - Resolved [Issue #10](https://github.com/universum-studios/android_device/issues/10),
