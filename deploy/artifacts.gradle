@@ -85,7 +85,6 @@ task sourcesJar(type: Jar) {
     description "Bundles Raw sources into 'artifact-sources.jar' like file."
     classifier = 'sources'
     from isModule ? android.sourceSets.main.java.srcDirs : android.sourceSets.release.java.srcDirs
-    from isModule ? android.sourceSets.main.res.sourceFiles : android.sourceSets.release.res.sourceFiles
 }
 
 /**
