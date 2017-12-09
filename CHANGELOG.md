@@ -1,15 +1,14 @@
 Change-Log
 ===============
 
+More **detailed changelog** for each respective version may be viewed by pressing on a desired _version's name_.
+
 ## Version 1.x ##
 
 ### [1.0.2](https://github.com/universum-studios/android_device/releases/tag/v1.0.2)###
 > 03.12.2017 
 
-- Small updates.
-- Resolved [Issue #10](https://github.com/universum-studios/android_device/issues/10),
-  [Issue #11](https://github.com/universum-studios/android_device/issues/11),
-  [Issue #12](https://github.com/universum-studios/android_device/issues/12).
+- Small updates and improvements.
 
 ### [1.0.1](https://github.com/universum-studios/android_device/releases/tag/v1.0.1)###
 > 26.03.2017
