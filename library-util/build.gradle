@@ -51,7 +51,7 @@ repositories {
 dependencies {
     // PRODUCTION ----------------------------------------------------------------------------------
     implementation deps.androidSupport.annotations
-    releaseImplementation "universum.studios.android:device-screen-core:${config.library.version}@aar"
+    releaseImplementation deps.modules.libraryScreenCore
 
     // DEVELOPMENT ---------------------------------------------------------------------------------
     debugApi project(':library-screen-core')

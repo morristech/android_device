@@ -51,8 +51,8 @@ repositories {
 dependencies {
     // PRODUCTION ----------------------------------------------------------------------------------
     implementation deps.androidSupport.annotations
-    releaseImplementation "universum.studios.android:device-core:${config.library.version}@aar"
-    releaseImplementation "universum.studios.android:device-storage-util:${config.library.version}@aar"
+    releaseImplementation deps.modules.libraryCore
+    releaseImplementation deps.modules.libraryStorageUtil
 
     // DEVELOPMENT ---------------------------------------------------------------------------------
     debugApi project(':library-core')

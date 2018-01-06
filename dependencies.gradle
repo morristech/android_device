@@ -9,7 +9,23 @@ def versions = [
         robolectric               : '3.5.1'
 ]
 
-ext.versions = versions
+def modulesPrimaryId = "${config.pom.groupId}:${config.pom.artifactId}"
+def modulesVersion = "${config.library.version.production}"
+def modules = [
+        library              : "${modulesPrimaryId}:${modulesVersion}@aar",
+        libraryCore          : "${modulesPrimaryId}-core:${modulesVersion}@aar",
+        libraryBattery       : "${modulesPrimaryId}-battery:${modulesVersion}@aar",
+        libraryConnection    : "${modulesPrimaryId}-connection:${modulesVersion}@aar",
+        libraryConnectionCore: "${modulesPrimaryId}-connection-core:${modulesVersion}@aar",
+        libraryConnectionUtil: "${modulesPrimaryId}-connection-util:${modulesVersion}@aar",
+        libraryScreen        : "${modulesPrimaryId}-screen:${modulesVersion}@aar",
+        libraryScreenCore    : "${modulesPrimaryId}-screen-core:${modulesVersion}@aar",
+        libraryScreenUtil    : "${modulesPrimaryId}-screen-util:${modulesVersion}@aar",
+        libraryStorage       : "${modulesPrimaryId}-storage:${modulesVersion}@aar",
+        libraryStorageCore   : "${modulesPrimaryId}-storage-core:${modulesVersion}@aar",
+        libraryStorageUtil   : "${modulesPrimaryId}-storage-util:${modulesVersion}@aar",
+        libraryUtil          : "${modulesPrimaryId}-util:${modulesVersion}@aar"
+]
 
 def androidSupport = [
         annotations   : "com.android.support:support-annotations:${versions.androidSupport}",
@@ -46,7 +62,9 @@ def other = [
         butterknifeProcessor: "com.jakewharton:butterknife-compiler:${versions.butterknife}"
 ]
 
+ext.versions = versions
 ext.deps = [
+        "modules"         : modules,
         "androidSupport"  : androidSupport,
         "test"            : test,
         "universumStudios": universumStudios,
