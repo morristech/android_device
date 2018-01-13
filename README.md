@@ -1,4 +1,4 @@
-Device
+Android Device
 ===============
 
 [![CircleCI](https://circleci.com/gh/universum-studios/android_device.svg?style=svg)](https://circleci.com/gh/universum-studios/android_device)
