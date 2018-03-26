@@ -11,8 +11,8 @@ device's **connection**.
 
     implementation "universum.studios.android:device-connection-util:${DESIRED_VERSION}@aar"
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [ConnectionUtils](https://github.com/universum-studios/android_device/tree/master/library-connection-util/src/main/java/universum/studios/android/device/connection/ConnectionUtils.java)

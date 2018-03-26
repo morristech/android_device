@@ -1,7 +1,7 @@
 Device-Storage-Core
 ===============
 
-This module contains components that may be used to obtain detailed information about **Android** 
+This module contains elements that may be used to obtain detailed information about **Android** 
 device's **storage**.
 
 ## Download ##
@@ -15,8 +15,8 @@ _depends on:_
 [device-core](https://github.com/universum-studios/android_device/tree/master/library-core),
 [device-storage-util](https://github.com/universum-studios/android_device/tree/master/library-storage-util)
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [Storage](https://github.com/universum-studios/android_device/tree/master/library-storage-core/src/main/java/universum/studios/android/device/storage/Storage.java)

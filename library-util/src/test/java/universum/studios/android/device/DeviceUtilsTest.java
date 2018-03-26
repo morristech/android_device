@@ -28,7 +28,5 @@ import universum.studios.android.test.local.RobolectricTestCase;
 public final class DeviceUtilsTest extends RobolectricTestCase {
 
 	@Test
-	public void test() {
-		// todo: implement test
-	}
+	public void test() {}
 }

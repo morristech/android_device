@@ -1,7 +1,7 @@
 Device-Connection-Core
 ===============
 
-This module contains components that may be used to obtain detailed information about **Android** 
+This module contains elements that may be used to obtain detailed information about **Android** 
 device's **connection**.
 
 ## Download ##
@@ -11,8 +11,8 @@ device's **connection**.
 
     implementation "universum.studios.android:device-connection-core:${DESIRED_VERSION}@aar"
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [Connection](https://github.com/universum-studios/android_device/tree/master/library-connection-core/src/main/java/universum/studios/android/device/connection/Connection.java)

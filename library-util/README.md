@@ -13,8 +13,8 @@ This module contains utilities that may be used to obtain additional information
 _depends on:_
 [device-screen-core](https://github.com/universum-studios/android_device/tree/master/library-screen-core)
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [DeviceUtils](https://github.com/universum-studios/android_device/tree/master/library-util/src/main/java/universum/studios/android/device/DeviceUtils.java)

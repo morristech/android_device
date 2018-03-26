@@ -11,8 +11,8 @@ device's **screen**.
 
     implementation "universum.studios.android:device-screen-util:${DESIRED_VERSION}@aar"
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [ScreenUtils](https://github.com/universum-studios/android_device/tree/master/library-screen-util/src/main/java/universum/studios/android/device/screen/ScreenUtils.java)

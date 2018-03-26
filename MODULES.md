@@ -22,7 +22,7 @@ as usually.
 
 
 ## Available modules ##
-> Following modules are available in the [latest](https://github.com/universum-studios/android_device/releases "Latest Releases page") stable release.
+> Following modules are available in the [latest](https://github.com/universum-studios/android_device/releases "Releases page") stable release.
 
 - **[Core](https://github.com/universum-studios/android_device/tree/master/library-core)**
 - **[Battery](https://github.com/universum-studios/android_device/tree/master/library-battery)**

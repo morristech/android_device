@@ -1,9 +1,13 @@
 Android Device
 ===============
 
-[![CircleCI](https://circleci.com/gh/universum-studios/android_device.svg?style=svg)](https://circleci.com/gh/universum-studios/android_device)
+[![CircleCI](https://circleci.com/gh/universum-studios/android_device.svg?style=shield)](https://circleci.com/gh/universum-studios/android_device)
 [![Codecov](https://codecov.io/gh/universum-studios/android_device/branch/master/graph/badge.svg)](https://codecov.io/gh/universum-studios/android_device)
 [![Codacy](https://api.codacy.com/project/badge/Grade/a9cb0ea55486495ebfeb83432934d07d)](https://www.codacy.com/app/universum-studios/android_device?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_device&amp;utm_campaign=Badge_Grade)
+
+## ! OBSOLETE ! ##
+
+**This library has become obsolete and thus will be no longer maintained.**
 
 Simple access to battery, connection, screen and storage information for the Android platform.
 
@@ -12,7 +16,7 @@ For more information please visit the **[Wiki](https://github.com/universum-stud
 ## Download ##
 [![Bintray](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Adevice/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Adevice/_latestVersion)
 
-Download the latest **[release](https://github.com/universum-studios/android_device/releases "Latest Releases page")** or **add as dependency** in your project via:
+Download the latest **[release](https://github.com/universum-studios/android_device/releases "Releases page")** or **add as dependency** in your project via:
 
 ### Gradle ###
 
