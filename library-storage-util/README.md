@@ -11,8 +11,8 @@ device's **storage**.
 
     implementation "universum.studios.android:device-storage-util:${DESIRED_VERSION}@aar"
 
-## Components ##
+## Elements ##
 
-Below are listed some of **primary components** that are available in this module:
+Below are listed some of **primary elements** that are available in this module:
 
 - [StorageUtils](https://github.com/universum-studios/android_device/tree/master/library-storage-util/src/main/java/universum/studios/android/device/storage/StorageUtils.java)
