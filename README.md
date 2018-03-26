@@ -7,7 +7,9 @@ Android Device
 
 ## ! OBSOLETE ! ##
 
-**This library has become obsolete and thus will be no longer maintained.**
+**> This library has become obsolete and will be no longer maintained. <**
+
+---
 
 Simple access to battery, connection, screen and storage information for the Android platform.
 
