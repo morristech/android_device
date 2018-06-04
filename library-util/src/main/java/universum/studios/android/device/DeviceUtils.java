@@ -29,6 +29,7 @@ import universum.studios.android.device.screen.Screen;
  * {@link #isTablet(Context)}.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 @SuppressWarnings("unused")
 public final class DeviceUtils {

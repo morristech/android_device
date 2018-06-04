@@ -24,18 +24,10 @@ import android.os.Build;
  * Device is a simple class providing basic information about the Android device.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 @SuppressWarnings("unused")
 public final class Device {
-
-	/*
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Log TAG.
-	 */
-	// private static final String TAG = "Device";
 
 	/**
 	 * Android version that powers this Android device.
@@ -129,6 +121,12 @@ public final class Device {
 			case Build.VERSION_CODES.N_MR1:
 				ANDROID_VERSION_NAME = "Nougat MR1";
 				break;
+			case Build.VERSION_CODES.O:
+				ANDROID_VERSION_NAME = "Oreo";
+				break;
+			case Build.VERSION_CODES.O_MR1:
+				ANDROID_VERSION_NAME = "Oreo MR1";
+				break;
 			default:
 				ANDROID_VERSION_NAME = "UNSPECIFIED";
 				break;
@@ -142,33 +140,10 @@ public final class Device {
 	 */
 	public static final int ANDROID_SDK_VERSION = Build.VERSION.SDK_INT;
 
-	/*
-	 * Interface ===================================================================================
-	 */
-
-	/*
-	 * Static members ==============================================================================
-	 */
-
-	/*
-	 * Members =====================================================================================
-	 */
-
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 */
 	private Device() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
-
-	/*
-	 * Inner classes ===============================================================================
-	 */
 }

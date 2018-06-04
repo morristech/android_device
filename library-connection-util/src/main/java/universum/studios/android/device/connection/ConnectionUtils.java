@@ -31,6 +31,7 @@ import android.support.annotation.RequiresPermission;
  * connection established or to access info of the current established network connection.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public final class ConnectionUtils {
 
@@ -116,9 +117,8 @@ public final class ConnectionUtils {
 	 * @see #obtainEstablishedConnectionType(Context)
 	 * @see #isConnectionEstablished(Context)
 	 */
-	@Nullable
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public static NetworkInfo obtainEstablishedConnectionInfo(@NonNull final Context context) {
+	@Nullable public static NetworkInfo obtainEstablishedConnectionInfo(@NonNull final Context context) {
 		return accessManager(context).getActiveNetworkInfo();
 	}
 
