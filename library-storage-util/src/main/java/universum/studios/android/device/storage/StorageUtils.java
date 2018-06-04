@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.storage;
 
@@ -33,12 +33,13 @@ import java.io.IOException;
  * Simple utility class specifying API allowing to create, copy, move or delete files on the current
  * Android device's file system.
  * <p>
- * This class wraps instance of {@link universum.studios.android.device.storage.StorageEditor} for
- * all file content related operations, like <b>deleting, copying and moving</b> of file/directory
- * content on the file system. <b>Note</b>, that all exceptions thrown by the editor need to be handled
- * by a caller of the StorageUtils API itself.
+ * This class wraps instance of {@link StorageEditor} for all file content related operations,
+ * like <b>deleting, copying and moving</b> of file/directory content on the file system.
+ * <b>Note</b> that all exceptions thrown by the editor need to be handled by a caller of the
+ * StorageUtils API itself.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public final class StorageUtils {
 
@@ -279,7 +280,7 @@ public final class StorageUtils {
 	}
 
 	/**
-	 * Wrapped {@link universum.studios.android.device.storage.StorageEditor#deleteDirectory(File, FileFilter, FilenameFilter)}
+	 * Wrapped {@link StorageEditor#deleteDirectory(File, FileFilter, FilenameFilter)}
 	 * upon this utils editor instance.
 	 *
 	 * @param path The path to be used to create <var>directory</var> parameter for editor.
@@ -326,7 +327,7 @@ public final class StorageUtils {
 	}
 
 	/**
-	 * Wrapped {@link universum.studios.android.device.storage.StorageEditor#copyFileContent(int, File, File)}
+	 * Wrapped {@link StorageEditor#copyFileContent(int, File, File)}
 	 * upon this utils editor instance.
 	 * <p>
 	 * <b>Note</b>, that the given <var>toPath</var> will be appended with a last path segment obtained
@@ -368,7 +369,7 @@ public final class StorageUtils {
 	}
 
 	/**
-	 * Wrapped {@link universum.studios.android.device.storage.StorageEditor#copyDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
+	 * Wrapped {@link StorageEditor#copyDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
 	 * upon this utils editor instance.
 	 * <p>
 	 * <b>Note</b>, that the given <var>toPath</var> will be appended with a last path segment obtained
@@ -410,7 +411,7 @@ public final class StorageUtils {
 	}
 
 	/**
-	 * Wrapped {@link universum.studios.android.device.storage.StorageEditor#moveFileContent(int, File, File)}
+	 * Wrapped {@link StorageEditor#moveFileContent(int, File, File)}
 	 * upon this utils editor instance.
 	 * <p>
 	 * <b>Note</b>, that the given <var>toPath</var> will be appended with a last path segment obtained
@@ -452,7 +453,7 @@ public final class StorageUtils {
 	}
 
 	/**
-	 * Wrapped {@link universum.studios.android.device.storage.StorageEditor#moveDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
+	 * Wrapped {@link StorageEditor#moveDirectoryContent(int, File, File, FileFilter, FilenameFilter)}
 	 * upon this utils editor instance.
 	 * <p>
 	 * <b>Note</b>, that the given <var>toPath</var> will be appended with a last path segment obtained

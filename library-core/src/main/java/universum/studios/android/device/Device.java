@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device;
 
@@ -24,18 +24,10 @@ import android.os.Build;
  * Device is a simple class providing basic information about the Android device.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 @SuppressWarnings("unused")
 public final class Device {
-
-	/*
-	 * Constants ===================================================================================
-	 */
-
-	/**
-	 * Log TAG.
-	 */
-	// private static final String TAG = "Device";
 
 	/**
 	 * Android version that powers this Android device.
@@ -129,6 +121,12 @@ public final class Device {
 			case Build.VERSION_CODES.N_MR1:
 				ANDROID_VERSION_NAME = "Nougat MR1";
 				break;
+			case Build.VERSION_CODES.O:
+				ANDROID_VERSION_NAME = "Oreo";
+				break;
+			case Build.VERSION_CODES.O_MR1:
+				ANDROID_VERSION_NAME = "Oreo MR1";
+				break;
 			default:
 				ANDROID_VERSION_NAME = "UNSPECIFIED";
 				break;
@@ -142,33 +140,10 @@ public final class Device {
 	 */
 	public static final int ANDROID_SDK_VERSION = Build.VERSION.SDK_INT;
 
-	/*
-	 * Interface ===================================================================================
-	 */
-
-	/*
-	 * Static members ==============================================================================
-	 */
-
-	/*
-	 * Members =====================================================================================
-	 */
-
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 */
 	private Device() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
-
-	/*
-	 * Inner classes ===============================================================================
-	 */
 }
