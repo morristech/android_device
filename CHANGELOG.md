@@ -6,7 +6,7 @@ More **detailed changelog** for each respective version may be viewed by pressin
 
 ## Version 1.x ##
 
-### 1.0.3 ###
+### [1.0.3](https://github.com/universum-studios/android_device/releases/tag/v1.0.3) ###
 > upcoming
  
 - Small updates and improvements.
