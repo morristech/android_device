@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.battery;
 
@@ -142,6 +142,7 @@ public interface Battery {
 	 * Interface for provider that may be used to access implementation of {@link Battery}.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface Provider {
 
@@ -151,8 +152,7 @@ public interface Battery {
 		 * @param context Context used by the battery implementation to access actual battery data.
 		 * @return Battery implementation with actual battery data already available.
 		 */
-		@NonNull
-		Battery getBattery(@NonNull Context context);
+		@NonNull Battery getBattery(@NonNull Context context);
 	}
 
 	/**
@@ -162,9 +162,7 @@ public interface Battery {
 
 		/**
 		 */
-		@NonNull
-		@Override
-		public Battery getBattery(@NonNull final Context context) {
+		@Override @NonNull public Battery getBattery(@NonNull final Context context) {
 			return BatteryImpl.getInstance(context);
 		}
 	};
@@ -176,7 +174,8 @@ public interface Battery {
 	/**
 	 * Listener that may be used to receive callback with info about changed battery's status.
 	 *
-	 * @author Martin Albedinsk
+	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface OnStatusListener {
 
@@ -197,6 +196,7 @@ public interface Battery {
 	 * Listener that may be used to receive callback with info about changed battery's plugged state.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface OnPluggedStateListener {
 
@@ -230,6 +230,8 @@ public interface Battery {
 	 * Listener that may be used to receive callback with info about changed battery's health (LOW/OK).
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
+	 *
 	 * @see #setHealthLowLevel(int)
 	 * @see #setHealthOkLevel(int)
 	 */
@@ -286,8 +288,7 @@ public interface Battery {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef(flag = true, value = {RECEIVER_BATTERY_STATUS, RECEIVER_BATTERY_HEALTH, RECEIVER_BATTERY_PLUGGED_STATE})
-	@interface Receiver {
-	}
+	@interface Receiver {}
 
 	/**
 	 * Copy of {@link BatteryManager#BATTERY_STATUS_UNKNOWN} flag for better access.
@@ -319,8 +320,7 @@ public interface Battery {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({STATUS_UNKNOWN, STATUS_CHARGING, STATUS_DISCHARGING, STATUS_NOT_CHARGING, STATUS_FULL})
-	@interface Status {
-	}
+	@interface Status {}
 
 	/**
 	 * Plugged state flag indicating that the battery plugged state is unknown due to some error or
@@ -367,8 +367,7 @@ public interface Battery {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({PLUGGED_UNKNOWN, PLUGGED_NONE, PLUGGED_AC, PLUGGED_USB, PLUGGED_WIRELESS})
-	@interface PluggedState {
-	}
+	@interface PluggedState {}
 
 	/**
 	 * Copy of {@link BatteryManager#BATTERY_HEALTH_UNKNOWN} flag for better access.
@@ -411,8 +410,7 @@ public interface Battery {
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({HEALTH_UNKNOWN, HEALTH_GOOD, HEALTH_OVERHEAT, HEALTH_DEAD,
 			HEALTH_OVER_VOLTAGE, HEALTH_UNSPECIFIED_FAILURE, HEALTH_COLD})
-	@interface Health {
-	}
+	@interface Health {}
 
 	/*
 	 * Enums =======================================================================================
@@ -422,6 +420,8 @@ public interface Battery {
 	 * Represents technology of the Android device's battery.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
+	 *
 	 * @see #resolve(String)
 	 */
 	enum BatteryTechnology {
@@ -523,8 +523,7 @@ public interface Battery {
 		 * @return Resolved battery technology instance or {@link BatteryTechnology#UNKNOWN}
 		 * if there is no battery technology with the requested tag.
 		 */
-		@NonNull
-		public static BatteryTechnology resolve(@NonNull final String tagName) {
+		@NonNull public static BatteryTechnology resolve(@NonNull final String tagName) {
 			for (final BatteryTechnology tech : BatteryTechnology.values()) {
 				if (tech.tagName.equalsIgnoreCase(tagName)) {
 					return tech;
@@ -544,8 +543,7 @@ public interface Battery {
 	 * @return The value of strength in the range {@code [0, 100]} or negative number if the current
 	 * battery data are unavailable.
 	 */
-	@IntRange(from = 0, to = 100)
-	int getStrength();
+	@IntRange(from = 0, to = 100) int getStrength();
 
 	/**
 	 * Returns the current status of the Android device's battery.
@@ -553,8 +551,7 @@ public interface Battery {
 	 * @return One of {@link #STATUS_CHARGING}, {@link #STATUS_DISCHARGING}, {@link #STATUS_NOT_CHARGING}
 	 * {@link #STATUS_FULL} or {@link #STATUS_UNKNOWN} if the current battery data are unavailable.
 	 */
-	@Status
-	int getStatus();
+	@Status int getStatus();
 
 	/**
 	 * Returns the current plugged state of the Android device's battery.
@@ -562,8 +559,7 @@ public interface Battery {
 	 * @return One of {@link #PLUGGED_AC}, {@link #PLUGGED_USB}, {@link #PLUGGED_WIRELESS}, {@link #PLUGGED_NONE}
 	 * or {@link #PLUGGED_UNKNOWN} if the current battery data are unavailable.
 	 */
-	@PluggedState
-	int getPluggedState();
+	@PluggedState int getPluggedState();
 
 	/**
 	 * Returns the current health of the Android device's battery.
@@ -572,8 +568,7 @@ public interface Battery {
 	 * {@link #HEALTH_DEAD}, {@link #HEALTH_OVERHEAT}, {@link #HEALTH_OVER_VOLTAGE} or {@link #HEALTH_UNKNOWN}
 	 * if the current battery data are unavailable.
 	 */
-	@Health
-	int getHealth();
+	@Health int getHealth();
 
 	/**
 	 * Returns the technology of the Android device's battery.
@@ -582,8 +577,7 @@ public interface Battery {
 	 * if technology can't be parsed due to unknown technology tag name or if the current battery data
 	 * are unavailable.
 	 */
-	@NonNull
-	BatteryTechnology getTechnology();
+	@NonNull BatteryTechnology getTechnology();
 
 	/**
 	 * Returns the current temperature of the Android device's battery.
@@ -656,8 +650,7 @@ public interface Battery {
 	 * @see #setHealthLowLevel(int)
 	 * @see #isLow()
 	 */
-	@IntRange(from = 0, to = 100)
-	int getHealthLowLevel();
+	@IntRange(from = 0, to = 100) int getHealthLowLevel();
 
 	/**
 	 * Sets value of the battery health <b>OK</b> level. This value will be used to determine whether
@@ -784,7 +777,6 @@ public interface Battery {
 		 *
 		 * @return New intent filter.
 		 */
-		@NonNull
-		public abstract IntentFilter newIntentFilter();
+		@NonNull public abstract IntentFilter newIntentFilter();
 	}
 }

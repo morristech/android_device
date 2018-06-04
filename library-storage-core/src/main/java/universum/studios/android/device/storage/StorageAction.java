@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.storage;
 
@@ -41,6 +41,7 @@ import java.util.List;
  * {@link Storage.BaseResult} when returning result for the preformed action.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 abstract class StorageAction {
 
@@ -68,17 +69,17 @@ abstract class StorageAction {
 	/**
 	 * Storage implementation to access some storage info.
 	 */
-	private final StorageImpl mStorage;
+	private final StorageImpl storage;
 
 	/**
 	 * Unique identifier of this storage action.
 	 */
-	private final int mAction;
+	private final int action;
 
 	/**
 	 * Action verb.
 	 */
-	private final String mActionVerb, mActionVerbPast;
+	private final String actionVerb, actionVerbPast;
 
 	/*
 	 * Constructors ================================================================================
@@ -93,10 +94,10 @@ abstract class StorageAction {
 	 * @param actionVerbPast Past form of the verb representing this action.
 	 */
 	private StorageAction(final StorageImpl storage, final int action, final String actionVerb, final String actionVerbPast) {
-		this.mStorage = storage;
-		this.mAction = action;
-		this.mActionVerb = actionVerb;
-		this.mActionVerbPast = actionVerbPast;
+		this.storage = storage;
+		this.action = action;
+		this.actionVerb = actionVerb;
+		this.actionVerbPast = actionVerbPast;
 	}
 
 	/*
@@ -116,7 +117,7 @@ abstract class StorageAction {
 		String exMessage = "";
 		boolean success = false;
 		try {
-			success = onPerformFileAction(flags, mStorage.appendBasePath(storage, toPath), mStorage.appendBasePath(storage, fromPath));
+			success = onPerformFileAction(flags, this.storage.appendBasePath(storage, toPath), this.storage.appendBasePath(storage, fromPath));
 		} catch (FileNotFoundException e) {
 			errorCode = Storage.ERROR_FILE_NOT_FOUND;
 			exMessage = e.getMessage();
@@ -128,10 +129,10 @@ abstract class StorageAction {
 			exMessage = e.getMessage();
 		}
 		return createResult(
-				mAction,
+				action,
 				success ?
-						buildStorageMessage("Successfully " + mActionVerbPast + " file('" + fromPath + "')", storage, null) :
-						buildStorageMessage("Failed to " + mActionVerb + " file('" + fromPath + "')", storage, exMessage),
+						buildStorageMessage("Successfully " + actionVerbPast + " file('" + fromPath + "')", storage, null) :
+						buildStorageMessage("Failed to " + actionVerb + " file('" + fromPath + "')", storage, exMessage),
 				fromPath,
 				flags,
 				success ? Storage.NO_ERROR : errorCode
@@ -165,7 +166,7 @@ abstract class StorageAction {
 			}
 			return this.processResults(results, passed, "files", storage, Storage.ERROR_API);
 		}
-		return createResults(mAction, 0, "No files to " + mActionVerb + ".", null, Storage.NO_FLAGS, Storage.ERROR_EMPTY_REQUEST);
+		return createResults(action, 0, "No files to " + actionVerb + ".", null, Storage.NO_FLAGS, Storage.ERROR_EMPTY_REQUEST);
 	}
 
 	/**
@@ -185,8 +186,8 @@ abstract class StorageAction {
 					flags,
 					filter,
 					nameFilter,
-					mStorage.appendBasePath(storage, toPath),
-					mStorage.appendBasePath(storage, fromPath)
+					this.storage.appendBasePath(storage, toPath),
+					this.storage.appendBasePath(storage, fromPath)
 			);
 		} catch (FileNotFoundException e) {
 			errorCode = Storage.ERROR_FILE_NOT_FOUND;
@@ -202,10 +203,10 @@ abstract class StorageAction {
 			exMessage = e.getMessage();
 		}
 		return createResult(
-				mAction,
+				action,
 				success ?
-						buildStorageMessage("Successfully " + mActionVerbPast + " directory('" + fromPath + "')", storage, null) :
-						buildStorageMessage("Failed to " + mActionVerb + " directory('" + fromPath + "')", storage, exMessage),
+						buildStorageMessage("Successfully " + actionVerbPast + " directory('" + fromPath + "')", storage, null) :
+						buildStorageMessage("Failed to " + actionVerb + " directory('" + fromPath + "')", storage, exMessage),
 				fromPath,
 				flags,
 				success ? Storage.NO_ERROR : errorCode
@@ -240,7 +241,7 @@ abstract class StorageAction {
 			}
 			return this.processResults(results, passed, "directories", storage, Storage.ERROR_API);
 		}
-		return createResults(mAction, 0, "No directories to " + mActionVerb + ".", null, flags, Storage.ERROR_EMPTY_REQUEST);
+		return createResults(action, 0, "No directories to " + actionVerb + ".", null, flags, Storage.ERROR_EMPTY_REQUEST);
 	}
 
 	/**
@@ -263,7 +264,7 @@ abstract class StorageAction {
 			}
 			return this.processResults(results, passed, "files/directories", storage, Storage.ERROR_API);
 		}
-		return StorageAction.createResults(mAction, 0, "No files/directories to delete.", null, flags, Storage.ERROR_EMPTY_REQUEST);
+		return StorageAction.createResults(action, 0, "No files/directories to delete.", null, flags, Storage.ERROR_EMPTY_REQUEST);
 	}
 
 	/**
@@ -278,11 +279,11 @@ abstract class StorageAction {
 	 * @return Result data of the performed action.
 	 */
 	Storage.Result performFileOrDirectoryAction(final int storage, final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) {
-		final File file = new File(mStorage.appendBasePath(storage, fromPath));
+		final File file = new File(this.storage.appendBasePath(storage, fromPath));
 		if (file.exists()) {
 			return file.isFile() ? performFileAction(storage, flags, toPath, fromPath) : performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 		}
-		return createResult(mAction, "No file/directory to " + mActionVerb + ".", fromPath, flags, Storage.ERROR_EMPTY_REQUEST);
+		return createResult(action, "No file/directory to " + actionVerb + ".", fromPath, flags, Storage.ERROR_EMPTY_REQUEST);
 	}
 
 	/**
@@ -317,18 +318,18 @@ abstract class StorageAction {
 		final int size = results.size();
 		if (passed != results.size()) {
 			return createResults(
-					mAction,
+					action,
 					passed,
-					buildStorageMessage("Failed to " + mActionVerb + " " + Integer.toString(size - passed) + " " + fileType, storage, null),
+					buildStorageMessage("Failed to " + actionVerb + " " + Integer.toString(size - passed) + " " + fileType, storage, null),
 					results,
 					-1,
 					errorCode
 			);
 		}
 		return createResults(
-				mAction,
+				action,
 				size,
-				buildStorageMessage("Successfully " + mActionVerbPast + " " + Integer.toString(passed) + " " + fileType, storage, null),
+				buildStorageMessage("Successfully " + actionVerbPast + " " + Integer.toString(passed) + " " + fileType, storage, null),
 				results,
 				-1,
 				0
@@ -361,21 +362,19 @@ abstract class StorageAction {
 		/**
 		 * Create a new instance of Create action with all necessary data initialized.
 		 */
-		Create(StorageImpl storage) {
+		Create(final StorageImpl storage) {
 			super(storage, Storage.ACTION_CREATE, "create", "created");
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.createFile(fromPath);
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.createDirectory(fromPath);
 		}
 	}
@@ -388,14 +387,13 @@ abstract class StorageAction {
 		/**
 		 * Create a new instance of Delete action with all necessary data initialized.
 		 */
-		Delete(StorageImpl storage) {
+		Delete(final StorageImpl storage) {
 			super(storage, Storage.ACTION_DELETE, "delete", "deleted");
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.deleteFile(fromPath);
 		}
 
@@ -415,21 +413,19 @@ abstract class StorageAction {
 		/**
 		 * Create a new instance of Copy action with all necessary data initialized.
 		 */
-		Copy(StorageImpl storage) {
+		Copy(final StorageImpl storage) {
 			super(storage, Storage.ACTION_COPY, "copy", "copied");
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.copyFile(flags, toPath, fromPath);
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.copyDirectory(flags, filter, nameFilter, toPath, fromPath);
 		}
 	}
@@ -442,21 +438,19 @@ abstract class StorageAction {
 		/**
 		 * Create a new instance of Move action with all necessary data initialized.
 		 */
-		Move(StorageImpl storage) {
+		Move(final StorageImpl storage) {
 			super(storage, Storage.ACTION_MOVE, "move", "moved");
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformFileAction(final int flags, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.moveFile(flags, toPath, fromPath);
 		}
 
 		/**
 		 */
-		@Override
-		boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
+		@Override boolean onPerformDirectoryAction(final int flags, final FileFilter filter, final FilenameFilter nameFilter, final String toPath, final String fromPath) throws IOException {
 			return StorageUtils.moveDirectory(flags, filter, nameFilter, toPath, fromPath);
 		}
 	}

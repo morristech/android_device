@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.storage;
 
@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * related operations.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public class StorageEditor {
 
@@ -55,7 +56,7 @@ public class StorageEditor {
 	 */
 	private static final String TAG = "StorageEditor";
 
-	/**
+	/*
 	 * Flags ---------------------------------------------------------------------------------------
 	 */
 
@@ -74,7 +75,7 @@ public class StorageEditor {
 	 */
 	public static final int COPY = 0x000000001 << 1;
 
-	/**
+	/*
 	 * ---------------------------------------------------------------------------------------------
 	 */
 
@@ -136,7 +137,7 @@ public class StorageEditor {
 	/**
 	 * Matcher to match file name and extract its type.
 	 */
-	private final Matcher mFileNameMatcher = Pattern.compile("^(.*)\\.(.+)$").matcher("");
+	private final Matcher fileNameMatcher = Pattern.compile("^(.*)\\.(.+)$").matcher("");
 
 	/*
 	 * Members =====================================================================================
@@ -158,8 +159,7 @@ public class StorageEditor {
 	 * @return New bytes buffer with size of the requested type or size of <b>1024</b> if there is no
 	 * such a buffer type.
 	 */
-	@NonNull
-	public static byte[] createBuffer(final int bufferType) {
+	@NonNull public static byte[] createBuffer(final int bufferType) {
 		switch (bufferType) {
 			case SMALL_BUFFER:
 			case MEDIUM_BUFFER:
@@ -504,8 +504,8 @@ public class StorageEditor {
 			return new File(filePath + suffix);
 		}
 		final String lastPathSegment = Uri.parse(filePath).getLastPathSegment();
-		if (mFileNameMatcher.reset(lastPathSegment).matches()) {
-			final String fileType = mFileNameMatcher.group(2);
+		if (fileNameMatcher.reset(lastPathSegment).matches()) {
+			final String fileType = fileNameMatcher.group(2);
 			// Remove the type suffix from path.
 			filePath = filePath.substring(0, filePath.length() - fileType.length() - 1);
 			return new File(filePath + suffix + "." + fileType);
