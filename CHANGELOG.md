@@ -1,10 +1,15 @@
 Change-Log
 ===============
-> Regular configuration update: _27.03.2018_
+> Regular configuration update: _01.06.2018_
 
 More **detailed changelog** for each respective version may be viewed by pressing on a desired _version's name_.
 
 ## Version 1.x ##
+
+### 1.0.3 ###
+> upcoming
+ 
+- Small updates and improvements.
 
 ### [1.0.2](https://github.com/universum-studios/android_device/releases/tag/v1.0.2) ###
 > 03.12.2017 

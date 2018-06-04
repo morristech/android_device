@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.connection;
 
@@ -102,6 +102,7 @@ import android.support.annotation.RequiresPermission;
  * </pre>
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public interface Connection {
 
@@ -113,6 +114,7 @@ public interface Connection {
 	 * Interface for provider that may be used to access implementation of {@link Connection}.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface Provider {
 
@@ -123,8 +125,7 @@ public interface Connection {
 		 *                data.
 		 * @return Connection implementation with actual connection data already available.
 		 */
-		@NonNull
-		Connection getConnection(@NonNull Context context);
+		@NonNull Connection getConnection(@NonNull Context context);
 	}
 
 	/**
@@ -134,9 +135,7 @@ public interface Connection {
 
 		/**
 		 */
-		@NonNull
-		@Override
-		public Connection getConnection(@NonNull final Context context) {
+		@Override @NonNull public Connection getConnection(@NonNull final Context context) {
 			return ConnectionImpl.getsInstance(context);
 		}
 	};
@@ -149,6 +148,7 @@ public interface Connection {
 	 * Listener that may be used to receive callback with info about changed network connection.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface OnConnectionListener {
 
@@ -195,6 +195,7 @@ public interface Connection {
 	 * {@link android.os.Build.VERSION_CODES#HONEYCOMB_MR2 API level 13} and higher.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	@SuppressWarnings("deprecation")
 	enum ConnectionType {
@@ -372,8 +373,7 @@ public interface Connection {
 		 * @return Resolved connection type instance or {@link ConnectionType#UNAVAILABLE} if there
 		 * is no connection type with the requested constant.
 		 */
-		@NonNull
-		public static ConnectionType resolve(final int systemConstant) {
+		@NonNull public static ConnectionType resolve(final int systemConstant) {
 			for (ConnectionType type : ConnectionType.values()) {
 				if (type.systemConstant == systemConstant) return type;
 			}
@@ -393,6 +393,7 @@ public interface Connection {
 	 *
 	 * @return {@code True} if some connection is established or will be established in a while,
 	 * {@code false} otherwise.
+	 *
 	 * @see #isConnected()
 	 * @see #getConnectionType()
 	 */
@@ -431,6 +432,7 @@ public interface Connection {
 	 *
 	 * @param connectionType Type of the connection of which the current state should be checked.
 	 * @return {@code True} if connection is established, {@code false} otherwise.
+	 *
 	 * @see #isConnectedOrConnecting(Connection.ConnectionType)
 	 */
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
@@ -454,25 +456,25 @@ public interface Connection {
 	 * @return One of {@link Connection.ConnectionType} values or  {@link Connection.ConnectionType#UNAVAILABLE}
 	 * if there is no connection currently available.
 	 */
-	@NonNull
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	ConnectionType getConnectionType();
+	@NonNull ConnectionType getConnectionType();
 
 	/**
 	 * Returns the current info about the requested <var>connectionType</var>.
 	 *
 	 * @param connectionType Type of the connection of which current info should be obtained.
 	 * @return Info of the requested connection type.
+	 *
 	 * @see #getConnectionType()
 	 */
-	@Nullable
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	NetworkInfo getConnectionInfo(@NonNull ConnectionType connectionType);
+	@Nullable NetworkInfo getConnectionInfo(@NonNull ConnectionType connectionType);
 
 	/**
 	 * Registers a callback to be invoked when some connection change occur.
 	 *
 	 * @param listener Callback to register.
+	 *
 	 * @see #registerConnectionReceiver(Context)
 	 */
 	void registerOnConnectionListener(@NonNull OnConnectionListener listener);
@@ -489,6 +491,7 @@ public interface Connection {
 	 * state.
 	 *
 	 * @param context The main activity of application.
+	 *
 	 * @see #registerOnConnectionListener(Connection.OnConnectionListener)
 	 * @see #unregisterConnectionReceiver(Context)
 	 */
@@ -505,6 +508,7 @@ public interface Connection {
 	 * Un-registers registered {@link ConnectionStateReceiver}.
 	 *
 	 * @param context Context in which was connection receiver registered before.
+	 *
 	 * @see #registerConnectionReceiver(Context)
 	 */
 	void unregisterConnectionReceiver(@NonNull Context context);

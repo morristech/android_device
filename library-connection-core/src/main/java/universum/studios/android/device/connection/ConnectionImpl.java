@@ -1,20 +1,20 @@
 /*
- * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
- * =================================================================================================
- *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
+ * *************************************************************************************************
+ *                                 Copyright 2016 Universum Studios
+ * *************************************************************************************************
+ *                  Licensed under the Apache License, Version 2.0 (the "License")
  * -------------------------------------------------------------------------------------------------
- * You may use this file only in compliance with the License. More details and copy of this License
- * you may obtain at
+ * You may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You can redistribute, modify or publish any part of the code written within this file but as it
- * is described in the License, the software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- * =================================================================================================
+ * *************************************************************************************************
  */
 package universum.studios.android.device.connection;
 
@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * A {@link Connection} implementation.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 final class ConnectionImpl implements Connection {
 
@@ -63,7 +64,7 @@ final class ConnectionImpl implements Connection {
 	/**
 	 * ConnectionImpl singleton instance.
 	 */
-	private static ConnectionImpl sInstance;
+	private static ConnectionImpl instance;
 
 	/*
 	 * Members =====================================================================================
@@ -72,27 +73,27 @@ final class ConnectionImpl implements Connection {
 	/**
 	 * Connectivity manager which provides current connection info.
 	 */
-	private final ConnectivityManager mConnectivityManager;
+	private final ConnectivityManager connectivityManager;
 
 	/**
 	 * Default connection receiver (broadcast receiver) to receive connection changes.
 	 */
-	private ConnectionStateReceiver mReceiver;
+	private ConnectionStateReceiver receiver;
 
 	/**
 	 * Flag indicating whether the {@link ConnectionStateReceiver} is already registered or not.
 	 */
-	private final AtomicBoolean mReceiverRegistered = new AtomicBoolean(false);
+	private final AtomicBoolean receiverRegistered = new AtomicBoolean(false);
 
 	/**
 	 * Current connection status.
 	 */
-	private ActualConnection mActualConnection = new ActualConnection(ConnectionType.UNAVAILABLE, false);
+	private ActualConnection actualConnection = new ActualConnection(ConnectionType.UNAVAILABLE, false);
 
 	/**
 	 * List of connection listeners.
 	 */
-	private final List<OnConnectionListener> mListeners = new ArrayList<>(2);
+	private final List<OnConnectionListener> listeners = new ArrayList<>(2);
 
 	/*
 	 * Constructors ================================================================================
@@ -104,7 +105,7 @@ final class ConnectionImpl implements Connection {
 	 * @param applicationContext Application context used to access system services.
 	 */
 	private ConnectionImpl(final Context applicationContext) {
-		this.mConnectivityManager = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		this.connectivityManager = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 
 	/*
@@ -117,72 +118,64 @@ final class ConnectionImpl implements Connection {
 	 * @param context Context used by the connection implementation to access system services.
 	 * @return Connection implementation with actual connection data available.
 	 */
-	@NonNull
-	static ConnectionImpl getsInstance(@NonNull final Context context) {
+	@NonNull static ConnectionImpl getsInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
-			if (sInstance == null) sInstance = new ConnectionImpl(context.getApplicationContext());
+			if (instance == null) instance = new ConnectionImpl(context.getApplicationContext());
 		}
-		return sInstance;
+		return instance;
 	}
 
 	/**
 	 */
-	@Override
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public boolean isConnectedOrConnecting() {
-		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+	@Override public boolean isConnectedOrConnecting() {
+		final NetworkInfo info = connectivityManager.getActiveNetworkInfo();
 		return info != null && info.isConnectedOrConnecting();
 	}
 
 	/**
 	 */
-	@Override
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public boolean isConnected() {
-		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+	@Override public boolean isConnected() {
+		final NetworkInfo info = connectivityManager.getActiveNetworkInfo();
 		return info != null && info.isConnected();
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("deprecation")
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public boolean isConnectedOrConnecting(@NonNull final ConnectionType connectionType) {
+	@Override public boolean isConnectedOrConnecting(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
-		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
+		final NetworkInfo info = connectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isConnectedOrConnecting();
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("deprecation")
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public boolean isConnected(@NonNull final ConnectionType connectionType) {
+	@Override public boolean isConnected(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
-		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
+		final NetworkInfo info = connectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isConnected();
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("deprecation")
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public boolean isAvailable(@NonNull final ConnectionType connectionType) {
+	@Override public boolean isAvailable(@NonNull final ConnectionType connectionType) {
 		// todo: Implement not deprecated approach ...
-		final NetworkInfo info = mConnectivityManager.getNetworkInfo(connectionType.systemConstant);
+		final NetworkInfo info = connectivityManager.getNetworkInfo(connectionType.systemConstant);
 		return info != null && info.isAvailable();
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public ConnectionType getConnectionType() {
-		final NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+	@Override @NonNull public ConnectionType getConnectionType() {
+		final NetworkInfo info = connectivityManager.getActiveNetworkInfo();
 		return info == null || !info.isConnected() ?
 				ConnectionType.UNAVAILABLE :
 				ConnectionType.resolve(info.getType());
@@ -190,43 +183,38 @@ final class ConnectionImpl implements Connection {
 
 	/**
 	 */
-	@Nullable
-	@Override
 	@SuppressWarnings("deprecation")
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	public NetworkInfo getConnectionInfo(@NonNull final ConnectionType type) {
+	@Override @Nullable public NetworkInfo getConnectionInfo(@NonNull final ConnectionType type) {
 		// todo: Implement not deprecated approach ...
-		return mConnectivityManager.getNetworkInfo(type.systemConstant);
+		return connectivityManager.getNetworkInfo(type.systemConstant);
 	}
 
 	/**
 	 */
-	@Override
-	public void registerOnConnectionListener(@NonNull final OnConnectionListener listener) {
-		synchronized (mListeners) {
-			if (!mListeners.contains(listener)) mListeners.add(listener);
+	@Override public void registerOnConnectionListener(@NonNull final OnConnectionListener listener) {
+		synchronized (listeners) {
+			if (!listeners.contains(listener)) listeners.add(listener);
 		}
 	}
 
 	/**
 	 */
-	@Override
-	public void unregisterOnConnectionListener(@NonNull final OnConnectionListener listener) {
-		synchronized (mListeners) {
-			mListeners.remove(listener);
+	@Override public void unregisterOnConnectionListener(@NonNull final OnConnectionListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
 		}
 	}
 
 	/**
 	 */
-	@Override
-	public void registerConnectionReceiver(@NonNull final Context context) {
+	@Override public void registerConnectionReceiver(@NonNull final Context context) {
 		synchronized (LOCK) {
-			if (!mReceiverRegistered.get()) {
-				this.mReceiverRegistered.set(true);
+			if (!receiverRegistered.get()) {
+				this.receiverRegistered.set(true);
 				context.registerReceiver(
-						mReceiver = new ConnectionStateReceiver(),
-						mReceiver.newIntentFilter()
+						receiver = new ConnectionStateReceiver(),
+						receiver.newIntentFilter()
 				);
 			}
 		}
@@ -234,20 +222,18 @@ final class ConnectionImpl implements Connection {
 
 	/**
 	 */
-	@Override
-	public boolean isConnectionReceiverRegistered() {
-		return mReceiverRegistered.get();
+	@Override public boolean isConnectionReceiverRegistered() {
+		return receiverRegistered.get();
 	}
 
 	/**
 	 */
-	@Override
-	public void unregisterConnectionReceiver(@NonNull final Context context) {
+	@Override public void unregisterConnectionReceiver(@NonNull final Context context) {
 		synchronized (LOCK) {
-			if (mReceiverRegistered.get()) {
-				context.unregisterReceiver(mReceiver);
-				this.mReceiverRegistered.set(false);
-				this.mReceiver = null;
+			if (receiverRegistered.get()) {
+				context.unregisterReceiver(receiver);
+				this.receiverRegistered.set(false);
+				this.receiver = null;
 			}
 		}
 	}
@@ -263,23 +249,23 @@ final class ConnectionImpl implements Connection {
 		if (isConnected()) {
 			final ConnectionType type = getConnectionType();
 			final ActualConnection connection = new ActualConnection(type, true);
-			if (!connection.equals(mActualConnection)) {
-				this.mActualConnection = connection;
+			if (!connection.equals(actualConnection)) {
+				this.actualConnection = connection;
 				final NetworkInfo info = getConnectionInfo(type);
-				synchronized (mListeners) {
-					if (!mListeners.isEmpty()) {
-						for (final OnConnectionListener listener : mListeners) {
+				synchronized (listeners) {
+					if (!listeners.isEmpty()) {
+						for (final OnConnectionListener listener : listeners) {
 							listener.onConnectionEstablished(context, type, info);
 						}
 					}
 				}
 			}
-		} else if (mActualConnection != null) {
-			final ConnectionType lostType = ConnectionType.values()[mActualConnection.type.ordinal()];
-			this.mActualConnection = new ActualConnection(ConnectionType.UNAVAILABLE, false);
-			synchronized (mListeners) {
-				if (!mListeners.isEmpty()) {
-					for (final OnConnectionListener listener : mListeners) {
+		} else if (actualConnection != null) {
+			final ConnectionType lostType = ConnectionType.values()[actualConnection.type.ordinal()];
+			this.actualConnection = new ActualConnection(ConnectionType.UNAVAILABLE, false);
+			synchronized (listeners) {
+				if (!listeners.isEmpty()) {
+					for (final OnConnectionListener listener : listeners) {
 						listener.onConnectionLost(context, lostType);
 					}
 				}
@@ -299,7 +285,7 @@ final class ConnectionImpl implements Connection {
 		/**
 		 * Connection type.
 		 */
-		ConnectionType type = ConnectionType.UNAVAILABLE;
+		ConnectionType type;
 
 		/**
 		 * Flag indicating whether the connection is established or not.
@@ -319,8 +305,7 @@ final class ConnectionImpl implements Connection {
 
 		/**
 		 */
-		@Override
-		public int hashCode() {
+		@Override public int hashCode() {
 			int hash = connected ? 1 : 0;
 			hash = 31 * hash + type.hashCode();
 			return hash;
@@ -328,8 +313,7 @@ final class ConnectionImpl implements Connection {
 
 		/**
 		 */
-		@Override
-		public boolean equals(@Nullable final Object other) {
+		@Override public boolean equals(@Nullable final Object other) {
 			if (other == this) return true;
 			if (!(other instanceof ActualConnection)) return false;
 			final ActualConnection connection = (ActualConnection) other;
