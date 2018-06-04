@@ -158,8 +158,7 @@ final class StorageImpl implements Storage {
 	 * @param context Context used by the storage implementation to access system services.
 	 * @return Storage implementation with actual storage data available.
 	 */
-	@NonNull
-	static StorageImpl getInstance(@NonNull final Context context) {
+	@NonNull static StorageImpl getInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
 			if (sInstance == null) sInstance = new StorageImpl(context.getApplicationContext());
 		}
@@ -168,17 +167,13 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result createFile(@NonNull final String path) {
+	@Override @NonNull public Result createFile(@NonNull final String path) {
 		return createFile(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result createFile(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public Result createFile(@StorageDir final int storage, @NonNull final String path) {
 		if (StorageUtils.directoryExists(appendBasePath(storage, path))) {
 			return StorageAction.createResult(
 					ACTION_CREATE,
@@ -193,33 +188,25 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results createFiles(@NonNull final String... paths) {
+	@Override @NonNull public Results createFiles(@NonNull final String... paths) {
 		return createFiles(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results createFiles(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public Results createFiles(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_CREATE.performFilesAction(storage, NO_FLAGS, "", paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result createDirectory(@NonNull final String path) {
+	@Override @NonNull public Result createDirectory(@NonNull final String path) {
 		return createDirectory(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result createDirectory(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public Result createDirectory(@StorageDir final int storage, @NonNull final String path) {
 		if (StorageUtils.directoryExists(appendBasePath(storage, path))) {
 			return StorageAction.createResult(
 					ACTION_CREATE,
@@ -234,411 +221,313 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results createDirectories(@NonNull final String... paths) {
+	@Override @NonNull public Results createDirectories(@NonNull final String... paths) {
 		return createDirectories(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results createDirectories(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public Results createDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_CREATE.performDirectoriesAction(storage, NO_FLAGS, null, null, "", paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteFile(@NonNull final String path) {
+	@Override @NonNull public Result deleteFile(@NonNull final String path) {
 		return deleteFile(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteFile(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public Result deleteFile(@StorageDir final int storage, @NonNull final String path) {
 		return SA_DELETE.performFileAction(storage, NO_FLAGS, "", path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteFiles(@NonNull final String... paths) {
+	@Override @NonNull public Results deleteFiles(@NonNull final String... paths) {
 		return deleteFiles(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteFiles(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public Results deleteFiles(@StorageDir final int storage, @NonNull final String... paths) {
 		return SA_DELETE.performFilesAction(storage, NO_FLAGS, "", paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteDirectory(@NonNull final String path) {
+	@Override @NonNull public Result deleteDirectory(@NonNull final String path) {
 		return deleteDirectory(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteDirectory(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public Result deleteDirectory(@StorageDir final int storage, @NonNull final String path) {
 		return deleteDirectory(storage, null, null, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
+	@Override @NonNull public Result deleteDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		return SA_DELETE.performDirectoryAction(storage, NO_FLAGS, filter, nameFilter, "", path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteDirectories(@NonNull final String... paths) {
+	@Override @NonNull public Results deleteDirectories(@NonNull final String... paths) {
 		return deleteDirectories(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteDirectories(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public Results deleteDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return deleteDirectories(storage, null, null, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
+	@Override @NonNull public Results deleteDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
 		return SA_DELETE.performDirectoriesAction(storage, NO_FLAGS, filter, nameFilter, "", paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteFileOrDirectory(@NonNull final String path) {
+	@Override @NonNull public Result deleteFileOrDirectory(@NonNull final String path) {
 		return deleteFileOrDirectory(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteFileOrDirectory(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public Result deleteFileOrDirectory(@StorageDir final int storage, @NonNull final String path) {
 		return deleteFileOrDirectory(storage, null, null, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result deleteFileOrDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
+	@Override @NonNull public Result deleteFileOrDirectory(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		return SA_DELETE.performFileOrDirectoryAction(storage, NO_FLAGS, filter, nameFilter, "", path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteFilesOrDirectories(@NonNull final String... paths) {
+	@Override @NonNull public Results deleteFilesOrDirectories(@NonNull final String... paths) {
 		return deleteFilesOrDirectories(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteFilesOrDirectories(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public Results deleteFilesOrDirectories(@StorageDir final int storage, @NonNull final String... paths) {
 		return deleteFilesOrDirectories(storage, null, null, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results deleteFilesOrDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
+	@Override @NonNull public Results deleteFilesOrDirectories(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths) {
 		return SA_DELETE.performFilesOrDirectoriesAction(storage, NO_FLAGS, filter, nameFilter, "", paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyFile(final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyFile(final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFile(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_COPY.performFileAction(storage, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFiles(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_DELETE.performFilesAction(storage, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyDirectory(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_DELETE.performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyDirectories(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_DELETE.performDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFileOrDirectory(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return copyFileOrDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result copyFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_COPY.performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFilesOrDirectories(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return copyFilesOrDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results copyFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_COPY.performFilesOrDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveFile(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveFile(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFile(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveFile(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performFileAction(storage, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveFiles(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFiles(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveFiles(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performFilesAction(storage, flags, toPath, fromPaths);
 	}
 
-	@NonNull
-	@Override
-	public Result moveDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	/**
+	 */
+	@Override @NonNull public Result moveDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveDirectory(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveDirectories(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
-	@NonNull
-	@Override
-	public Result moveFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	/**
+	 */
+	@Override @NonNull public Result moveFileOrDirectory(@Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFileOrDirectory(BASE, flags, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String fromPath) {
 		return moveFileOrDirectory(storage, flags, null, null, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
+	@Override @NonNull public Result moveFileOrDirectory(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String fromPath) {
 		return SA_MOVE.performFileOrDirectoryAction(storage, flags, filter, nameFilter, toPath, fromPath);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveFilesOrDirectories(@Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFilesOrDirectories(BASE, flags, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return moveFilesOrDirectories(storage, flags, null, null, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
+	@Override @NonNull public Results moveFilesOrDirectories(@StorageDir final int storage, @Flags final int flags, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @Nullable final String toPath, @NonNull final String... fromPaths) {
 		return SA_MOVE.performFilesOrDirectoriesAction(storage, flags, filter, nameFilter, toPath, fromPaths);
 	}
 
 	/**
 	 */
-	@Override
-	public boolean changeFilePermissions(@NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
+	@Override public boolean changeFilePermissions(@NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
 		return changeFilePermissions(BASE, path, permissions, ownerOnly);
 	}
 
 	/**
 	 */
-	@Override
-	public boolean changeFilePermissions(@StorageDir final int storage, @NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
+	@Override public boolean changeFilePermissions(@StorageDir final int storage, @NonNull final String path, @FilePermissions final int permissions, final boolean ownerOnly) {
 		final File file = this.newFile(storage, path);
 		if (file.isFile() && permissions > 0) {
 			if (file.setExecutable((permissions & PERMISSION_EXECUTE) != 0, ownerOnly) &&
@@ -653,38 +542,33 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@Override
-	public boolean hasFreeSpace(@StorageDir final int storage, final long bytes) {
+	@Override public boolean hasFreeSpace(@StorageDir final int storage, final long bytes) {
 		final File storageFile = getStorage(storage);
 		return storageFile != null && storageFile.getFreeSpace() >= bytes;
 	}
 
 	/**
 	 */
-	@Override
-	public long getFreeSpace(@StorageDir final int storage) {
+	@Override public long getFreeSpace(@StorageDir final int storage) {
 		final File storageFile = getStorage(storage);
 		return storageFile == null ? 0 : storageFile.getFreeSpace();
 	}
 
 	/**
 	 */
-	@Override
-	public boolean isExternalReadOnly() {
+	@Override public boolean isExternalReadOnly() {
 		return Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
 	}
 
 	/**
 	 */
-	@Override
-	public boolean isExternalMounted() {
+	@Override public boolean isExternalMounted() {
 		return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
 	}
 
 	/**
 	 */
-	@Override
-	public boolean isExternalAvailable() {
+	@Override public boolean isExternalAvailable() {
 		return checkExternalAvailability();
 	}
 
@@ -720,9 +604,7 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public String getStoragePath(@StorageDir final int storage) {
+	@Override @NonNull public String getStoragePath(@StorageDir final int storage) {
 		if (storage == BASE) {
 			return "";
 		}
@@ -732,9 +614,7 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@Nullable
-	@Override
-	public File getStorage(@StorageDir final int storage) {
+	@Override @Nullable public File getStorage(@StorageDir final int storage) {
 		switch (storage) {
 			case INTERNAL:
 				return mContext.getFilesDir();
@@ -802,34 +682,26 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public File getFile(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public File getFile(@StorageDir final int storage, @NonNull final String path) {
 		return this.newFile(storage, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public List<File> getDirectoryContent(@NonNull final String path) {
+	@Override @NonNull public List<File> getDirectoryContent(@NonNull final String path) {
 		return getDirectoryContent(BASE, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public List<File> getDirectoryContent(@StorageDir final int storage, @NonNull final String path) {
+	@Override @NonNull public List<File> getDirectoryContent(@StorageDir final int storage, @NonNull final String path) {
 		return getDirectoryContent(storage, null, null, path);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
 	@SuppressWarnings("unchecked")
-	public List<File> getDirectoryContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
+	@Override @NonNull public List<File> getDirectoryContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String path) {
 		final File dir = this.newFile(storage, path);
 		if (dir.isDirectory()) {
 			if (filter == null) {
@@ -896,25 +768,19 @@ final class StorageImpl implements Storage {
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public List<File> getDirectoriesContent(@NonNull final String... paths) {
+	@Override @NonNull public List<File> getDirectoriesContent(@NonNull final String... paths) {
 		return getDirectoriesContent(BASE, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public List<File> getDirectoriesContent(@StorageDir final int storage, @NonNull final String... paths) {
+	@Override @NonNull public List<File> getDirectoriesContent(@StorageDir final int storage, @NonNull final String... paths) {
 		return getDirectoriesContent(storage, null, null, paths);
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public List<File> getDirectoriesContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
+	@Override @NonNull public List<File> getDirectoriesContent(@StorageDir final int storage, @Nullable final FileFilter filter, @Nullable final FilenameFilter nameFilter, @NonNull final String... paths) {
 		final List<File> files = new ArrayList<>();
 		if (paths.length > 0) {
 			for (final String path : paths) {
