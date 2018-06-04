@@ -40,6 +40,7 @@ import android.view.WindowManager;
  * A {@link Screen} implementation.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 final class ScreenImpl implements Screen {
 
@@ -69,7 +70,7 @@ final class ScreenImpl implements Screen {
 	 * ScreenImpl singleton instance.
 	 */
 	@SuppressLint("StaticFieldLeak")
-	private static ScreenImpl sInstance;
+	private static ScreenImpl instance;
 
 	/*
 	 * Members =====================================================================================
@@ -78,73 +79,73 @@ final class ScreenImpl implements Screen {
 	/**
 	 * Display metrics.
 	 */
-	private final DisplayMetrics mMetrics = new DisplayMetrics();
+	private final DisplayMetrics metrics = new DisplayMetrics();
 
 	/**
 	 * Application context.
 	 */
-	private final Context mContext;
+	private final Context context;
 
 	/**
 	 * "Default" width of the current Android device's screen.
 	 */
-	private final int mWidth;
+	private final int width;
 
 	/**
 	 * "Default" height of the current Android device's screen.
 	 */
-	private final int mHeight;
+	private final int height;
 
 	/**
 	 * Window manager service.
 	 */
-	private final WindowManager mWindowManager;
+	private final WindowManager windowManager;
 
 	/**
 	 * Default orientation of the current Android device's screen.
 	 */
-	private final int mDefaultOrientation;
+	private final int defaultOrientation;
 
 	/**
 	 * Type of the current Android device's screen.
 	 */
-	private final ScreenType mType;
+	private final ScreenType type;
 
 	/**
 	 * Density of the current Android device's screen.
 	 */
-	private final ScreenDensity mDensity;
+	private final ScreenDensity density;
 
 	/**
 	 * Raw density of the current Android device's screen.
 	 */
-	private final int mRawDensity;
+	private final int rawDensity;
 
 	/**
 	 * Actual orientation of the current Android device's screen.
 	 */
-	private int mCurrentOrientation = ORIENTATION_UNSPECIFIED;
+	private int currentOrientation = ORIENTATION_UNSPECIFIED;
 
 	/**
 	 * Actual rotation of the current Android device's screen.
 	 */
-	private ScreenRotation mCurrentRotation = ScreenRotation.UNKNOWN;
+	private ScreenRotation currentRotation = ScreenRotation.UNKNOWN;
 
 	/**
 	 * Actual width of the current Android device's screen. Depends on the actual screen orientation.
 	 */
-	private int mCurrentWidth;
+	private int currentWidth;
 
 	/**
 	 * Actual height of the current Android device's screen. Depends on the actual screen orientation.
 	 */
-	private int mCurrentHeight;
+	private int currentHeight;
 
 	/**
 	 * Flag indicating whether the current Android device's screen orientation is currently locked or
 	 * not.
 	 */
-	private boolean mOrientationLocked;
+	private boolean orientationLocked;
 
 	/*
 	 * Constructors ================================================================================
@@ -156,86 +157,86 @@ final class ScreenImpl implements Screen {
 	 * @param applicationContext Application context used to access system services.
 	 */
 	private ScreenImpl(final Context applicationContext) {
-		this.mContext = applicationContext;
-		this.mWindowManager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);
+		this.context = applicationContext;
+		this.windowManager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);
 		this.refresh();
 		// Resolve default orientation.
-		switch (mCurrentRotation) {
+		switch (currentRotation) {
 			case ROTATION_0:
 			case ROTATION_180:
-				switch (mCurrentOrientation) {
+				switch (currentOrientation) {
 					case ORIENTATION_LANDSCAPE:
 					case ORIENTATION_REVERSE_LANDSCAPE:
-						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;
+						this.defaultOrientation = ORIENTATION_LANDSCAPE;
 						break;
 					case ORIENTATION_PORTRAIT:
 					case ORIENTATION_REVERSE_PORTRAIT:
-						this.mDefaultOrientation = ORIENTATION_PORTRAIT;
+						this.defaultOrientation = ORIENTATION_PORTRAIT;
 						break;
 					default:
-						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+						this.defaultOrientation = ORIENTATION_UNSPECIFIED;
 						break;
 				}
 				break;
 			case ROTATION_90:
 			case ROTATION_270:
-				switch (mCurrentOrientation) {
+				switch (currentOrientation) {
 					case ORIENTATION_LANDSCAPE:
 					case ORIENTATION_REVERSE_LANDSCAPE:
-						this.mDefaultOrientation = ORIENTATION_PORTRAIT;
+						this.defaultOrientation = ORIENTATION_PORTRAIT;
 						break;
 					case ORIENTATION_PORTRAIT:
 					case ORIENTATION_REVERSE_PORTRAIT:
-						this.mDefaultOrientation = ORIENTATION_LANDSCAPE;
+						this.defaultOrientation = ORIENTATION_LANDSCAPE;
 						break;
 					default:
-						this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+						this.defaultOrientation = ORIENTATION_UNSPECIFIED;
 						break;
 				}
 				break;
 			default:
-				this.mDefaultOrientation = ORIENTATION_UNSPECIFIED;
+				this.defaultOrientation = ORIENTATION_UNSPECIFIED;
 				break;
 		}
-		this.mDensity = ScreenDensity.resolve(mRawDensity = mMetrics.densityDpi);
+		this.density = ScreenDensity.resolve(rawDensity = metrics.densityDpi);
 		// Resolve screen type.
 		float defaultWidthDP, defaultHeightDP;
-		switch (mCurrentOrientation) {
+		switch (currentOrientation) {
 			case ORIENTATION_LANDSCAPE:
 			case ORIENTATION_REVERSE_LANDSCAPE:
-				defaultWidthDP = pixelToDP(mMetrics.heightPixels);
-				defaultHeightDP = pixelToDP(mMetrics.widthPixels);
+				defaultWidthDP = pixelToDP(metrics.heightPixels);
+				defaultHeightDP = pixelToDP(metrics.widthPixels);
 				break;
 			case ORIENTATION_PORTRAIT:
 			case ORIENTATION_REVERSE_PORTRAIT:
-				defaultWidthDP = pixelToDP(mMetrics.widthPixels);
-				defaultHeightDP = pixelToDP(mMetrics.heightPixels);
+				defaultWidthDP = pixelToDP(metrics.widthPixels);
+				defaultHeightDP = pixelToDP(metrics.heightPixels);
 				break;
 			case ORIENTATION_UNSPECIFIED:
 			default:
-				defaultWidthDP = pixelToDP(mMetrics.widthPixels);
-				defaultHeightDP = pixelToDP(mMetrics.heightPixels);
+				defaultWidthDP = pixelToDP(metrics.widthPixels);
+				defaultHeightDP = pixelToDP(metrics.heightPixels);
 				break;
 		}
-		this.mType = ScreenType.resolve(defaultWidthDP, defaultHeightDP);
+		this.type = ScreenType.resolve(defaultWidthDP, defaultHeightDP);
 		// Resolve actual screen metrics.
 		final boolean reverse;
-		switch (mDefaultOrientation) {
+		switch (defaultOrientation) {
 			case ORIENTATION_PORTRAIT:
-				reverse = mCurrentOrientation != ORIENTATION_PORTRAIT && mCurrentOrientation != ORIENTATION_REVERSE_PORTRAIT;
+				reverse = currentOrientation != ORIENTATION_PORTRAIT && currentOrientation != ORIENTATION_REVERSE_PORTRAIT;
 				break;
 			case ORIENTATION_LANDSCAPE:
-				reverse = mCurrentOrientation != ORIENTATION_LANDSCAPE && mCurrentOrientation != ORIENTATION_REVERSE_LANDSCAPE;
+				reverse = currentOrientation != ORIENTATION_LANDSCAPE && currentOrientation != ORIENTATION_REVERSE_LANDSCAPE;
 				break;
 			default:
 				reverse = false;
 				break;
 		}
 		// Initialize display actual width and height.
-		this.mCurrentWidth = mMetrics.widthPixels;
-		this.mCurrentHeight = mMetrics.heightPixels;
-		this.mWidth = reverse ? mCurrentHeight : mCurrentWidth;
-		this.mHeight = reverse ? mCurrentWidth : mCurrentHeight;
+		this.currentWidth = metrics.widthPixels;
+		this.currentHeight = metrics.heightPixels;
+		this.width = reverse ? currentHeight : currentWidth;
+		this.height = reverse ? currentWidth : currentHeight;
 	}
 
 	/**
@@ -244,51 +245,45 @@ final class ScreenImpl implements Screen {
 	 * @param context Context used by the screen implementation to access system services.
 	 * @return Screen implementation with actual screen data available.
 	 */
-	@NonNull
-	static ScreenImpl getsInstance(@NonNull final Context context) {
+	@NonNull static ScreenImpl getsInstance(@NonNull final Context context) {
 		synchronized (LOCK) {
-			if (sInstance == null) sInstance = new ScreenImpl(context.getApplicationContext());
+			if (instance == null) instance = new ScreenImpl(context.getApplicationContext());
 		}
-		return sInstance;
+		return instance;
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("deprecation")
-	public boolean isOn() {
-		final PowerManager power = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+	@Override public boolean isOn() {
+		final PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 		return power != null && power.isScreenOn();
 	}
 
 	/**
 	 */
-	@Override
 	@TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
-	public boolean isInteractive() {
-		final PowerManager power = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+	@Override public boolean isInteractive() {
+		final PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 		return power != null && power.isInteractive();
 	}
 
 	/**
 	 */
-	@Override
-	public boolean lockOrientation(@NonNull final Activity activity) {
+	@Override public boolean lockOrientation(@NonNull final Activity activity) {
 		return requestOrientation(activity, ORIENTATION_CURRENT);
 	}
 
 	/**
 	 */
-	@Override
-	public void unlockOrientation(@NonNull final Activity activity) {
+	@Override public void unlockOrientation(@NonNull final Activity activity) {
 		requestOrientation(activity, ORIENTATION_USER);
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("WrongConstant")
-	public boolean requestOrientation(@NonNull final Activity activity, @Orientation final int orientation) {
+	@Override public boolean requestOrientation(@NonNull final Activity activity, @Orientation final int orientation) {
 		switch (orientation) {
 			case ORIENTATION_CURRENT:
 				activity.setRequestedOrientation(getCurrentOrientation());
@@ -299,155 +294,119 @@ final class ScreenImpl implements Screen {
 				activity.setRequestedOrientation(orientation);
 				break;
 		}
-		return mOrientationLocked = (orientation != ORIENTATION_USER);
+		return orientationLocked = (orientation != ORIENTATION_USER);
 	}
 
 	/**
 	 */
-	@Override
-	@Orientation
 	@SuppressWarnings("ResourceType")
-	public int getRequestedOrientation(@NonNull final Activity activity) {
+	@Override @Orientation public int getRequestedOrientation(@NonNull final Activity activity) {
 		return activity.getRequestedOrientation();
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public Display getDisplay() {
-		return mWindowManager.getDefaultDisplay();
+	@Override @NonNull public Display getDisplay() {
+		return windowManager.getDefaultDisplay();
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	@IntRange(from = 0)
-	public int getWidth() {
-		return mWidth;
+	@Override @Px @IntRange(from = 0) public int getWidth() {
+		return width;
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	@IntRange(from = 0)
-	public int getHeight() {
-		return mHeight;
+	@Override @Px @IntRange(from = 0) public int getHeight() {
+		return height;
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	@IntRange(from = 0)
-	public int getCurrentWidth() {
+	@Override @Px @IntRange(from = 0) public int getCurrentWidth() {
 		refresh();
-		return mCurrentWidth;
+		return currentWidth;
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	@IntRange(from = 0)
-	public int getCurrentHeight() {
+	@Override @Px @IntRange(from = 0) public int getCurrentHeight() {
 		refresh();
-		return mCurrentHeight;
+		return currentHeight;
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public DisplayMetrics getMetrics() {
+	@Override @NonNull public DisplayMetrics getMetrics() {
 		refresh();
-		return mMetrics;
+		return metrics;
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public ScreenDensity getDensity() {
-		return mDensity;
+	@Override @NonNull public ScreenDensity getDensity() {
+		return density;
 	}
 
 	/**
 	 */
-	@Override
-	public int getRawDensity() {
-		return mRawDensity;
+	@Override public int getRawDensity() {
+		return rawDensity;
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public ScreenType getType() {
-		return mType;
+	@Override @NonNull public ScreenType getType() {
+		return type;
 	}
 
 	/**
 	 */
-	@Override
-	@Orientation
-	public int getCurrentOrientation() {
+	@Override @Orientation public int getCurrentOrientation() {
 		refresh();
-		return mCurrentOrientation;
+		return currentOrientation;
 	}
 
 	/**
 	 */
-	@Override
-	@Orientation
-	public int getDefaultOrientation() {
-		return mDefaultOrientation;
+	@Override @Orientation public int getDefaultOrientation() {
+		return defaultOrientation;
 	}
 
 	/**
 	 */
-	@NonNull
-	@Override
-	public ScreenRotation getCurrentRotation() {
+	@Override @NonNull public ScreenRotation getCurrentRotation() {
 		refresh();
-		return mCurrentRotation;
+		return currentRotation;
 	}
 
 	/**
 	 */
-	@Override
-	@FloatRange(from = 0)
-	public float getDiagonalDistanceInInches() {
+	@Override @FloatRange(from = 0) public float getDiagonalDistanceInInches() {
 		refresh();
 		// Calculation in inches will depends on the exact pixel per inch in each axis (x and y) of the device display.
-		return (float) Math.sqrt(Math.pow((mWidth / mMetrics.xdpi), 2) + Math.pow((mHeight / mMetrics.ydpi), 2));
+		return (float) Math.sqrt(Math.pow((width / metrics.xdpi), 2) + Math.pow((height / metrics.ydpi), 2));
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	@IntRange(from = 0)
 	@SuppressWarnings("SuspiciousNameCombination")
-	public int getDiagonalDistanceInPixels() {
+	@Override @Px @IntRange(from = 0) public int getDiagonalDistanceInPixels() {
 		refresh();
-		return Math.round((float) Math.sqrt(Math.pow(mWidth, 2) + Math.pow(mHeight, 2)));
+		return Math.round((float) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)));
 	}
 
 	/**
 	 */
-	@Override
-	public float getRefreshRate() {
+	@Override public float getRefreshRate() {
 		return getDisplay().getRefreshRate();
 	}
 
 	/**
 	 */
-	@Override
 	@SuppressWarnings("ResourceType")
-	public int getBrightness(@NonNull final Activity activity) {
+	@Override public int getBrightness(@NonNull final Activity activity) {
 		final Window window = activity.getWindow();
 		// Get the brightness from the current application window settings.
 		return Math.round(window.getAttributes().screenBrightness * 100);
@@ -455,8 +414,7 @@ final class ScreenImpl implements Screen {
 
 	/**
 	 */
-	@Override
-	public void setBrightness(@NonNull final Activity activity, @IntRange(from = 0, to = 100) final int brightness) {
+	@Override public void setBrightness(@NonNull final Activity activity, @IntRange(from = 0, to = 100) final int brightness) {
 		if (brightness < 0 || brightness > 100) {
 			throw new IllegalArgumentException("Brightness value(" + brightness + ") is out of the range [0, 100].");
 		}
@@ -470,11 +428,10 @@ final class ScreenImpl implements Screen {
 
 	/**
 	 */
-	@Override
-	public int getSystemBrightness() {
+	@Override public int getSystemBrightness() {
 		float brightness = 0;
 		try {
-			brightness = System.getInt(mContext.getContentResolver(), System.SCREEN_BRIGHTNESS);
+			brightness = System.getInt(context.getContentResolver(), System.SCREEN_BRIGHTNESS);
 		} catch (SettingNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -483,36 +440,31 @@ final class ScreenImpl implements Screen {
 
 	/**
 	 */
-	@Override
-	public boolean isOrientationLocked() {
-		return mOrientationLocked;
+	@Override public boolean isOrientationLocked() {
+		return orientationLocked;
 	}
 
 	/**
 	 */
-	@Override
-	public float pixelToDP(@Px final int pixel) {
+	@Override public float pixelToDP(@Px final int pixel) {
 		// From the Android developers documentation:
 		// px = dp * (dpi / 160)
 		// So modified equation is:
 		// dp = px / (dpi / 160)
-		return pixel / (mDensity.value / 160);
+		return pixel / (density.value / 160);
 	}
 
 	/**
 	 */
-	@Px
-	@Override
-	public int dpToPixel(final float dp) {
+	@Override @Px public int dpToPixel(final float dp) {
 		// From the Android developers documentation:
 		// px = dp * (dpi / 160)
-		return Math.round(dp * (mDensity.value / 160));
+		return Math.round(dp * (density.value / 160));
 	}
 
 	/**
 	 */
-	@Override
-	public float getScreenDP() {
+	@Override public float getScreenDP() {
 		// From the Android developers documentation:
 		// The density-independent pixel is equivalent to one physical pixel on
 		// a 160 dpi screen, which is the baseline density assumed by the system
@@ -521,7 +473,7 @@ final class ScreenImpl implements Screen {
 		// So modified equation is:
 		// dp = px / (dpi / 160)
 		// and finally to determine for 1 px:
-		return mDensity.value / 160;
+		return density.value / 160;
 	}
 
 	/**
@@ -529,10 +481,10 @@ final class ScreenImpl implements Screen {
 	 * the current data are requested.
 	 */
 	private void refresh() {
-		getDisplay().getMetrics(mMetrics);
+		getDisplay().getMetrics(metrics);
 		// Refresh when:
 		// 1) screen orientation change occurred
-		if (mCurrentWidth != mMetrics.widthPixels || mCurrentHeight != mMetrics.heightPixels) {
+		if (currentWidth != metrics.widthPixels || currentHeight != metrics.heightPixels) {
 			onRefresh();
 		}
 	}
@@ -544,11 +496,11 @@ final class ScreenImpl implements Screen {
 	private void onRefresh() {
 		// Update orientation to the actual. This call also updates the screen rotation.
 		int orientation = ORIENTATION_UNSPECIFIED;
-		this.mCurrentRotation = ScreenRotation.resolve(getDisplay().getRotation());
-		switch (mContext.getResources().getConfiguration().orientation) {
+		this.currentRotation = ScreenRotation.resolve(getDisplay().getRotation());
+		switch (context.getResources().getConfiguration().orientation) {
 			case Configuration.ORIENTATION_LANDSCAPE:
 				// Check screen rotation.
-				switch (mCurrentRotation) {
+				switch (currentRotation) {
 					case ROTATION_0:
 						// Tablet in landscape mode.
 					case ROTATION_90:
@@ -568,7 +520,7 @@ final class ScreenImpl implements Screen {
 				break;
 			case Configuration.ORIENTATION_PORTRAIT:
 				// Check screen rotation.
-				switch (mCurrentRotation) {
+				switch (currentRotation) {
 					case ROTATION_0:
 						// Phone in portrait mode.
 					case ROTATION_270:
@@ -591,10 +543,10 @@ final class ScreenImpl implements Screen {
 				// Nothing to refresh.
 				break;
 		}
-		this.mCurrentOrientation = orientation;
+		this.currentOrientation = orientation;
 		// Get screen metrics to handle actual ones.
-		this.mCurrentWidth = mMetrics.widthPixels;
-		this.mCurrentHeight = mMetrics.heightPixels;
+		this.currentWidth = metrics.widthPixels;
+		this.currentHeight = metrics.heightPixels;
 	}
 
 	/*

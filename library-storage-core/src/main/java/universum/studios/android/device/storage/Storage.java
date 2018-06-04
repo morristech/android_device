@@ -110,6 +110,7 @@ import java.util.List;
  * </ul>
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public interface Storage {
 
@@ -121,6 +122,7 @@ public interface Storage {
 	 * Interface for provider that may be used to access implementation of {@link Storage}.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface Provider {
 
@@ -130,8 +132,7 @@ public interface Storage {
 		 * @param context Context used by the storage implementation to access actual storage data.
 		 * @return Storage implementation with actual storage data already available.
 		 */
-		@NonNull
-		Storage getStorage(@NonNull Context context);
+		@NonNull Storage getStorage(@NonNull Context context);
 	}
 
 	/**
@@ -141,9 +142,7 @@ public interface Storage {
 
 		/**
 		 */
-		@NonNull
-		@Override
-		public Storage getStorage(@NonNull final Context context) {
+		@Override @NonNull public Storage getStorage(@NonNull final Context context) {
 			return StorageImpl.getInstance(context);
 		}
 	};
@@ -179,10 +178,9 @@ public interface Storage {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef(flag = true, value = {DEFAULT, OVERWRITE, COPY})
-	@interface Flags {
-	}
+	@interface Flags {}
 
-	/**
+	/*
 	 * Permissions ---------------------------------------------------------------------------------
 	 */
 
@@ -228,10 +226,9 @@ public interface Storage {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef(flag = true, value = {PERMISSION_READ, PERMISSION_WRITE, PERMISSION_EXECUTE})
-	@interface FilePermissions {
-	}
+	@interface FilePermissions {}
 
-	/**
+	/*
 	 * Storage identifiers -------------------------------------------------------------------------
 	 */
 
@@ -314,10 +311,9 @@ public interface Storage {
 	 */
 	@Retention(RetentionPolicy.SOURCE)
 	@IntDef({BASE, ROOT, DATA, CACHE, INTERNAL, EXTERNAL, EXTERNAL_PACKAGE})
-	@interface StorageDir {
-	}
+	@interface StorageDir {}
 
-	/**
+	/*
 	 * Actions -------------------------------------------------------------------------------------
 	 */
 
@@ -353,7 +349,7 @@ public interface Storage {
 	 */
 	int ACTION_MOVE = 0x04;
 
-	/**
+	/*
 	 * Error codes ---------------------------------------------------------------------------------
 	 */
 
@@ -432,7 +428,7 @@ public interface Storage {
 	 */
 	int ERROR_DIRECTORY_SAME_AS_FILE = -0x13;
 
-	/**
+	/*
 	 * ---------------------------------------------------------------------------------------------
 	 */
 
@@ -450,6 +446,7 @@ public interface Storage {
 	 * Represents unit to measure files on an Android device's file system.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	enum Unit {
 
@@ -625,8 +622,7 @@ public interface Storage {
 	/**
 	 * Same as {@link #createFile(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result createFile(@NonNull String path);
+	@NonNull Result createFile(@NonNull String path);
 
 	/**
 	 * Creates a <b>file</b> with the given <var>path</var> on this Android device's storage.
@@ -639,14 +635,12 @@ public interface Storage {
 	 * @param path    The path to the file which should be created.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result createFile(@StorageDir int storage, @NonNull String path);
+	@NonNull Result createFile(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Same as {@link #createFiles(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results createFiles(@NonNull String... paths);
+	@NonNull Results createFiles(@NonNull String... paths);
 
 	/**
 	 * Creates all <b>files</b> with the given <var>paths</var> on this Android device's storage.
@@ -657,14 +651,12 @@ public interface Storage {
 	 * @param paths Set of paths of files which should be created.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results createFiles(@StorageDir int storage, @NonNull String... paths);
+	@NonNull Results createFiles(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Same as {@link #createDirectory(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result createDirectory(@NonNull String path);
+	@NonNull Result createDirectory(@NonNull String path);
 
 	/**
 	 * Creates a <b>directory</b> with the given <var>path</var> on this Android device's storage.
@@ -677,14 +669,12 @@ public interface Storage {
 	 * @param path    The path to the directory which should be created.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result createDirectory(@StorageDir int storage, @NonNull String path);
+	@NonNull Result createDirectory(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Same as {@link #createDirectories(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results createDirectories(@NonNull String... paths);
+	@NonNull Results createDirectories(@NonNull String... paths);
 
 	/**
 	 * Creates all <b>directories</b> with the given <var>paths</var> on this Android device's storage.
@@ -695,14 +685,12 @@ public interface Storage {
 	 * @param paths Set of paths of directories which should be created.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results createDirectories(@StorageDir int storage, @NonNull String... paths);
+	@NonNull Results createDirectories(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Same as {@link #deleteFile(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result deleteFile(@NonNull String path);
+	@NonNull Result deleteFile(@NonNull String path);
 
 	/**
 	 * Deletes a file at the given <var>path</var> from this Android device's storage.
@@ -715,14 +703,12 @@ public interface Storage {
 	 * @param path    The path to the file which should be deleted.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result deleteFile(@StorageDir int storage, @NonNull String path);
+	@NonNull Result deleteFile(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Same as {@link #deleteFiles(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results deleteFiles(@NonNull String... paths);
+	@NonNull Results deleteFiles(@NonNull String... paths);
 
 	/**
 	 * Deletes all files at the given <var>paths</var> from this Android device's storage.
@@ -733,21 +719,18 @@ public interface Storage {
 	 * @param paths Set of paths to files which should be deleted.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results deleteFiles(@StorageDir int storage, @NonNull String... paths);
+	@NonNull Results deleteFiles(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Same as {@link #deleteDirectory(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result deleteDirectory(@NonNull String path);
+	@NonNull Result deleteDirectory(@NonNull String path);
 
 	/**
 	 * Same as {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)} with {@code null}
 	 * filters.
 	 */
-	@NonNull
-	Result deleteDirectory(@StorageDir int storage, @NonNull String path);
+	@NonNull Result deleteDirectory(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Deletes a directory at the given <var>path</var> from this Android device's storage.
@@ -773,21 +756,18 @@ public interface Storage {
 	 *                   should be deleted.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result deleteDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+	@NonNull Result deleteDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
 
 	/**
 	 * Same as {@link #deleteDirectories(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results deleteDirectories(@NonNull String... paths);
+	@NonNull Results deleteDirectories(@NonNull String... paths);
 
 	/**
 	 * Same as {@link #deleteDirectories(int, FileFilter, FilenameFilter, String...)} with {@code null}
 	 * filters.
 	 */
-	@NonNull
-	Results deleteDirectories(@StorageDir int storage, @NonNull String... paths);
+	@NonNull Results deleteDirectories(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Deletes all directories at the given <var>paths</var> from this Android device's storage.
@@ -798,55 +778,47 @@ public interface Storage {
 	 * @param paths Set of paths to directories which should be deleted.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results deleteDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+	@NonNull Results deleteDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
 
 	/**
 	 * Same as {@link #deleteFileOrDirectory(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result deleteFileOrDirectory(@NonNull String path);
+	@NonNull Result deleteFileOrDirectory(@NonNull String path);
 
 	/**
 	 * Same as {@link #deleteFileOrDirectory(int, FileFilter, FilenameFilter, String)} with
 	 * {@code null} filters.
 	 */
-	@NonNull
-	Result deleteFileOrDirectory(@StorageDir int storage, @NonNull String path);
+	@NonNull Result deleteFileOrDirectory(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Performs {@link #deleteFile(int, String)} or {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}
 	 * depends on whether the given <var>path</var> points to a file or to a directory.
 	 */
-	@NonNull
-	Result deleteFileOrDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+	@NonNull Result deleteFileOrDirectory(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
 
 	/**
 	 * Same as {@link #deleteFilesOrDirectories(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results deleteFilesOrDirectories(@NonNull String... paths);
+	@NonNull Results deleteFilesOrDirectories(@NonNull String... paths);
 
 	/**
 	 * Same as {@link #deleteFilesOrDirectories(int, FileFilter, FilenameFilter, String...)} with
 	 * {@code null} filters.
 	 */
-	@NonNull
-	Results deleteFilesOrDirectories(@StorageDir int storage, @NonNull String... paths);
+	@NonNull Results deleteFilesOrDirectories(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Performs {@link #deleteFile(int, String)} or {@link #deleteDirectory(int, FileFilter, FilenameFilter, String)}
 	 * for each of the given <var>paths</var> depends on whether the iterated path points to a file
 	 * or to a directory.
 	 */
-	@NonNull
-	Results deleteFilesOrDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+	@NonNull Results deleteFilesOrDirectories(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
 
 	/**
 	 * Same as {@link #copyFile(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result copyFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Copies a file from the given <var>fromPath</var> to the given <var>toPath</var> on this Android
@@ -865,14 +837,12 @@ public interface Storage {
 	 * @param fromPath The path to the file which should be copied.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result copyFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #copyFiles(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results copyFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Copies all files at the given <var>fromPaths</var> on this Android device's storage.
@@ -883,21 +853,18 @@ public interface Storage {
 	 * @param fromPaths Set of paths to files which should be copied.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results copyFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #copyFile(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result copyDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
 	 * {@code null} filters, so whole content of the requested directory will be copied.
 	 */
-	@NonNull
-	Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Copies a directory from the given <var>fromPath</var> to the given <var>toPath</var> on this
@@ -928,21 +895,18 @@ public interface Storage {
 	 * @param fromPath   The path to the directory which or of which filtered files should be copied.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #copyDirectories(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results copyDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #copyDirectories(int, int, FileFilter, FilenameFilter, String, String...)} with
 	 * {@code null} filters, so whole content of the requested directories will be copied.
 	 */
-	@NonNull
-	Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Copies all directories at the given <var>fromPaths</var> on this Android device's storage.
@@ -953,55 +917,47 @@ public interface Storage {
 	 * @param fromPaths Set of paths to directories which should be copied.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #copyFileOrDirectory(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result copyFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #copyFileOrDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
 	 * {@code null} filters.
 	 */
-	@NonNull
-	Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Performs {@link #copyFile(int, int, String, String)} or {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}
 	 * depends on whether the given <var>fromPath</var> points to a file or to a directory.
 	 */
-	@NonNull
-	Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result copyFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #copyFilesOrDirectories(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results copyFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #copyFilesOrDirectories(int, int, FileFilter, FilenameFilter, String, String...)}
 	 * with {@code null} filters.
 	 */
-	@NonNull
-	Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Performs {@link #copyFile(int, int, String, String)} or {@link #copyDirectory(int, int, FileFilter, FilenameFilter, String, String)}
 	 * for each of the given <var>fromPaths</var> depends on whether the iterated path points to a file
 	 * or to a directory.
 	 */
-	@NonNull
-	Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results copyFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #moveFile(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result moveFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveFile(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Moves a file from the given <var>fromPath</var> to the given <var>toPath</var> on this Android
@@ -1019,14 +975,12 @@ public interface Storage {
 	 * @param fromPath The path to the file which should be copied.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result moveFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveFile(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #moveFiles(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results moveFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveFiles(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Moves all files at the given <var>fromPaths</var> on this Android device's storage.
@@ -1037,21 +991,18 @@ public interface Storage {
 	 * @param fromPaths Set of paths to files which should be moved.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results moveFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveFiles(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #moveFile(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result moveDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
 	 * {@code null} filters, so whole content of the requested directory will be copied.
 	 */
-	@NonNull
-	Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Moves a directory from the given <var>fromPath</var> to the given <var>toPath</var> on this
@@ -1081,21 +1032,18 @@ public interface Storage {
 	 * @param fromPath   The path to the directory which or of which filtered files should be moved.
 	 * @return Result data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #moveDirectories(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results moveDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #moveDirectories(int, int, FileFilter, FilenameFilter, String, String...)} with
 	 * {@code null} filters, so whole content of the requested directories will be copied.
 	 */
-	@NonNull
-	Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Moves all directories at the given <var>fromPaths</var> on this Android device's storage.
@@ -1106,49 +1054,42 @@ public interface Storage {
 	 * @param fromPaths Set of paths to directories which should be moved.
 	 * @return Results data for this action to identify whether this action succeeded or failed.
 	 */
-	@NonNull
-	Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #moveFileOrDirectory(int, int, String, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Result moveFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveFileOrDirectory(@Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #moveFileOrDirectory(int, int, FileFilter, FilenameFilter, String, String)} with
 	 * {@code null} filters.
 	 */
-	@NonNull
-	Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Performs {@link #moveFile(int, int, String, String)} or {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)}
 	 * depends on whether the given <var>fromPath</var> points to a file or to a directory.
 	 */
-	@NonNull
-	Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
+	@NonNull Result moveFileOrDirectory(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String fromPath);
 
 	/**
 	 * Same as {@link #moveFilesOrDirectories(int, int, String, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	Results moveFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveFilesOrDirectories(@Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #moveFilesOrDirectories(int, int, FileFilter, FilenameFilter, String, String...)}
 	 * with {@code null} filters.
 	 */
-	@NonNull
-	Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Performs {@link #moveFile(int, int, String, String)} or {@link #moveDirectory(int, int, FileFilter, FilenameFilter, String, String)}
 	 * for each of the given <var>fromPaths</var> depends on whether the iterated path points to a file
 	 * or to a directory.
 	 */
-	@NonNull
-	Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
+	@NonNull Results moveFilesOrDirectories(@StorageDir int storage, @Flags int flags, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @Nullable String toPath, @NonNull String... fromPaths);
 
 	/**
 	 * Same as {@link #changeFilePermissions(int, String, int, boolean)} for {@link #BASE} storage.
@@ -1252,16 +1193,14 @@ public interface Storage {
 	 * @return The directory for the desired storage, or {@code null} unknown storage type was
 	 * requested.
 	 */
-	@Nullable
-	File getStorage(@StorageDir int storage);
+	@Nullable File getStorage(@StorageDir int storage);
 
 	/**
 	 * Returns a path obtained from the requested storage by {@link #getStorage(int) getStorage(int).getPath()}.
 	 *
 	 * @return The path of the requested storage type.
 	 */
-	@NonNull
-	String getStoragePath(@StorageDir int storage);
+	@NonNull String getStoragePath(@StorageDir int storage);
 
 	/**
 	 * Returns a file eventually stored on the specified <var>storage</var>.
@@ -1276,21 +1215,18 @@ public interface Storage {
 	 * @return A new instance of File with the path created from the path of the given <var>storage</var>
 	 * appended by the given relative file <var>path</var>.
 	 */
-	@NonNull
-	File getFile(@StorageDir int storage, @NonNull String path);
+	@NonNull File getFile(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Same as {@link #getDirectoryContent(int, String)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	List<File> getDirectoryContent(@NonNull String path);
+	@NonNull List<File> getDirectoryContent(@NonNull String path);
 
 	/**
 	 * Same as {@link #getDirectoryContent(int, FileFilter, FilenameFilter, String)}
 	 * with {@code null} filters.
 	 */
-	@NonNull
-	List<File> getDirectoryContent(@StorageDir int storage, @NonNull String path);
+	@NonNull List<File> getDirectoryContent(@StorageDir int storage, @NonNull String path);
 
 	/**
 	 * Lists all files stored within a directory at the given <var>path</var> on this Android device's
@@ -1311,21 +1247,18 @@ public interface Storage {
 	 * the specified path doesn't exists or is not a directory or just none file passes through the
 	 * given filters.
 	 */
-	@NonNull
-	List<File> getDirectoryContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
+	@NonNull List<File> getDirectoryContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String path);
 
 	/**
 	 * Same as {@link #getDirectoriesContent(int, String...)} for {@link #BASE} storage.
 	 */
-	@NonNull
-	List<File> getDirectoriesContent(@NonNull String... paths);
+	@NonNull List<File> getDirectoriesContent(@NonNull String... paths);
 
 	/**
 	 * Same as {@link #getDirectoriesContent(int, FileFilter, FilenameFilter, String...)}
 	 * with {@code null} filters.
 	 */
-	@NonNull
-	List<File> getDirectoriesContent(@StorageDir int storage, @NonNull String... paths);
+	@NonNull List<File> getDirectoriesContent(@StorageDir int storage, @NonNull String... paths);
 
 	/**
 	 * Lists all files stored within directories at the given <var>paths</var> on this Android
@@ -1338,8 +1271,7 @@ public interface Storage {
 	 * @return List with all files obtained from {@link #getDirectoryContent(int, FileFilter, FilenameFilter, String)}
 	 * for each of the given <var>paths</var>.
 	 */
-	@NonNull
-	List<File> getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
+	@NonNull List<File> getDirectoriesContent(@StorageDir int storage, @Nullable FileFilter filter, @Nullable FilenameFilter nameFilter, @NonNull String... paths);
 
 	/*
 	 * Inner classes ===============================================================================
@@ -1404,14 +1336,16 @@ public interface Storage {
 	/**
 	 * This class represents structure for result which will be returned by this storage API when
 	 * invoking some of its methods which accepts only <b>single path</b> as parameter.
+	 *
+	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	final class Result extends BaseResult {
 
 		/**
 		 * The path passed to the method for which was this result created.
 		 */
-		@NonNull
-		public final String path;
+		@NonNull public final String path;
 
 		/**
 		 * Creates a new instance of Result like {@link BaseResult#BaseResult(int, String, int, int)}.
@@ -1428,6 +1362,9 @@ public interface Storage {
 	 * This class represents structure for result which will be returned by this storage API when
 	 * invoking some of its methods which accepts set of <b>paths</b> as parameter so when requesting
 	 * a bulk storage operation.
+	 *
+	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	final class Results extends BaseResult {
 
@@ -1444,8 +1381,7 @@ public interface Storage {
 		 * <p>
 		 * This list of results will be always the same size as the size of provided paths.
 		 */
-		@NonNull
-		public final List<Result> results;
+		@NonNull public final List<Result> results;
 
 		/**
 		 * Creates a new instance of Results like {@link BaseResult#BaseResult(int, String, int, int)}.

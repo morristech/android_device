@@ -72,6 +72,7 @@ import java.lang.annotation.RetentionPolicy;
  * </ul>
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public interface Screen {
 
@@ -83,6 +84,7 @@ public interface Screen {
 	 * Interface for provider that may be used to access implementation of {@link Screen}.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
 	 */
 	interface Provider {
 
@@ -92,8 +94,7 @@ public interface Screen {
 		 * @param context Context used by the screen implementation to access actual screen data.
 		 * @return Screen implementation with actual screen data already available.
 		 */
-		@NonNull
-		Screen getScreen(@NonNull Context context);
+		@NonNull Screen getScreen(@NonNull Context context);
 	}
 
 	/**
@@ -103,9 +104,7 @@ public interface Screen {
 
 		/**
 		 */
-		@NonNull
-		@Override
-		public Screen getScreen(@NonNull final Context context) {
+		@Override @NonNull public Screen getScreen(@NonNull final Context context) {
 			return ScreenImpl.getsInstance(context);
 		}
 	};
@@ -186,8 +185,7 @@ public interface Screen {
 			ORIENTATION_REVERSE_LANDSCAPE, ORIENTATION_REVERSE_PORTRAIT,
 			ORIENTATION_FULL_SENSOR
 	})
-	@interface Orientation {
-	}
+	@interface Orientation {}
 
 	/*
 	 * Enums =======================================================================================
@@ -197,6 +195,8 @@ public interface Screen {
 	 * Represents density of the Android device's screen.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
+	 *
 	 * @see #resolve(float)
 	 */
 	enum ScreenDensity {
@@ -287,8 +287,7 @@ public interface Screen {
 		 * @return Resolved screen density instance or {@link ScreenDensity#UNKNOWN} if there is no
 		 * screen density with the requested density value.
 		 */
-		@NonNull
-		public static ScreenDensity resolve(float densityDpi) {
+		@NonNull public static ScreenDensity resolve(float densityDpi) {
 			for (ScreenDensity density : values()) {
 				if ((densityDpi + DENSITY_CHECK_OFFSET) >= density.value && (densityDpi - DENSITY_CHECK_OFFSET) <= density.value) return density;
 			}
@@ -300,6 +299,8 @@ public interface Screen {
 	 * Represents type of the Android device's screen.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
+	 *
 	 * @see #resolve(float, float)
 	 */
 	enum ScreenType {
@@ -378,8 +379,7 @@ public interface Screen {
 		 * @return Resolved screen type instance or {@link ScreenType#UNKNOWN} if there is no screen
 		 * type with the given dimensions specified.
 		 */
-		@NonNull
-		public static ScreenType resolve(final float widthDp, final float heightDp) {
+		@NonNull public static ScreenType resolve(final float widthDp, final float heightDp) {
 			for (ScreenType type : REVERSED_VALUES) {
 				if (widthDp >= type.nativeWidthDp && heightDp >= type.nativeHeightDp) return type;
 			}
@@ -393,6 +393,8 @@ public interface Screen {
 	 * <b>Note: </b>there is difference between tablet default rotation and phone default rotation.
 	 *
 	 * @author Martin Albedinsky
+	 * @since 1.0
+	 *
 	 * @see #resolve(int)
 	 */
 	enum ScreenRotation {
@@ -469,8 +471,7 @@ public interface Screen {
 		 * @return Resolved screen rotation instance or {@link ScreenRotation#UNKNOWN} if there is
 		 * no screen rotation with the requested constant.
 		 */
-		@NonNull
-		public static ScreenRotation resolve(final int systemConstant) {
+		@NonNull public static ScreenRotation resolve(final int systemConstant) {
 			for (ScreenRotation rotation : values()) {
 				if (rotation.systemConstant == systemConstant) return rotation;
 			}
@@ -504,26 +505,21 @@ public interface Screen {
 	 *
 	 * @return The default display obtained by {@link android.view.WindowManager#getDefaultDisplay()}.
 	 */
-	@NonNull
-	Display getDisplay();
+	@NonNull Display getDisplay();
 
 	/**
 	 * Returns the "default" width of the Android device's screen.
 	 *
 	 * @return Screen width in pixels.
 	 */
-	@Px
-	@IntRange(from = 0)
-	int getWidth();
+	@Px @IntRange(from = 0) int getWidth();
 
 	/**
 	 * Returns the "default" height of the Android device's screen.
 	 *
 	 * @return Screen height in pixels.
 	 */
-	@Px
-	@IntRange(from = 0)
-	int getHeight();
+	@Px @IntRange(from = 0) int getHeight();
 
 	/**
 	 * Returns the current width of the Android device's screen, which depends on the current screen
@@ -531,9 +527,7 @@ public interface Screen {
 	 *
 	 * @return Screen current width in pixels.
 	 */
-	@Px
-	@IntRange(from = 0)
-	int getCurrentWidth();
+	@Px @IntRange(from = 0) int getCurrentWidth();
 
 	/**
 	 * Returns the current height of the Android device's screen, which depends on the current screen
@@ -541,27 +535,24 @@ public interface Screen {
 	 *
 	 * @return Screen current height in pixels.
 	 */
-	@Px
-	@IntRange(from = 0)
-	int getCurrentHeight();
+	@Px @IntRange(from = 0) int getCurrentHeight();
 
 	/**
 	 * Returns the current display metrics of the Android device's screen.
 	 *
 	 * @return Display metrics.
 	 */
-	@NonNull
-	DisplayMetrics getMetrics();
+	@NonNull DisplayMetrics getMetrics();
 
 	/**
 	 * Returns the density of the Android device's screen.
 	 *
 	 * @return One of {@link Screen.ScreenDensity} values or {@link Screen.ScreenDensity#UNKNOWN UNKNOWN}
 	 * if the current screen data are unavailable.
+	 *
 	 * @see #getRawDensity()
 	 */
-	@NonNull
-	ScreenDensity getDensity();
+	@NonNull ScreenDensity getDensity();
 
 	/**
 	 * Returns the raw density of the Android device's screen obtained from the screen metrics.
@@ -577,8 +568,7 @@ public interface Screen {
 	 * @return One of {@link Screen.ScreenType} values or {@link Screen.ScreenType#UNKNOWN UNKNOWN}
 	 * if the current screen data are unavailable.
 	 */
-	@NonNull
-	ScreenType getType();
+	@NonNull ScreenType getType();
 
 	/**
 	 * Returns the default orientation of the Android device's screen.
@@ -599,8 +589,7 @@ public interface Screen {
 	 * {@link #ORIENTATION_BEHIND}, or {@link #ORIENTATION_UNSPECIFIED} if the current screen data
 	 * are unavailable or orientation is unknown.
 	 */
-	@Orientation
-	int getCurrentOrientation();
+	@Orientation int getCurrentOrientation();
 
 	/**
 	 * Returns the current rotation of the Android device's screen.
@@ -608,25 +597,21 @@ public interface Screen {
 	 * @return One of {@link Screen.ScreenRotation} values or {@link Screen.ScreenRotation#UNKNOWN UNKNOWN}
 	 * if the current screen data are unavailable or orientation is unknown.
 	 */
-	@NonNull
-	ScreenRotation getCurrentRotation();
+	@NonNull ScreenRotation getCurrentRotation();
 
 	/**
 	 * Returns the diagonal distance of the Android device's screen.
 	 *
 	 * @return Diagonal distance in the inches.
 	 */
-	@FloatRange(from = 0)
-	float getDiagonalDistanceInInches();
+	@FloatRange(from = 0) float getDiagonalDistanceInInches();
 
 	/**
 	 * Returns the diagonal distance of the Android device's screen.
 	 *
 	 * @return Diagonal distance in the raw pixels.
 	 */
-	@Px
-	@IntRange(from = 0)
-	int getDiagonalDistanceInPixels();
+	@Px @IntRange(from = 0) int getDiagonalDistanceInPixels();
 
 	/**
 	 * Returns the back-light brightness of the Android device's screen for the current application
@@ -637,8 +622,7 @@ public interface Screen {
 	 * application window doesn't have set custom brightness value or the given activity or its window
 	 * is invalid.
 	 */
-	@IntRange(from = -1, to = 100)
-	int getBrightness(@NonNull Activity activity);
+	@IntRange(from = -1, to = 100) int getBrightness(@NonNull Activity activity);
 
 	/**
 	 * Sets the back-light brightness of the Android device's screen. Brightness will be applied only
@@ -658,8 +642,7 @@ public interface Screen {
 	 *
 	 * @return The value of system brightness as an Android user set it in the settings.
 	 */
-	@IntRange(from = 0, to = 100)
-	int getSystemBrightness();
+	@IntRange(from = 0, to = 100) int getSystemBrightness();
 
 	/**
 	 * Requests the specified orientation as orientation of the Android device's screen for the given
@@ -681,8 +664,7 @@ public interface Screen {
 	 * @param activity Currently visible activity of which requested orientation to obtain.
 	 * @return One of the orientation flags specified within this interface.
 	 */
-	@Orientation
-	int getRequestedOrientation(@NonNull Activity activity);
+	@Orientation int getRequestedOrientation(@NonNull Activity activity);
 
 	/**
 	 * Locks orientation of the Android device's screen at the current orientation for the given
@@ -736,8 +718,7 @@ public interface Screen {
 	 * @return Pixel value transformed from the given density pixel value.
 	 * @see #pixelToDP(int)
 	 */
-	@Px
-	int dpToPixel(float dp);
+	@Px int dpToPixel(float dp);
 
 	/**
 	 * Returns the value of density pixel for 1 pixel for the Android device's screen.

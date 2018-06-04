@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
  * Simple utility class specifying API allowing to manage screen of the current Android device.
  *
  * @author Martin Albedinsky
+ * @since 1.0
  */
 public final class ScreenUtils {
 
